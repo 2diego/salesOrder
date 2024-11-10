@@ -18,7 +18,7 @@ function App() {
           <Route path="/Manage" element={<Manage />} />
           <Route path="/Profile" element={<Profile />} />
         </Route>
-        {/* Ruta directa para clientes a través del enlace proporcionado */}
+        {/* Ruta para clientes a través del enlace proporcionado */}
         <Route path="/customer/NewOrder" element={<NewOrder />} />
       </Routes>
     </Router>

@@ -1,0 +1,22 @@
+.btn-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--mainPadding);
+}
+
+.btn-blue{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--mainBlue);
+  color: var(--mainWhite);
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+p {
+  padding: var(--mainPadding);
+}
