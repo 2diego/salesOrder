@@ -3,7 +3,9 @@
   --lightBlue: #4D7099;
   --mainBlack: #0D141C;
   --mainWhite: #F7FAFC;
+  --mainGray: #E8EDF2;
   --mainPadding: 1rem;
+  --mainBlueHover: #0D4A8F;
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

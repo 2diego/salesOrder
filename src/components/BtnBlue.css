@@ -5,7 +5,7 @@
   padding: var(--mainPadding);
 }
 
-.btn-blue{
+/*.btn-blue{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,8 +15,39 @@
   border-radius: 0.75rem;
   font-size: 1rem;
   font-weight: bold;
+  gap: 0.75rem;
 }
 
 p {
   padding: var(--mainPadding);
+}*/
+
+.btn-blue {
+  width: 100%;
+  max-width: 480px;
+  height: 40px;
+  background-color: var(--mainBlue);
+  border-radius: 12px;
+  padding: var(--mainPadding);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--mainWhite);
+}
+
+.btn-blue:hover {
+  background-color: var(--mainBlueHover);
+}
+
+.btn-blue span {
+  color: var(--mainWhite);
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 21px;
 }

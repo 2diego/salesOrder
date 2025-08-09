@@ -1,0 +1,11 @@
+.section-title {
+  padding: 1rem 0rem 2rem;
+}
+
+.section-title h2 {
+  color: #0D141C;
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+}

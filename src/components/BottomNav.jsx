@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { LiaToolsSolid } from 'react-icons/lia';
 import { LuUser2, LuClipboardList, LuFileBarChart } from "react-icons/lu";
 import './BottomNav.css';
 
 const BottomNav = () => {
   const [activeTab, setActiveTab] = useState("Orders");
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -22,41 +21,40 @@ const BottomNav = () => {
     }
   }, [location]);
 
-  const handleNavClick = (tab, route) => {
+  const handleNavClick = (tab) => {
     setActiveTab(tab);
-    navigate(route);
   }
 
   return (
     <div className="bottom-nav">
-      <div
+      <Link to={"/Orders"} style={{ textDecoration: 'none' }}
         className={`nav-item ${activeTab === "Orders" ? "active" : ""}`}
-        onClick={() => handleNavClick("Orders", "/Orders")}
+        onClick={() => handleNavClick("Orders")}
       >
         <LuClipboardList />
         <span>Pedidos</span>
-      </div>
-      <div
+      </Link>
+      <Link to={"/Reports"} style={{ textDecoration: 'none' }}
         className={`nav-item ${activeTab === "Reports" ? "active" : ""}`}
-        onClick={() => handleNavClick("Reports", "/Reports")}
+        onClick={() => handleNavClick("Reports")}
       >
         <LuFileBarChart />
         <span>Reportes</span>
-      </div>
-      <div
+      </Link>
+      <Link to={"/Manage"} style={{ textDecoration: 'none' }}
         className={`nav-item ${activeTab === "Manage" ? "active" : ""}`}
-        onClick={() => handleNavClick("Manage", "/Manage")}
+        onClick={() => handleNavClick("Manage")}
       >
         <LiaToolsSolid  />
         <span>Administrar</span>
-      </div>
-      <div
+      </Link>
+      <Link to={"/Profile"} style={{ textDecoration: 'none' }}
         className={`nav-item ${activeTab === "Profile" ? "active" : ""}`}
-        onClick={() => handleNavClick("Profile", "/Profile")}
+        onClick={() => handleNavClick("Profile")}
       >
         <LuUser2 />
         <span>Perfil</span>
-      </div>
+      </Link>
     </div>
   );
 };
