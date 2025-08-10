@@ -10,13 +10,13 @@ const BottomNav = () => {
 
   useEffect(() => {
     const currentPath = location.pathname;
-    if (currentPath === "/Orders") {
+    if (currentPath.startsWith("/Orders")) {
       setActiveTab("Orders");
-    } else if (currentPath === "/Reports") {
+    } else if (currentPath.startsWith("/Reports")) {
       setActiveTab("Reports");
-    } else if (currentPath === "/Manage") {
+    } else if (currentPath.startsWith("/Manage")) {
       setActiveTab("Manage");
-    } else if (currentPath === "/Profile") {
+    } else if (currentPath.startsWith("/Profile")) {
       setActiveTab("Profile");
     }
   }, [location]);

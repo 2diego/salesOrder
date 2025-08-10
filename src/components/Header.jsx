@@ -1,22 +1,24 @@
 import PropTypes from 'prop-types';
 import './Header.css';
 
-const Header = ({ text, children }) => {
+const Header = ({ title, subtitle, children }) => {
   const [iconIzq, iconDer] = children;
 
   return (
     <div className="header-container">
       <div className="icon-left">{iconIzq}</div>
-      <p className="header-text">
-        {text}
-      </p>
+      <div className="header-text">
+        <span className="title">{title}</span>
+        <span className="subtitle">{subtitle}</span>
+      </div>
       <div className="icon-right">{iconDer}</div>
     </div>
   );
 };
 
 Header.propTypes = {
-  text: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  subtitle: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };
 

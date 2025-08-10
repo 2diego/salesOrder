@@ -9,6 +9,8 @@ import Profile from './pages/Admin/Profile/Profile.jsx';
 import NewOrder from './pages/Customer/NewOrder.jsx';
 import Adminlayout from './layouts/AdminLayout.jsx';
 import OrderHistory from './pages/Admin/Manage/OrderHistory.jsx';
+import Cart from './pages/Customer/Cart.jsx';
+import AdminSellers from './pages/Admin/Manage/AdminSellers.jsx';
 
 const router = createBrowserRouter([
   {
@@ -29,7 +31,13 @@ const router = createBrowserRouter([
       },
       {
         path: "/Manage",
-        element: <Manage />
+        element: <Manage />,
+        children: [
+          {
+            path: "/Manage/AdminSellers",
+            element: <AdminSellers />
+          }
+        ]
       },
       {
         path: "/Profile",
@@ -44,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: "/NewOrder",
     element: <NewOrder />
+  },
+  {
+    path: "/Cart",
+    element: <Cart />
   }
 ]);
 

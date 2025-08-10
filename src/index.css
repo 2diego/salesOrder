@@ -20,3 +20,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
+/* Link expiration text */
+.expiration-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0 1rem;
+  height: 33px;
+  justify-content: center;
+}
+
+.expiration-text span {
+  color: #4D7099;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  line-height: 21px;
+}
