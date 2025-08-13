@@ -8,15 +8,15 @@ import { Link } from "react-router-dom"
 const Cart = () => {
 
 const [products, setProducts] = useState([ // TODO: Buscar productos en la base de datos
-    { id: 1, name: 'Producto 1', quantity: 0 },
-    { id: 2, name: 'Producto 2', quantity: 0 },
-    { id: 3, name: 'Producto 3', quantity: 0 },
-    { id: 4, name: 'Producto 4', quantity: 0 },
-    { id: 5, name: 'Producto 5', quantity: 0 },
-    { id: 6, name: 'Producto 6', quantity: 0 },
+    { id: '1', name: 'Producto 1', quantity: 0 },
+    { id: '2', name: 'Producto 2', quantity: 0 },
+    { id: '3', name: 'Producto 3', quantity: 0 },
+    { id: '4', name: 'Producto 4', quantity: 0 },
+    { id: '5', name: 'Producto 5', quantity: 0 },
+    { id: '6', name: 'Producto 6', quantity: 0 },
   ])
 
-  const updateQuantity = (productId, change) => {
+  const updateQuantity = (productId: string, change: number) => {
     setProducts(prevProducts =>
       prevProducts.map(product =>
         product.id === productId

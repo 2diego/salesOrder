@@ -1,7 +1,13 @@
 import "./FormField.css";
-import PropTypes from "prop-types";
 
-const FormField = ({ label, value, editable = false, onChange }) => {
+interface FormFieldProps {
+  label: string;
+  value: string;
+  editable?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const FormField = ({ label, value, editable = false, onChange }: FormFieldProps) => {
   return (
     <div className="form-field">
       <div className="field-input">
@@ -20,11 +26,6 @@ const FormField = ({ label, value, editable = false, onChange }) => {
   );
 };
 
-FormField.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.string,
-  editable: PropTypes.bool,
-  onChange: PropTypes.func,
-};
+
 
 export default FormField;

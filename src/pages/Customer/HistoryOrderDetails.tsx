@@ -2,14 +2,23 @@ import Header from "../../components/Header";
 import SectionTitle from "../../components/SectionTitle";
 import BtnBlue from "../../components/BtnBlue";
 import { Link } from "react-router-dom";
-import InfoRow from '../../components/InfoRow'
-import { LuClipboardList } from 'react-icons/lu'
+import ProductList from "../../components/ProductList";
 
-const CustomerOrderHistory = () => {
+const HistoryOrderDetails = () => {
+
+  const products = [ // TODO: Buscar productos en la base de datos
+      { id: '1', name: 'Producto 1', quantity: 2 },
+      { id: '2', name: 'Producto 2', quantity: 1 },
+      { id: '3', name: 'Producto 3', quantity: 4 },
+      { id: '4', name: 'Producto 4', quantity: 3 },
+      { id: '5', name: 'Producto 5', quantity: 2 },
+      { id: '6', name: 'Producto 6', quantity: 5 },
+    ]
+
   return (
     <>
             {/* Header */}        
-            <Header title="Historial de pedidos">
+            <Header title="Pedido Nº 00000005" subtitle="12/02/2024">
               <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
               </svg>
@@ -24,43 +33,25 @@ const CustomerOrderHistory = () => {
               <h2>Nombre cliente</h2>
             </SectionTitle>
 
-            <InfoRow
-              columns={[
-                <span key={"date"}>12/02/24</span>,
-                <span key={"orderId"}>Pedido Nº 00000456</span>,
-              ]}
-              actionLabel="Ver detalle"
-              actionIcon={<LuClipboardList />}
-              onActionClick={() => {/* ver detalle */}}
-              onRowClick={() => {/* opcional: abrir detalle */}}
+            {/* Order Details */}
+            <ProductList 
+              products={products}
+              showQuantityControls={false}
+              showExpandArrow={false}
             />
-            <InfoRow
-              columns={[
-                <span key={"date"}>06/02/24</span>,
-                <span key={"orderId"}>Pedido Nº 00000426</span>,
-              ]}
-              actionLabel="Ver detalle"
-              actionIcon={<LuClipboardList />}
-              onActionClick={() => {/* ver detalle */}}
-              onRowClick={() => {/* opcional: abrir detalle */}}
-            />
-            <InfoRow
-              columns={[
-                <span key={"date"}>02/02/24</span>,
-                <span key={"orderId"}>Pedido Nº 00000386</span>,
-              ]}
-              actionLabel="Ver detalle"
-              actionIcon={<LuClipboardList />}
-              onActionClick={() => {/* ver detalle */}}
-              onRowClick={() => {/* opcional: abrir detalle */}}
-            />
+
+
             
             {/* Bottom Actions */}
             <div className="bottom-actions">
-
+              {/* Send Order Button */}
+              <BtnBlue width="100%" height="3rem">
+                <span>Repetir pedido</span>
+              </BtnBlue>
+      
               {/* Back Button */}
               <div style={{ marginBottom: '2rem', width: '100%' }}>
-                <Link to="/NewOrder" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to="/CustomerOrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <BtnBlue width="100%" height="3rem">
                     <span>Volver</span>
                   </BtnBlue>
@@ -76,7 +67,7 @@ const CustomerOrderHistory = () => {
   );
 };
 
-export default CustomerOrderHistory;
+export default HistoryOrderDetails;
 
 
 /* Para OrderHistory (read only):

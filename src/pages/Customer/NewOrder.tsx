@@ -12,14 +12,14 @@ const NewOrder = () => {
   const [activeCategory, setActiveCategory] = useState('Todos')
 
   const [products, setProducts] = useState([ // TODO: Buscar productos en la base de datos
-    { id: 1, name: 'Producto 1', quantity: 0 },
-    { id: 2, name: 'Producto 2', quantity: 0 },
-    { id: 3, name: 'Producto 3', quantity: 0 },
+    { id: '1', name: 'Producto 1', quantity: 0 },
+    { id: '2', name: 'Producto 2', quantity: 0 },
+    { id: '3', name: 'Producto 3', quantity: 0 },
   ])
 
   const categories = ['Todos', 'Categ. 1', 'Categ. 2'] // TODO: Agregar carrusel de categorías y buscar categorías en la base de datos
 
-  const updateQuantity = (productId, change) => {
+  const updateQuantity = (productId: string, change: number) => {
     setProducts(prevProducts =>
       prevProducts.map(product =>
         product.id === productId
@@ -29,7 +29,7 @@ const NewOrder = () => {
     )
   }
 
-  const handleCategoryChange = (category) => {
+  const handleCategoryChange = (category: string) => {
     setActiveCategory(category)
     // TODO: Agregar logica para filtrar productos por categoría
     console.log('Categoría seleccionada:', category)

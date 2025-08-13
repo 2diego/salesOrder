@@ -2,19 +2,19 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import Orders from './pages/Admin/Orders/Orders.jsx';
-import Reports from './pages/Admin/Reports/Reports.jsx';
-import Manage from './pages/Admin/Manage/Manage.jsx';
-import Profile from './pages/Admin/Profile/Profile.jsx';
-import NewOrder from './pages/Customer/NewOrder.jsx';
-import Adminlayout from './layouts/AdminLayout.jsx';
-import OrderHistory from './pages/Admin/Manage/OrderHistory.jsx';
-import Cart from './pages/Customer/Cart.jsx';
-import AdminSellers from './pages/Admin/Manage/AdminSellers.jsx';
-import AdminProducts from './pages/Admin/Manage/AdminProducts.jsx';
-import AdminClients from './pages/Admin/Manage/AdminClients.jsx';
-import CustomerOrderHistory from './pages/Customer/CustomerOrderHistory.jsx';
-import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails.jsx';
+import Orders from './pages/Admin/Orders/Orders';
+import Reports from './pages/Admin/Reports/Reports';
+import Manage from './pages/Admin/Manage/Manage';
+import Profile from './pages/Admin/Profile/Profile';
+import NewOrder from './pages/Customer/NewOrder';
+import Adminlayout from './layouts/AdminLayout';
+import OrderHistory from './pages/Admin/Manage/OrderHistory';
+import Cart from './pages/Customer/Cart';
+import AdminSellers from './pages/Admin/Manage/AdminSellers';
+import AdminProducts from './pages/Admin/Manage/AdminProducts';
+import AdminClients from './pages/Admin/Manage/AdminClients';
+import CustomerOrderHistory from './pages/Customer/CustomerOrderHistory';
+import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails';
 
 const router = createBrowserRouter([
   {
@@ -77,7 +77,10 @@ const router = createBrowserRouter([
   }
 ]);
 
-createRoot(document.getElementById('root')).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Failed to find the root element');
+
+createRoot(rootElement).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>,

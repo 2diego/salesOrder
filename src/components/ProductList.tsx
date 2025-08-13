@@ -1,5 +1,20 @@
 import './ProductList.css'
-import PropTypes from 'prop-types'
+
+interface Product {
+  id: string;
+  name: string;
+  detail?: string;
+  quantity?: number;
+  price?: number;
+}
+
+interface ProductListProps {
+  products: Product[];
+  onQuantityChange?: (productId: string, change: number) => void;
+  showQuantityControls?: boolean;
+  showExpandArrow?: boolean;
+  className?: string;
+}
 
 const ProductList = ({ 
   products, 
@@ -7,8 +22,8 @@ const ProductList = ({
   showQuantityControls = true,
   showExpandArrow = true,
   className = ""
-}) => {
-  const updateQuantity = (productId, change) => {
+}: ProductListProps) => {
+  const updateQuantity = (productId: string, change: number) => {
     if (onQuantityChange) {
       onQuantityChange(productId, change)
     }
@@ -51,7 +66,7 @@ const ProductList = ({
             )}
 
             {/* Alternative display for cart/order details without quantity controls */}
-            {!showQuantityControls && product.quantity > 0 && (
+            {!showQuantityControls && product.quantity && product.quantity > 0 && (
               <div className="product-quantity-info">
                 <span className="quantity-text">{product.quantity}</span>
                 {product.price && (
@@ -75,20 +90,6 @@ const ProductList = ({
   )
 }
 
-ProductList.propTypes = {
-  products: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      detail: PropTypes.string,
-      quantity: PropTypes.number,
-      price: PropTypes.number
-    })
-  ).isRequired,
-  onQuantityChange: PropTypes.func,
-  showQuantityControls: PropTypes.bool,
-  showExpandArrow: PropTypes.bool,
-  className: PropTypes.string
-}
+
 
 export default ProductList

@@ -21,7 +21,7 @@ const BottomNav = () => {
     }
   }, [location]);
 
-  const handleNavClick = (tab) => {
+  const handleNavClick = (tab: string) => {
     setActiveTab(tab);
   }
 

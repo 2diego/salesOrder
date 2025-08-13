@@ -1,8 +1,15 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import './Header.css';
 
-const Header = ({ title, subtitle, children }) => {
-  const [iconIzq, iconDer] = children;
+interface HeaderProps {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}
+
+const Header = ({ title, subtitle, children }: HeaderProps) => {
+  const childrenArray = React.Children.toArray(children);
+  const [iconIzq, iconDer] = childrenArray;
 
   return (
     <div className="header-container">
@@ -16,10 +23,6 @@ const Header = ({ title, subtitle, children }) => {
   );
 };
 
-Header.propTypes = {
-  title: PropTypes.string.isRequired,
-  subtitle: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-};
+
 
 export default Header;

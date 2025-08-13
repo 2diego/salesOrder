@@ -1,8 +1,11 @@
-import propTypes from 'prop-types';
 import './NavTo.css';
 import { LuArrowRight } from "react-icons/lu";
 
-const NavTo = ({text}) => {
+interface NavToProps {
+  text: string;
+}
+
+const NavTo = ({text}: NavToProps) => {
   return (
     <div className="navto-container">
       <p>{text}</p>
@@ -11,8 +14,6 @@ const NavTo = ({text}) => {
   )
 };
 
-NavTo.propTypes = {
-  text: propTypes.string.isRequired,
-};
+
 
 export default NavTo;

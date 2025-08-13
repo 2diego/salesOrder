@@ -1,5 +1,13 @@
-import PropTypes from 'prop-types'
 import './InfoRow.css'
+
+interface InfoRowProps {
+  columns: React.ReactNode[];
+  actionLabel?: string;
+  actionIcon?: React.ReactNode;
+  onActionClick?: () => void;
+  onRowClick?: () => void;
+  className?: string;
+}
 
 const InfoRow = ({
   columns,
@@ -8,13 +16,13 @@ const InfoRow = ({
   onActionClick,
   onRowClick,
   className = ''
-}) => {
+}: InfoRowProps) => {
   const totalColumns = columns.length + (actionLabel ? 1 : 0)
 
   return (
     <div
       className={`info-row ${onRowClick ? 'clickable' : ''} ${className}`}
-      style={{ '--columns': totalColumns }}
+      style={{ '--columns': totalColumns } as React.CSSProperties}
       onClick={onRowClick}
     >
       {columns.map((content, idx) => (
@@ -37,14 +45,7 @@ const InfoRow = ({
   )
 }
 
-InfoRow.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.node).isRequired,
-  actionLabel: PropTypes.string,
-  actionIcon: PropTypes.node,
-  onActionClick: PropTypes.func,
-  onRowClick: PropTypes.func,
-  className: PropTypes.string
-}
+
 
 export default InfoRow
 

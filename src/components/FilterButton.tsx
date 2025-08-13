@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import propTypes from 'prop-types';
 import './FilterButton.css';
 
 /**
@@ -32,6 +31,15 @@ import './FilterButton.css';
  *   showArrows={false}
  * />
  */
+interface FilterButtonProps {
+  categories?: string[];
+  onCategoryChange?: (category: string) => void;
+  showArrows?: boolean;
+  className?: string;
+  activeCategory?: string;
+  onActiveCategoryChange?: (category: string) => void;
+}
+
 const FilterButton = ({ 
   categories = ['Todos'], 
   onCategoryChange, 
@@ -39,21 +47,21 @@ const FilterButton = ({
   className = '',
   activeCategory: externalActiveCategory,
   onActiveCategoryChange 
-}) => {
+}: FilterButtonProps) => {
   const [internalActiveCategory, setInternalActiveCategory] = useState('Todos');
   
   // Use external state if provided, otherwise use internal state
   const activeCategory = externalActiveCategory !== undefined ? externalActiveCategory : internalActiveCategory;
   const setActiveCategory = onActiveCategoryChange || setInternalActiveCategory;
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     if (onCategoryChange) {
       onCategoryChange(category);
     }
   };
 
-  const handleArrowClick = (direction) => {
+  const handleArrowClick = (direction: 'left' | 'right') => {
     const currentIndex = categories.indexOf(activeCategory);
     let newIndex;
     
@@ -104,19 +112,6 @@ const FilterButton = ({
   );
 };
 
-FilterButton.propTypes = {
-  /** Array of category names to display */
-  categories: propTypes.arrayOf(propTypes.string),
-  /** Callback function called when a category is selected */
-  onCategoryChange: propTypes.func,
-  /** Whether to show navigation arrows (default: true) */
-  showArrows: propTypes.bool,
-  /** Additional CSS classes to apply to the container */
-  className: propTypes.string,
-  /** Currently active category (for controlled component) */
-  activeCategory: propTypes.string,
-  /** Callback function to update active category (for controlled component) */
-  onActiveCategoryChange: propTypes.func
-};
+
 
 export default FilterButton;

@@ -1,40 +1,40 @@
 import Header from "../../../components/Header"
+import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import NavTo from "../../../components/NavTo";
 import SectionTitle from "../../../components/SectionTitle";
-import { LuFileBarChart } from "react-icons/lu";
 
-const Reports = () => {
+const Manage = () => {
   return (
     <>
       {/* Header */}  
-      <Header title="Nombre usuario">
+      <Header title="Nombre usuario" subtitle="Admin">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
         </svg>
-        <LuFileBarChart />
+        <LiaToolsSolid fontSize={"1.75rem"}/>
       </Header>
 
       {/* Manage Title */}
       <SectionTitle>
-        <h2>Reportes</h2>
+        <h2>Administrar</h2>
       </SectionTitle>
 
       {/* Manage Options */}
-      <Link to="/Reports" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Estadisticas de ventas" />
-      </Link>
       <Link to="/OrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Historial de pedidos" />
       </Link>
-      <Link to="/Reports" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Reporte" />
+      <Link to="/Manage/AdminSellers" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Administrar Vendedores" />
       </Link>
-      <Link to="/Reports" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Reporte" />
+      <Link to="/Manage/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Administrar Productos" />
+      </Link>
+      <Link to="/Manage/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Administrar Clientes" />
       </Link>
     </>
   )
 }
 
-export default Reports
+export default Manage
