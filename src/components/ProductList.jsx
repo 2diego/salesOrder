@@ -53,7 +53,7 @@ const ProductList = ({
             {/* Alternative display for cart/order details without quantity controls */}
             {!showQuantityControls && product.quantity > 0 && (
               <div className="product-quantity-info">
-                <span className="quantity-text">Cantidad: {product.quantity}</span>
+                <span className="quantity-text">{product.quantity}</span>
                 {product.price && (
                   <span className="price-text">${product.price}</span>
                 )}

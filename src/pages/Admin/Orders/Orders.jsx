@@ -4,6 +4,7 @@ import NavTo from "../../../components/NavTo";
 import { LuPlus, LuClipboardList } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../components/SectionTitle";
+import InfoRow from '../../../components/InfoRow'
 
 const Orders = () => {
 
@@ -21,16 +22,68 @@ const Orders = () => {
       <SectionTitle>
         <h2>Pedidos sin validar</h2>
       </SectionTitle>
+      
+      <InfoRow
+        columns={[
+          <span key={'date'}>12/02/2024</span>,
+          <span key={'client-name'}>Juan Perez</span>,
+        ]}
+        actionLabel="Validar"
+        actionIcon={<LuClipboardList />}
+        onActionClick={() => {/* validar */}}
+      />
+      <InfoRow
+        columns={[
+          <span key={'date'}>12/02/2024</span>,
+          <span key={'client-name'}>Ruben Gonzalez</span>,
+        ]}
+        actionLabel="Validar"
+        actionIcon={<LuClipboardList />}
+        onActionClick={() => {/* validar */}}
+      />
+      <InfoRow
+        columns={[
+          <span key={'date'}>11/02/2024</span>,
+          <span key={'client-name'}>Maria Gimenez</span>,
+        ]}
+        actionLabel="Validar"
+        actionIcon={<LuClipboardList />}
+        onActionClick={() => {/* validar */}}
+      />
+      <InfoRow
+        columns={[
+          <span key={'date'}>10/02/2024</span>,
+          <span key={'client-name'}>Miguel Martinez</span>,
+        ]}
+        actionLabel="Validar"
+        actionIcon={<LuClipboardList />}
+        onActionClick={() => {/* validar */}}
+      />
 
-      {/* Orders History */}
-      <Link to="/OrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Historial de pedidos" />
-      </Link>
 
-      {/* Generate Link Button */}
-      <BtnBlue width="100%" height="3rem">
-        <LuPlus style={{ fontSize: "1.5rem" }} /><span>Generar link</span>
-      </BtnBlue>
+      {/* Bottom Actions Block */}
+      <div className="bottom-actions-block" style={{
+        position: 'fixed',
+        bottom: 84,
+        left: 0,
+        right: 0,
+        background: 'white',
+        borderTop: '1px solid #E8EDF2',
+        padding: '1rem',
+        zIndex: 999
+      }}>
+        {/* Orders History */}
+        <div>
+          <Link to="/OrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <NavTo text="Historial de pedidos" />
+          </Link>
+        </div>
+
+        {/* Generate Link Button */}
+        <BtnBlue width="100%" height="3rem">
+          <LuPlus style={{ fontSize: "1.5rem" }} /><span>Generar link</span>
+        </BtnBlue>
+      </div>
     </>
   )
 }

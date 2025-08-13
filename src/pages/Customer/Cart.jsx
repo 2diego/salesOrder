@@ -3,6 +3,7 @@ import SectionTitle from "../../components/SectionTitle"
 import ProductList from "../../components/ProductList"
 import BtnBlue from "../../components/BtnBlue"
 import { useState } from "react"
+import { Link } from "react-router-dom"
 
 const Cart = () => {
 
@@ -66,21 +67,26 @@ const [products, setProducts] = useState([ // TODO: Buscar productos en la base 
         showExpandArrow={true}
       />
 
-      {/* Button Send Order */}
-      <div style={{ justifySelf: 'self-end' }}>
+      {/* Bottom Actions */}
+      <div className="bottom-actions">
+        {/* Send Order Button */}
         <BtnBlue width="100%" height="3rem">
           <span>Enviar pedido</span>
         </BtnBlue>
-      </div>
 
-      {/* Button Back */}
-      <BtnBlue width="100%" height="3rem">
-        <span>Volver</span>
-      </BtnBlue>
+        {/* Back Button */}
+        <div style={{ marginBottom: '2rem', width: '100%' }}>
+          <Link to="/NewOrder" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <BtnBlue width="100%" height="3rem">
+              <span>Volver</span>
+            </BtnBlue>
+          </Link>
+        </div>
 
-      {/* Footer Text */}
-      <div className="expiration-text">
-        <span>Este enlace caduca en 24 horas</span>
+        {/* Footer Text */}
+        <div className="expiration-text">
+          <span>Este enlace caduca en 24 horas</span>
+        </div>
       </div>
     </>
   );

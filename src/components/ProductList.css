@@ -100,16 +100,14 @@
 .product-quantity-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.25rem;
+  width: 2rem;
 }
 
 .quantity-text {
-  color: #0D141C;
-  font-family: 'Work Sans', sans-serif;
-  font-size: 0.875rem;
+  font-size: 1.25rem;
   font-weight: 500;
-  line-height: 21px;
 }
 
 .price-text {

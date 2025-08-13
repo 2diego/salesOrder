@@ -11,6 +11,10 @@ import Adminlayout from './layouts/AdminLayout.jsx';
 import OrderHistory from './pages/Admin/Manage/OrderHistory.jsx';
 import Cart from './pages/Customer/Cart.jsx';
 import AdminSellers from './pages/Admin/Manage/AdminSellers.jsx';
+import AdminProducts from './pages/Admin/Manage/AdminProducts.jsx';
+import AdminClients from './pages/Admin/Manage/AdminClients.jsx';
+import CustomerOrderHistory from './pages/Customer/CustomerOrderHistory.jsx';
+import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails.jsx';
 
 const router = createBrowserRouter([
   {
@@ -32,12 +36,6 @@ const router = createBrowserRouter([
       {
         path: "/Manage",
         element: <Manage />,
-        children: [
-          {
-            path: "/Manage/AdminSellers",
-            element: <AdminSellers />
-          }
-        ]
       },
       {
         path: "/Profile",
@@ -46,6 +44,18 @@ const router = createBrowserRouter([
       {
         path: "/OrderHistory",
         element: <OrderHistory />
+      },
+      {
+        path: "/Manage/AdminSellers",
+        element: <AdminSellers />
+      },
+      {
+        path: "/Manage/AdminProducts",
+        element: <AdminProducts />
+      },
+      {
+        path: "/Manage/AdminClients",
+        element: <AdminClients />
       }
     ]
   },
@@ -56,6 +66,14 @@ const router = createBrowserRouter([
   {
     path: "/Cart",
     element: <Cart />
+  },
+  {
+    path: "/CustomerOrderHistory",
+    element: <CustomerOrderHistory />
+  },
+  {
+    path: "/HistoryOrderDetails",
+    element: <HistoryOrderDetails />
   }
 ]);
 

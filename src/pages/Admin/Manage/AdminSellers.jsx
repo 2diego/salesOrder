@@ -18,26 +18,20 @@ const AdminSellers = () => {
 
       {/* Manage Title */}
       <SectionTitle>
-        <h2>Administrar</h2>
+        <h2>Administrar vendedores</h2>
       </SectionTitle>
 
       {/* Manage Options */}
-      <Link to="/OrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Historial de pedidos" />
+      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Ver Vendedores" />
       </Link>
-      <Link to="/AdminSellers" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Administrar Vendedores" />
-      </Link>
-      <Link to="/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Administrar Productos" />
-      </Link>
-      <Link to="/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Administrar Clientes" />
+      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Agregar Vendedores" />
       </Link>
 
       {/* Back Button */}
       <Link to="/Manage" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <BtnBlue width="100%" height="3rem">
+        <BtnBlue width="100%" height="3rem" isBackButton="true">
           <span>Volver</span>
         </BtnBlue>
       </Link>

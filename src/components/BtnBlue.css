@@ -5,6 +5,15 @@
   padding: var(--mainPadding);
 }
 
+/* Estilo para botón "Volver" cuando no hay BottomNav */
+.btn-back {
+  position: fixed;
+  bottom: 80px; /* Posicionado arriba del BottomNav o mensaje de caducidad */
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
 /*.btn-blue{
   display: flex;
   justify-content: center;

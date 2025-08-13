@@ -27,10 +27,10 @@ const Manage = () => {
       <Link to="/Manage/AdminSellers" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Administrar Vendedores" />
       </Link>
-      <Link to="/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Administrar Productos" />
       </Link>
-      <Link to="/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Administrar Clientes" />
       </Link>
     </>

@@ -1,7 +1,35 @@
+import Header from "../../../components/Header"
+import { Link } from "react-router-dom";
+import NavTo from "../../../components/NavTo";
+import SectionTitle from "../../../components/SectionTitle";
+import { LuUser2 } from "react-icons/lu";
+
 const Profile = () => {
   return (
     <>
-      <h1>Profile</h1>
+      {/* Header */}  
+      <Header title="Nombre usuario">
+        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+        <LuUser2 />
+      </Header>
+
+      {/* Manage Title */}
+      <SectionTitle>
+        <h2>Perfil de usuario</h2>
+      </SectionTitle>
+
+      {/* Manage Options */}
+      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Modificar nombre" />
+      </Link>
+      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Modificar email" />
+      </Link>
+      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Modificar contraseña" />
+      </Link>
     </>
   )
 }
