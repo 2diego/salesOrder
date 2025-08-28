@@ -8,7 +8,7 @@ export const databaseConfig: TypeOrmModuleOptions = {
   password: 'Diego35415036',
   database: 'app-pedidos',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: true, // Solo en desarrollo
+  synchronize: true, // Solo en desarrollo, en produccion hay que usar migraciones
   logging: true,
   charset: 'utf8mb4',
   timezone: 'local',

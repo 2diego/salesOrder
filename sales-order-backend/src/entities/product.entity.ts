@@ -13,8 +13,17 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price: number;
+
   @Column({ name: 'category_id' })
   categoryId: number;
+
+  @Column({ unique: true, nullable: true })
+  sku: string;
+
+  @Column({ type: 'int', default: 0 })
+  stock: number;
 
   @Column({ name: 'is_active', default: true })
   isActive: boolean;

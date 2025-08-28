@@ -15,20 +15,26 @@ export class Client {
   @Column()
   phone: string;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
-  @Column()
+  @Column({ nullable: true })
   city: string;
 
-  @Column()
+  @Column({ nullable: true })
   state: string;
 
-  @Column({ name: 'postal_code' })
+  @Column({ name: 'postal_code', nullable: true })
   postalCode: string;
+
+  @Column({ nullable: true })
+  company: string;
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
