@@ -6,6 +6,7 @@ export class CreateClientDTO {
   name: string;
 
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @IsString()
@@ -13,16 +14,16 @@ export class CreateClientDTO {
   phone: string;
 
   @IsString()
-  @IsOptional()
-  address?: string;
+  @IsNotEmpty()
+  address: string;
 
   @IsString()
-  @IsOptional()
-  city?: string;
+  @IsNotEmpty()
+  city: string;
 
   @IsString()
-  @IsOptional()
-  state?: string;
+  @IsNotEmpty()
+  state: string;
 
   @IsString()
   @IsOptional()

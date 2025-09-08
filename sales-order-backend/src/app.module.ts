@@ -9,6 +9,10 @@ import { UsersModule } from './modules/users/users.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
 import { ClientsModule } from './modules/clients/clients.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { OrdersItemsModule } from './modules/orders-items/orders-items.module';
+import { OrdersLinksModule } from './modules/orders-links/orders-links.module';
+import { OrdersValidationsModule } from './modules/orders-validations/orders-validations.module';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { ClientsModule } from './modules/clients/clients.module';
     CategoriesModule,
     ProductsModule,
     ClientsModule,
+    OrdersModule,
+    OrdersItemsModule,
+    OrdersLinksModule,
+    OrdersValidationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,7 +2,7 @@ import Header from "../../../components/Header"
 import { Link } from "react-router-dom";
 import NavTo from "../../../components/NavTo";
 import SectionTitle from "../../../components/SectionTitle";
-import { LuFileBarChart } from "react-icons/lu";
+import { LuFileChartColumnIncreasing } from "react-icons/lu";
 
 const Reports = () => {
   return (
@@ -12,7 +12,7 @@ const Reports = () => {
         <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
         </svg>
-        <LuFileBarChart />
+        <LuFileChartColumnIncreasing />
       </Header>
 
       {/* Manage Title */}

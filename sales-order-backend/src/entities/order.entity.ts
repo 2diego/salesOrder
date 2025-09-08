@@ -35,11 +35,6 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @Column({ name: 'delivery_date', type: 'date', nullable: true })
-  deliveryDate: Date;
-
-  @Column({ name: 'expires_at', type: 'timestamp', nullable: true })
-  expiresAt: Date;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

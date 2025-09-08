@@ -66,19 +66,23 @@ export class ClientsService {
   async remove(id: number): Promise<{ message: string }> {
     const client = await this.findOne(id);
     
-    // Verificar si hay órdenes usando este cliente
+    // Verificar si hay órdenes usando este cliente (solo pendientes?)
     const ordersCount = await this.clientRepository
       .createQueryBuilder('client')
       .leftJoin('client.orders', 'order')
       .where('client.id = :id', { id })
+      //.andWhere('order.status = :status', { status: 'PENDING' })
       .getCount();
 
     if (ordersCount > 0) {
       throw new ConflictException('Cannot delete client that has orders');
     }
 
-    await this.clientRepository.remove(client);
-    
+    await this.clientRepository.remove(client); //Eliminar o desactivar? Si se elimina hay que eliminar ordenes asociadas?
+    // desactivar:
+    // client.isActive = false;
+    // await this.clientRepository.save(client);
+
     return { message: `Client "${client.name}" has been deleted` };
   }
 

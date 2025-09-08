@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { LiaToolsSolid } from 'react-icons/lia';
-import { LuUser2, LuClipboardList, LuFileBarChart } from "react-icons/lu";
+import { LuUser, LuClipboardList, LuFileChartColumnIncreasing } from "react-icons/lu";
 import './BottomNav.css';
 
 const BottomNav = () => {
@@ -38,7 +38,7 @@ const BottomNav = () => {
         className={`nav-item ${activeTab === "Reports" ? "active" : ""}`}
         onClick={() => handleNavClick("Reports")}
       >
-        <LuFileBarChart />
+        <LuFileChartColumnIncreasing />
         <span>Reportes</span>
       </Link>
       <Link to={"/Manage"} style={{ textDecoration: 'none' }}
@@ -52,7 +52,7 @@ const BottomNav = () => {
         className={`nav-item ${activeTab === "Profile" ? "active" : ""}`}
         onClick={() => handleNavClick("Profile")}
       >
-        <LuUser2 />
+        <LuUser />
         <span>Perfil</span>
       </Link>
     </div>

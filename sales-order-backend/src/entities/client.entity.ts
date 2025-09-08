@@ -15,13 +15,13 @@ export class Client {
   @Column()
   phone: string;
 
-  @Column({ nullable: true })
+  @Column()
   address: string;
 
-  @Column({ nullable: true })
+  @Column()
   city: string;
 
-  @Column({ nullable: true })
+  @Column()
   state: string;
 
   @Column({ name: 'postal_code', nullable: true })
