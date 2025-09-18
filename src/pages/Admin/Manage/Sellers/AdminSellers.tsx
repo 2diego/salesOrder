@@ -1,11 +1,11 @@
-import Header from "../../../components/Header"
+import Header from "../../../../components/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
-import NavTo from "../../../components/NavTo";
-import SectionTitle from "../../../components/SectionTitle";
-import BtnBlue from "../../../components/BtnBlue";
+import NavTo from "../../../../components/NavTo";
+import SectionTitle from "../../../../components/SectionTitle";
+import BtnBlue from "../../../../components/BtnBlue";
 
-const AdminProducts = () => {
+const AdminSellers = () => {
   return (
     <>
       {/* Header */}  
@@ -18,15 +18,15 @@ const AdminProducts = () => {
 
       {/* Manage Title */}
       <SectionTitle>
-        <h2>Administrar productos</h2>
+        <h2>Administrar vendedores</h2>
       </SectionTitle>
 
       {/* Manage Options */}
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Ver Productos" />
+      <Link to="/Manage/SellersList" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Ver Vendedores" />
       </Link>
       <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Agregar Productos" />
+        <NavTo text="Agregar Vendedores" />
       </Link>
 
       {/* Back Button */}
@@ -39,4 +39,4 @@ const AdminProducts = () => {
   )
 }
 
-export default AdminProducts
+export default AdminSellers

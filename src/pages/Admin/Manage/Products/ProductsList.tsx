@@ -7,7 +7,7 @@ import SearchBar from "../../../../components/SearchBar";
 import InfoRow from "../../../../components/InfoRow";
 import { LuClipboardList, LuPlus } from 'react-icons/lu';
 
-const ClientsList = () => {
+const ProductsList = () => {
   return (
     <>
       {/* Header */}  
@@ -21,10 +21,10 @@ const ClientsList = () => {
       {/* Title */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <SectionTitle>
-          <h2>Clientes</h2>
+          <h2>Productos</h2>
         </SectionTitle>
         <BtnBlue width="3rem" height="3rem" borderRadius="24px">
-          <Link to="/Manage/AdminClients/AddClient" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/Manage/AdminProducts/AddProduct" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span><LuPlus style={{ fontSize: "2rem" }} /></span>
           </Link>
         </BtnBlue>
@@ -32,31 +32,43 @@ const ClientsList = () => {
 
 
       { /* Search Bar */ }
-      <SearchBar placeholder="Buscar clientes" />
+      <SearchBar placeholder="Buscar productos" />
 
-      { /* Clients List */ }
-        <InfoRow className="row-header"
-          columns={[
-            <span key={'name'}>Cliente</span>,
-            <span key={'id'}>Código</span>,
-            <span key={'localidad'}>Localidad</span>,
-            <span key={'direccion'}>Dirección</span>,
-          ]}
-          actionIcon={<LuClipboardList />}
-        />
-        <InfoRow
+      { /* Products List */ }
+      <InfoRow className="row-header"
         columns={[
-          <span key={'client'}>Juan Pérez</span>,
-          <span key={'id'}>00000456</span>,
-          <span key={'localidad'}>Olavarría</span>,
-          <span key={'direccion'}>Colon 123</span>,
+          <span key={'id'}>Código</span>,
+          <span key={'description'}>Descripción</span>
+        ]}
+        actionIcon={<LuClipboardList />}
+      />
+      <InfoRow
+      columns={[
+        <span key={'id'}>100</span>,
+        <span key={'description'}>Sulleg Extra Blanco 12x4x30</span>
+      ]}
+      actionLabel="Editar"
+      actionIcon={<LuClipboardList />}
+      /> 
+      <InfoRow
+      columns={[
+        <span key={'id'}>900</span>,
+        <span key={'description'}>Elegante 4x120m</span>
+      ]}
+      actionLabel="Editar"
+      actionIcon={<LuClipboardList />}
+      /> 
+      <InfoRow
+        columns={[
+          <span key={'id'}>904</span>,
+          <span key={'description'}>Elegante 6x30m S/H</span>
         ]}
         actionLabel="Editar"
         actionIcon={<LuClipboardList />}
       /> 
 
       {/* Back Button */}
-      <Link to="/Manage/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
         <BtnBlue width="100%" height="3rem" isBackButton={true}>
           <span>Volver</span>
         </BtnBlue>
@@ -65,4 +77,4 @@ const ClientsList = () => {
   )
 };
 
-export default ClientsList;
+export default ProductsList;

@@ -10,12 +10,14 @@ import NewOrder from './pages/Customer/NewOrder';
 import Adminlayout from './layouts/AdminLayout';
 import OrderHistory from './pages/Admin/Manage/OrderHistory';
 import Cart from './pages/Customer/Cart';
-import AdminSellers from './pages/Admin/Manage/AdminSellers';
-import AdminProducts from './pages/Admin/Manage/AdminProducts';
+import AdminSellers from './pages/Admin/Manage/Sellers/AdminSellers';
+import AdminProducts from './pages/Admin/Manage/Products/AdminProducts';
 import AdminClients from './pages/Admin/Manage/Clients/AdminClients';
 import CustomerOrderHistory from './pages/Customer/CustomerOrderHistory';
 import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails';
 import ClientsList from './pages/Admin/Manage/Clients/ClientsList';
+import ProductsList from './pages/Admin/Manage/Products/ProductsList';
+import SellersList from './pages/Admin/Manage/Sellers/SellersList';
 
 const router = createBrowserRouter([
   {
@@ -61,6 +63,14 @@ const router = createBrowserRouter([
       {
         path: "/Manage/ClientsList",
         element: <ClientsList />
+      },
+      {
+        path: "/Manage/ProductsList",
+        element: <ProductsList />
+      },
+      {
+        path: "/Manage/SellersList",
+        element: <SellersList />
       }
     ]
   },

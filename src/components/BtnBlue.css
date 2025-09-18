@@ -36,7 +36,6 @@ p {
   max-width: 480px;
   height: 40px;
   background-color: var(--mainBlue);
-  border-radius: 12px;
   padding: var(--mainPadding);
   display: flex;
   align-items: center;
