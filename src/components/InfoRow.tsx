@@ -17,7 +17,7 @@ const InfoRow = ({
   onRowClick,
   className = ''
 }: InfoRowProps) => {
-  const totalColumns = columns.length + (actionLabel ? 1 : 0)
+  const totalColumns = columns.length + (actionLabel || actionIcon ? 1 : 0)
 
   return (
     <div
@@ -34,10 +34,10 @@ const InfoRow = ({
       {actionLabel && (
         <div className="info-cell action-cell">
           <button type="button" className="row-action" onClick={(e) => { e.stopPropagation(); onActionClick && onActionClick() }}>
-            <span>{actionLabel}</span>
             {actionIcon && (
               <span className="action-icon">{actionIcon}</span>
             )}
+            <span>{actionLabel}</span>
           </button>
         </div>
       )}

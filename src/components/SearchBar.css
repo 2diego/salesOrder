@@ -1,0 +1,16 @@
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 24px;
+  padding: 8px;
+  background: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.search-bar {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 4px 8px;
+}

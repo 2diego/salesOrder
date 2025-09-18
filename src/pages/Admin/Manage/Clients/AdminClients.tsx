@@ -1,9 +1,9 @@
-import Header from "../../../components/Header"
+import Header from "../../../../components/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
-import NavTo from "../../../components/NavTo";
-import SectionTitle from "../../../components/SectionTitle";
-import BtnBlue from "../../../components/BtnBlue";
+import NavTo from "../../../../components/NavTo";
+import SectionTitle from "../../../../components/SectionTitle";
+import BtnBlue from "../../../../components/BtnBlue";
 
 const AdminClients = () => {
   return (
@@ -22,7 +22,7 @@ const AdminClients = () => {
       </SectionTitle>
 
       {/* Manage Options */}
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/ClientsList" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Ver Clientes" />
       </Link>
       <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>

@@ -28,7 +28,7 @@ const Orders = () => {
           <span key={'date'}>12/02/2024</span>,
           <span key={'client-name'}>Juan Perez</span>,
         ]}
-        actionLabel="Validar"
+        actionLabel="Ver pedido"
         actionIcon={<LuClipboardList />}
         onActionClick={() => {/* validar */}}
       />
@@ -37,7 +37,7 @@ const Orders = () => {
           <span key={'date'}>12/02/2024</span>,
           <span key={'client-name'}>Ruben Gonzalez</span>,
         ]}
-        actionLabel="Validar"
+        actionLabel="Ver pedido"
         actionIcon={<LuClipboardList />}
         onActionClick={() => {/* validar */}}
       />
@@ -46,7 +46,7 @@ const Orders = () => {
           <span key={'date'}>11/02/2024</span>,
           <span key={'client-name'}>Maria Gimenez</span>,
         ]}
-        actionLabel="Validar"
+        actionLabel="Ver pedido"
         actionIcon={<LuClipboardList />}
         onActionClick={() => {/* validar */}}
       />
@@ -55,7 +55,7 @@ const Orders = () => {
           <span key={'date'}>10/02/2024</span>,
           <span key={'client-name'}>Miguel Martinez</span>,
         ]}
-        actionLabel="Validar"
+        actionLabel="Ver pedido"
         actionIcon={<LuClipboardList />}
         onActionClick={() => {/* validar */}}
       />

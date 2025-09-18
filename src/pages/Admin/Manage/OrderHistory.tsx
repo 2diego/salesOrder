@@ -23,36 +23,33 @@ const OrderHistory = () => {
       </SectionTitle>
 
       {/* Order History Options */}
-      <div style={{ marginBottom: '1.2rem !important' }}>
-      <InfoRow
+      <InfoRow className="row-header"
         columns={[
           <span key={'date'}>Fecha</span>,
           <span key={'id'}>Nro de pedido</span>,
           <span key={'client'}>Cliente</span>,
           <span key={'status'}>Estado</span>,
         ]}
+        actionIcon={<LuClipboardList />}
+      />
+      <InfoRow
+        columns={[
+          <span key={'date'}>12/02/24</span>,
+          <span key={'id'}>00000456</span>,
+          <span key={'client'}>Juan Pérez</span>,
+          <span key={'status'} style={{ color: '#8d2121ff', fontWeight: 'bold' }}>S/V</span>,
+        ]}
         actionLabel="Ver más"
         actionIcon={<LuClipboardList />}
       />
-      </div>
       <InfoRow
         columns={[
           <span key={'date'}>12/02/24</span>,
           <span key={'id'}>00000456</span>,
           <span key={'client'}>Juan Pérez</span>,
-          <span key={'status'}>S/V</span>,
+          <span key={'status'} style={{ color: '#3c9234ff', fontWeight: 'bold' }}>V</span>,
         ]}
-        actionLabel="Ver detalle"
-        actionIcon={<LuClipboardList />}
-      />
-      <InfoRow
-        columns={[
-          <span key={'date'}>12/02/24</span>,
-          <span key={'id'}>00000456</span>,
-          <span key={'client'}>Juan Pérez</span>,
-          <span key={'status'}>V</span>,
-        ]}
-        actionLabel="Ver detalle"
+        actionLabel="Ver más"
         actionIcon={<LuClipboardList />}
       />
 

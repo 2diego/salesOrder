@@ -12,9 +12,10 @@ import OrderHistory from './pages/Admin/Manage/OrderHistory';
 import Cart from './pages/Customer/Cart';
 import AdminSellers from './pages/Admin/Manage/AdminSellers';
 import AdminProducts from './pages/Admin/Manage/AdminProducts';
-import AdminClients from './pages/Admin/Manage/AdminClients';
+import AdminClients from './pages/Admin/Manage/Clients/AdminClients';
 import CustomerOrderHistory from './pages/Customer/CustomerOrderHistory';
 import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails';
+import ClientsList from './pages/Admin/Manage/Clients/ClientsList';
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "/Manage/AdminClients",
         element: <AdminClients />
+      },
+      {
+        path: "/Manage/ClientsList",
+        element: <ClientsList />
       }
     ]
   },
