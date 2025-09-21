@@ -24,7 +24,7 @@ const ProductsList = () => {
           <h2>Productos</h2>
         </SectionTitle>
         <BtnBlue width="3rem" height="3rem" borderRadius="24px">
-          <Link to="/Manage/AdminProducts/AddProduct" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/Manage/AddProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span><LuPlus style={{ fontSize: "2rem" }} /></span>
           </Link>
         </BtnBlue>

@@ -18,6 +18,9 @@ import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails';
 import ClientsList from './pages/Admin/Manage/Clients/ClientsList';
 import ProductsList from './pages/Admin/Manage/Products/ProductsList';
 import SellersList from './pages/Admin/Manage/Sellers/SellersList';
+import AddClients from './pages/Admin/Manage/Clients/AddClients';
+import AddProducts from './pages/Admin/Manage/Products/AddProducts';
+import AddSellers from './pages/Admin/Manage/Sellers/AddSellers';
 
 const router = createBrowserRouter([
   {
@@ -71,6 +74,18 @@ const router = createBrowserRouter([
       {
         path: "/Manage/SellersList",
         element: <SellersList />
+      },
+      {
+        path: "/Manage/AddClients",
+        element: <AddClients />
+      },
+      {
+        path: "/Manage/AddProducts",
+        element: <AddProducts />
+      },
+      {
+        path: "/Manage/AddSellers",
+        element: <AddSellers />
       }
     ]
   },

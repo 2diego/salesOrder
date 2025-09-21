@@ -25,7 +25,7 @@ const AdminProducts = () => {
       <Link to="/Manage/ProductsList" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Ver Productos" />
       </Link>
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/AddProducts" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Agregar Productos" />
       </Link>
 

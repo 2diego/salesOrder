@@ -24,7 +24,7 @@ const SellersList = () => {
           <h2>Vendedores</h2>
         </SectionTitle>
         <BtnBlue width="3rem" height="3rem" borderRadius="24px">
-          <Link to="/Manage/AdminSellers/AddSeller" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/Manage/AddSellers" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span><LuPlus style={{ fontSize: "2rem" }} /></span>
           </Link>
         </BtnBlue>

@@ -25,7 +25,7 @@ const AdminClients = () => {
       <Link to="/Manage/ClientsList" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Ver Clientes" />
       </Link>
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/AddClients" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Agregar Clientes" />
       </Link>
 

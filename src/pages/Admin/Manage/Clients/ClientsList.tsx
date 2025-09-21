@@ -24,7 +24,7 @@ const ClientsList = () => {
           <h2>Clientes</h2>
         </SectionTitle>
         <BtnBlue width="3rem" height="3rem" borderRadius="24px">
-          <Link to="/Manage/AdminClients/AddClient" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/Manage/AddClients" style={{ textDecoration: 'none', color: 'inherit' }}>
             <span><LuPlus style={{ fontSize: "2rem" }} /></span>
           </Link>
         </BtnBlue>

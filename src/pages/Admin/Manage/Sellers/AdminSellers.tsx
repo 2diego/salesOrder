@@ -25,7 +25,7 @@ const AdminSellers = () => {
       <Link to="/Manage/SellersList" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Ver Vendedores" />
       </Link>
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Manage/AddSellers" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Agregar Vendedores" />
       </Link>
 
