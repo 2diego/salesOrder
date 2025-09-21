@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import FilterButton from '../../components/FilterButton'
+import FilterButton from '../../components/FilterButton/FilterButton'
 import './NewOrder.css'
-import BtnBlue from '../../components/BtnBlue'
-import Header from '../../components/Header'
-import FormField from '../../components/FormField'
-import ProductList from '../../components/ProductList'
-import SectionTitle from '../../components/SectionTitle'
+import BtnBlue from '../../components/BtnBlue/BtnBlue'
+import Header from '../../components/Header/Header'
+import FormField from '../../components/FormField/FormField'
+import ProductList from '../../components/ProductList/ProductList'
+import SectionTitle from '../../components/SectionTitle/SectionTitle'
 import { Link } from 'react-router-dom'
 
 const NewOrder = () => {

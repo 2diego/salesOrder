@@ -1,8 +1,8 @@
-import Header from "../../components/Header";
-import SectionTitle from "../../components/SectionTitle";
-import BtnBlue from "../../components/BtnBlue";
+import Header from "../../components/Header/Header";
+import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import BtnBlue from "../../components/BtnBlue/BtnBlue";
 import { Link } from "react-router-dom";
-import InfoRow from '../../components/InfoRow'
+import InfoRow from '../../components/InfoRow/InfoRow'
 import { LuClipboardList } from 'react-icons/lu'
 
 const CustomerOrderHistory = () => {

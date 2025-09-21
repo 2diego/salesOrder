@@ -1,9 +1,9 @@
-import Header from "../../../components/Header"
+import Header from "../../../components/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
-import SectionTitle from "../../../components/SectionTitle";
-import BtnBlue from "../../../components/BtnBlue";
-import InfoRow from "../../../components/InfoRow";
+import SectionTitle from "../../../components/SectionTitle/SectionTitle";
+import BtnBlue from "../../../components/BtnBlue/BtnBlue";
+import InfoRow from "../../../components/InfoRow/InfoRow";
 import { LuClipboardList } from 'react-icons/lu';
 
 const OrderHistory = () => {

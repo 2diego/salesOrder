@@ -1,7 +1,7 @@
-import Header from "../../components/Header"
-import SectionTitle from "../../components/SectionTitle"
-import ProductList from "../../components/ProductList"
-import BtnBlue from "../../components/BtnBlue"
+import Header from "../../components/Header/Header"
+import SectionTitle from "../../components/SectionTitle/SectionTitle"
+import ProductList from "../../components/ProductList/ProductList"
+import BtnBlue from "../../components/BtnBlue/BtnBlue"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 

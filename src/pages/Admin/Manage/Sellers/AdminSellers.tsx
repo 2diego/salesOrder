@@ -1,9 +1,9 @@
-import Header from "../../../../components/Header"
+import Header from "../../../../components/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
-import NavTo from "../../../../components/NavTo";
-import SectionTitle from "../../../../components/SectionTitle";
-import BtnBlue from "../../../../components/BtnBlue";
+import NavTo from "../../../../components/NavTo/NavTo";
+import SectionTitle from "../../../../components/SectionTitle/SectionTitle";
+import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 
 const AdminSellers = () => {
   return (

@@ -1,7 +1,7 @@
-import Header from "../../../components/Header"
+import Header from "../../../components/Header/Header"
 import { Link } from "react-router-dom";
-import NavTo from "../../../components/NavTo";
-import SectionTitle from "../../../components/SectionTitle";
+import NavTo from "../../../components/NavTo/NavTo";
+import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import { LuFileChartColumnIncreasing } from "react-icons/lu";
 
 const Reports = () => {

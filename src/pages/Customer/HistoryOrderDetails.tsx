@@ -1,8 +1,8 @@
-import Header from "../../components/Header";
-import SectionTitle from "../../components/SectionTitle";
-import BtnBlue from "../../components/BtnBlue";
+import Header from "../../components/Header/Header";
+import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import BtnBlue from "../../components/BtnBlue/BtnBlue";
 import { Link } from "react-router-dom";
-import ProductList from "../../components/ProductList";
+import ProductList from "../../components/ProductList/ProductList";
 
 const HistoryOrderDetails = () => {
 
