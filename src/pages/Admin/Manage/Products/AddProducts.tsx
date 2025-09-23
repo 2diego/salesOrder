@@ -4,8 +4,23 @@ import { Link } from "react-router-dom";
 import SectionTitle from "../../../../components/SectionTitle/SectionTitle";
 import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 import FormField from "../../../../components/FormField/FormField";
+import { useState } from "react";
 
 const AddProducts = () => {
+  const [productData, setProductData] = useState({
+    code: '',
+    description: '',
+    price: '',
+    stock: ''
+  });
+
+  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProductData(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+  }
+
   return (
     <>
       {/* Header */}  
@@ -23,16 +38,40 @@ const AddProducts = () => {
 
       {/* Form Fields */}
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Código</h4>
-      <FormField label="codigo" value="Ej: 900" editable={false} />
+      <FormField
+        label="codigo"
+        value={productData.code}
+        placeholder="Ej: 900"
+        editable={true}
+        onChange={handleInputChange('code')}
+      />
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Descripción</h4>
-      <FormField label="descripcion" value="Ej: Producto de prueba" editable={false} />
+      <FormField
+        label="descripcion"
+        value={productData.description}
+        placeholder="Ej: Producto de prueba"
+        editable={true}
+        onChange={handleInputChange('description')}
+      />
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Precio</h4>
-      <FormField label="precio" value="Ej: $100" editable={false} />
+      <FormField
+        label="precio"
+        value={productData.price}
+        placeholder="Ej: $100"
+        editable={true}
+        onChange={handleInputChange('price')}
+      /> {/* cambiar de string a int */}
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Stock</h4>
-      <FormField label="stock" value="Ej: 50" editable={false} />
+      <FormField
+        label="stock"
+        value={productData.stock}
+        placeholder="Ej: 50"
+        editable={true}
+        onChange={handleInputChange('stock')}
+      /> {/* cambiar de string a int */}
 
       <div style={{ justifyItems: 'end' }}>
         <BtnBlue width="100%" height="3rem">

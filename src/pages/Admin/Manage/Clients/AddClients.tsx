@@ -4,8 +4,23 @@ import { Link } from "react-router-dom";
 import SectionTitle from "../../../../components/SectionTitle/SectionTitle";
 import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 import FormField from "../../../../components/FormField/FormField";
+import { useState } from "react";
 
 const AddClients = () => {
+  const [clientData, setClientData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
+
+  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setClientData(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+  };
+  
   return (
     <>
       {/* Header */}  
@@ -23,16 +38,40 @@ const AddClients = () => {
 
       {/* Form Fields */}
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Nombre</h4>
-      <FormField label="nombre" value="Ej: Juan Perez" editable={false} />
+      <FormField 
+        label="nombre" 
+        value={clientData.name} 
+        placeholder="Ej: Juan Perez"
+        editable={true}
+        onChange={handleInputChange('name')}
+      />
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Correo</h4>
-      <FormField label="correo" value="Ej: juanperez@example.com" editable={false} />
+      <FormField 
+        label="correo" 
+        value={clientData.email} 
+        placeholder="Ej: juanperez@example.com"
+        editable={true}
+        onChange={handleInputChange('email')}
+      />
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Teléfono</h4>
-      <FormField label="telefono" value="Ej: 1234-5678" editable={false} />
+      <FormField 
+        label="telefono" 
+        value={clientData.phone} 
+        placeholder="Ej: 1234-5678"
+        editable={true}
+        onChange={handleInputChange('phone')}
+      />
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Dirección</h4>
-      <FormField label="direccion" value="Ej: Calle Falsa 123" editable={false} />
+      <FormField 
+        label="direccion" 
+        value={clientData.address} 
+        placeholder="Ej: Calle Falsa 123"
+        editable={true}
+        onChange={handleInputChange('address')}
+      />
 
       <div style={{ justifyItems: 'end' }}>
         <BtnBlue width="100%" height="3rem">
