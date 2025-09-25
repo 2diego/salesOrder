@@ -20,7 +20,7 @@ const AddClients = () => {
       [field]: e.target.value
     }));
   };
-  
+
   return (
     <>
       {/* Header */}  
@@ -62,7 +62,7 @@ const AddClients = () => {
         placeholder="Ej: 1234-5678"
         editable={true}
         onChange={handleInputChange('phone')}
-      />
+      /> {/* Cambiar de string a int */}
 
       <h4 style={{ marginBottom: '0.5rem', marginLeft: '1rem' }}>Dirección</h4>
       <FormField 

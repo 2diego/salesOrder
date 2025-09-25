@@ -80,9 +80,11 @@ const Orders = () => {
         </div>
 
         {/* Generate Link Button */}
-        <BtnBlue width="100%" height="3rem">
-          <LuPlus style={{ fontSize: "1.5rem" }} /><span>Generar link</span>
-        </BtnBlue>
+        <Link to="/CreateLink" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <BtnBlue width="100%" height="3rem">
+            <LuPlus style={{ fontSize: "1.5rem" }} /><span>Generar link</span>
+          </BtnBlue>
+        </Link>
       </div>
     </>
   )

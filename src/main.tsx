@@ -21,6 +21,8 @@ import SellersList from './pages/Admin/Manage/Sellers/SellersList';
 import AddClients from './pages/Admin/Manage/Clients/AddClients';
 import AddProducts from './pages/Admin/Manage/Products/AddProducts';
 import AddSellers from './pages/Admin/Manage/Sellers/AddSellers';
+import CreateLink from './pages/Admin/Orders/CreateLink';
+import ValidateOrder from './pages/Admin/Orders/ValidateOrder';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,14 @@ const router = createBrowserRouter([
       {
         path: "/Orders",
         element: <Orders />
+      },
+      {
+        path: "/CreateLink",
+        element: <CreateLink />
+      },
+      {
+        path: "/ValidateOrder",
+        element: <ValidateOrder />
       },
       {
         path: "/Reports",
