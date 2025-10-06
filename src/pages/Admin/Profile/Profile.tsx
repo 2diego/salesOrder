@@ -5,6 +5,7 @@ import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import { LuUser } from "react-icons/lu";
 
 const Profile = () => {
+
   return (
     <>
       {/* Header */}  
@@ -21,13 +22,10 @@ const Profile = () => {
       </SectionTitle>
 
       {/* Manage Options */}
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Modificar nombre" />
+      <Link to="/Profile/EditProfile" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <NavTo text="Modificar datos de perfil" />
       </Link>
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <NavTo text="Modificar email" />
-      </Link>
-      <Link to="" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Profile/EditPassword" style={{ textDecoration: 'none', color: 'inherit' }}>
         <NavTo text="Modificar contraseña" />
       </Link>
     </>

@@ -23,6 +23,8 @@ import AddProducts from './pages/Admin/Manage/Products/AddProducts';
 import AddSellers from './pages/Admin/Manage/Sellers/AddSellers';
 import CreateLink from './pages/Admin/Orders/CreateLink';
 import ValidateOrder from './pages/Admin/Orders/ValidateOrder';
+import EditPassword from './pages/Admin/Profile/EditPassword';
+import EditProfile from './pages/Admin/Profile/EditProfile';
 
 const router = createBrowserRouter([
   {
@@ -56,6 +58,14 @@ const router = createBrowserRouter([
       {
         path: "/Profile",
         element: <Profile />
+      },
+      {
+        path: "/Profile/EditProfile",
+        element: <EditProfile />
+      },
+      {
+        path: "/Profile/EditPassword",
+        element: <EditPassword />
       },
       {
         path: "/OrderHistory",

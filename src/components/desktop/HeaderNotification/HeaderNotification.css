@@ -1,0 +1,43 @@
+.header-notification {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.3s ease;
+  margin-left: -2rem;
+  margin-top: 2.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.notification-count {
+  color: white;
+  text-align: center;
+  user-select: none;
+}
+
+/* Default variant - Blue */
+.header-notification--default {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+/* Success variant - Green */
+.header-notification--success {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Warning variant - Orange */
+.header-notification--warning {
+  background: linear-gradient(135deg, #ffa200b9, #ff8800c5);
+}
+
+/* Error variant - Red */
+.header-notification--error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}

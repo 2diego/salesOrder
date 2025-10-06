@@ -1,0 +1,22 @@
+.admin-desktop-layout {
+  display: flex;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.admin-content {
+  flex: 1;
+  margin-left: 275px; /* Ancho del sidebar */
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-main {
+  flex: 1;
+  background-color: rgb(17, 24, 39);
+  margin-top: 1rem;
+}
+
+/* Contenido responsive */
+.admin-main > * {
+  max-width: 100%;
+}

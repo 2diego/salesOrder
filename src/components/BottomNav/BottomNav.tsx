@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { LiaToolsSolid } from 'react-icons/lia';
-import { LuUser, LuClipboardList, LuFileChartColumnIncreasing } from "react-icons/lu";
+import { LuUser, LuClipboardList, LuPlus } from "react-icons/lu";
 import './BottomNav.css';
 
 const BottomNav = () => {
@@ -12,12 +12,12 @@ const BottomNav = () => {
     const currentPath = location.pathname;
     if (currentPath.startsWith("/Orders")) {
       setActiveTab("Orders");
-    } else if (currentPath.startsWith("/Reports")) {
-      setActiveTab("Reports");
     } else if (currentPath.startsWith("/Manage")) {
       setActiveTab("Manage");
     } else if (currentPath.startsWith("/Profile")) {
       setActiveTab("Profile");
+    } else if (currentPath.startsWith("/CreateLink")) {
+      setActiveTab("CreateLink");
     }
   }, [location]);
 
@@ -27,19 +27,19 @@ const BottomNav = () => {
 
   return (
     <div className="bottom-nav">
+      <Link to={"/CreateLink"} style={{ textDecoration: 'none' }}
+        className={`nav-item ${activeTab === "CreateLink" ? "active" : ""}`}
+        onClick={() => handleNavClick("CreateLink")}
+      >
+        <LuPlus />
+        <span>Generar Link</span>
+      </Link>
       <Link to={"/Orders"} style={{ textDecoration: 'none' }}
         className={`nav-item ${activeTab === "Orders" ? "active" : ""}`}
         onClick={() => handleNavClick("Orders")}
       >
         <LuClipboardList />
         <span>Pedidos</span>
-      </Link>
-      <Link to={"/Reports"} style={{ textDecoration: 'none' }}
-        className={`nav-item ${activeTab === "Reports" ? "active" : ""}`}
-        onClick={() => handleNavClick("Reports")}
-      >
-        <LuFileChartColumnIncreasing />
-        <span>Reportes</span>
       </Link>
       <Link to={"/Manage"} style={{ textDecoration: 'none' }}
         className={`nav-item ${activeTab === "Manage" ? "active" : ""}`}

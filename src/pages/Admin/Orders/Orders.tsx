@@ -1,7 +1,6 @@
 import Header from "../../../components/Header/Header";
 import BtnBlue from "../../../components/BtnBlue/BtnBlue"
-import NavTo from "../../../components/NavTo/NavTo";
-import { LuPlus, LuClipboardList } from "react-icons/lu";
+import { LuClipboardList } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import InfoRow from '../../../components/InfoRow/InfoRow'
@@ -67,24 +66,15 @@ const Orders = () => {
         bottom: 84,
         left: 0,
         right: 0,
-        background: 'white',
-        borderTop: '1px solid #E8EDF2',
-        padding: '1rem',
-        zIndex: 999
       }}>
-        {/* Orders History */}
-        <div>
-          <Link to="/OrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <NavTo text="Historial de pedidos" />
-          </Link>
-        </div>
 
         {/* Generate Link Button */}
-        <Link to="/CreateLink" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to="/OrderHistory" style={{ textDecoration: 'none', color: 'inherit' }}>
           <BtnBlue width="100%" height="3rem">
-            <LuPlus style={{ fontSize: "1.5rem" }} /><span>Generar link</span>
+            <span>Historial de pedidos</span>
           </BtnBlue>
         </Link>
+        
       </div>
     </>
   )

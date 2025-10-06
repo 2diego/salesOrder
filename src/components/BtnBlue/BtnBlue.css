@@ -32,6 +32,8 @@
 
 .btn-blue:hover {
   background-color: var(--mainBlueHover);
+  border-color: rgba(100, 100, 100, 0.50);
+  box-shadow: rgba(0, 0, 0, 0.349) 0rem 0.25rem 0.375rem -0.0625rem, rgba(0, 0, 0, 0.06) 0rem 0.125rem 0.25rem -0.0625rem;
 }
 
 .btn-blue span {
