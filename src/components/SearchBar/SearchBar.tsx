@@ -3,6 +3,8 @@ import './SearchBar.css';
 type SearchBarProps = {
   placeholder: string;
   mobile?: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
 };
 
 const searchIcon = <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24" height="24" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -13,11 +15,17 @@ const searchIconDesktop = <svg className="search-icon-desktop" fill="none" strok
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
 
-const SearchBar = ({placeholder, mobile = true}: SearchBarProps) => {
+const SearchBar = ({placeholder, mobile = true, value, onChange}: SearchBarProps) => {
   return (
     <div className={mobile ? 'search-bar-container' : 'search-bar-container-desktop'}>
       {mobile? searchIcon : searchIconDesktop}
-      <input className={mobile ? 'search-bar' : 'search-bar-desktop'} type="text" placeholder={placeholder} />
+      <input 
+        className={mobile ? 'search-bar' : 'search-bar-desktop'} 
+        type="text" 
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+      />
     </div>
   );
 };

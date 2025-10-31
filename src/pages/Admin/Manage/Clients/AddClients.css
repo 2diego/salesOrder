@@ -25,16 +25,7 @@
   animation: popupSlideIn 0.3s ease-out;
 }
 
-@keyframes popupSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
+/* Scrollbar y Alert Styles están en index.css como estilos compartidos */
 
 .desktop-popup-header {
   display: flex;
@@ -86,12 +77,7 @@
   margin-left: 0;
 }
 
-.desktop-form .button-container {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+/* Alert Styles están en index.css como estilos compartidos */
 
 /* Mobile Styles */
 .form-container {
@@ -105,12 +91,4 @@
   font-weight: 500;
   margin-bottom: 0.5rem;
   margin-left: 1rem;
-}
-
-.button-container {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0 1rem;
 }

@@ -1,79 +1,113 @@
 import Header from "../../../../components/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import SectionTitle from "../../../../components/SectionTitle/SectionTitle";
 import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 import FormField from "../../../../components/FormField/FormField";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import './AddClients.css';
-import { clientsService, CreateClientDTO } from "../../../../services/clientsService";
+import { clientsService, Client, UpdateClientDTO } from "../../../../services/clientsService";
 
-interface AddClientsProps {
+interface EditClientsProps {
   desktop?: boolean;
   onClose?: () => void;
-  onClientAdded?: () => void; // Callback para refrescar la lista de clientes
+  client?: Client;
+  onClientUpdated?: (updated: Client) => void;
 }
 
-const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onClientAdded }) => {
+const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, client, onClientUpdated }) => {
   const navigate = useNavigate();
-  const [clientData, setClientData] = useState<CreateClientDTO>({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: ''
+  const params = useParams();
+  const [currentClient, setCurrentClient] = useState<Client | null>(client || null);
+  const [formData, setFormData] = useState({
+    name: client?.name || '',
+    email: client?.email || '',
+    phone: client?.phone || '',
+    address: client?.address || '',
+    city: client?.city || '',
+    state: client?.state || ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Fetch cliente via route
+  useEffect(() => {
+    const load = async () => {
+      if (!currentClient && params.id) {
+        try {
+          const data = await clientsService.findOne(parseInt(params.id));
+          setCurrentClient(data);
+          setFormData({
+            name: data.name || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            address: data.address || '',
+            city: data.city || '',
+            state: data.state || ''
+          });
+        } catch (e: any) {
+          setError(e.message || 'No se pudo cargar el cliente');
+        }
+      }
+    };
+    load();
+  }, [currentClient, params.id]);
+
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setClientData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [field]: e.target.value
     }));
-    // Limpiar errores cuando el usuario empiece a escribir
     if (error) setError(null);
   };
 
+  const hasChanges = useMemo(() => {
+    if (!currentClient) return false;
+    return (
+      formData.name !== currentClient.name ||
+      formData.email !== currentClient.email ||
+      formData.phone !== currentClient.phone ||
+      formData.address !== currentClient.address ||
+      formData.city !== currentClient.city ||
+      formData.state !== currentClient.state
+    );
+  }, [formData, currentClient]);
+
+  const buildDiff = (): UpdateClientDTO => {
+    const diff: UpdateClientDTO = {};
+    if (!currentClient) return diff;
+    if (formData.name !== currentClient.name) diff.name = formData.name;
+    if (formData.email !== currentClient.email) diff.email = formData.email;
+    if (formData.phone !== currentClient.phone) diff.phone = formData.phone;
+    if (formData.address !== currentClient.address) diff.address = formData.address;
+    if (formData.city !== currentClient.city) diff.city = formData.city;
+    if (formData.state !== currentClient.state) diff.state = formData.state;
+    return diff;
+  };
+
   const validateForm = (): boolean => {
-    if (!clientData.name.trim()) {
+    if (!formData.name.trim()) {
       setError('El nombre es obligatorio');
       return false;
     }
-    if (!clientData.email.trim()) {
+    if (!formData.email.trim()) {
       setError('El correo es obligatorio');
       return false;
     }
-    // Validación básica de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(clientData.email)) {
+    if (!emailRegex.test(formData.email)) {
       setError('El correo no tiene un formato válido');
-      return false;
-    }
-    if (!clientData.phone.trim()) {
-      setError('El teléfono es obligatorio');
-      return false;
-    }
-    if (!clientData.address.trim()) {
-      setError('La dirección es obligatoria');
-      return false;
-    }
-    if (!clientData.city.trim()) {
-      setError('La ciudad es obligatoria');
-      return false;
-    }
-    if (!clientData.state.trim()) {
-      setError('La provincia es obligatoria');
       return false;
     }
     return true;
   };
 
   const handleSubmit = async () => {
-    // Validar formulario
-    if (!validateForm()) {
+    if (!validateForm()) return;
+    const diff = buildDiff();
+    if (Object.keys(diff).length === 0) {
+      setError('No hay cambios para guardar');
       return;
     }
 
@@ -81,29 +115,19 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
     setError(null);
 
     try {
-      // Llamar al servicio para crear el cliente
-      const newClient = await clientsService.create(clientData);
-      console.log('Cliente creado exitosamente:', newClient);
-      
+      if (!currentClient) return;
+      const updated = await clientsService.update(currentClient.id, diff);
       setSuccess(true);
-
-      // Llamar al callback para refrescar la lista (si existe)
-      if (onClientAdded) {
-        onClientAdded();
-      }
-
-      // Mostrar mensaje de éxito por 1.5 segundos y luego cerrar/navegar
+      onClientUpdated && onClientUpdated(updated);
       setTimeout(() => {
         if (desktop && onClose) {
           onClose();
         } else {
           navigate('/Manage/AdminClients');
         }
-      }, 1500);
-
+      }, 1200);
     } catch (err: any) {
-      console.error('Error al crear cliente:', err);
-      setError(err.message || 'Error al crear el cliente. Por favor, intenta de nuevo.');
+      setError(err.message || 'Error al actualizar el cliente');
     } finally {
       setLoading(false);
     }
@@ -111,10 +135,9 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
 
   const content = (
     <>
-      {/* Desktop Header */}
       {desktop && (
         <div className="desktop-popup-header">
-          <h3>Nuevo Cliente</h3>
+          <h3>Editar Cliente</h3>
           <button className="close-button" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
@@ -123,7 +146,6 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
         </div>
       )}
 
-      {/* Mobile Header */}
       {!desktop && (
         <Header title="Nombre usuario" subtitle="Admin">
           <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -133,14 +155,12 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
         </Header>
       )}
 
-      {/* Mobile Title */}
       {!desktop && (
         <SectionTitle>
-          <h2>Nuevo cliente</h2>
+          <h2>Editar cliente</h2>
         </SectionTitle>
       )}
 
-      {/* Mensajes de Error y Éxito */}
       {error && (
         <div className={`alert alert-error ${desktop ? 'desktop-alert' : ''}`}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -155,76 +175,33 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="currentColor"/>
           </svg>
-          <span>¡Cliente creado exitosamente!</span>
+          <span>¡Cliente actualizado!</span>
         </div>
       )}
 
-      {/* Form Fields */}
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
         <h4 className="field-label">Nombre</h4>
-        <FormField 
-          label="nombre" 
-          value={clientData.name} 
-          placeholder="Ej: Juan Perez"
-          editable={true}
-          onChange={handleInputChange('name')}
-        />
+        <FormField label="nombre" value={formData.name} placeholder="Nombre" editable={true} onChange={handleInputChange('name')} />
 
         <h4 className="field-label">Correo</h4>
-        <FormField 
-          label="correo" 
-          value={clientData.email} 
-          placeholder="Ej: juanperez@example.com"
-          editable={true}
-          onChange={handleInputChange('email')}
-        />
+        <FormField label="correo" value={formData.email} placeholder="Correo" editable={true} onChange={handleInputChange('email')} />
 
         <h4 className="field-label">Teléfono</h4>
-        <FormField 
-          label="telefono" 
-          value={clientData.phone} 
-          placeholder="Ej: 1234-5678"
-          editable={true}
-          onChange={handleInputChange('phone')}
-        />
+        <FormField label="telefono" value={formData.phone} placeholder="Teléfono" editable={true} onChange={handleInputChange('phone')} />
 
         <h4 className="field-label">Dirección</h4>
-        <FormField 
-          label="direccion" 
-          value={clientData.address} 
-          placeholder="Ej: Calle Falsa 123"
-          editable={true}
-          onChange={handleInputChange('address')}
-        />
+        <FormField label="direccion" value={formData.address} placeholder="Dirección" editable={true} onChange={handleInputChange('address')} />
 
         <h4 className="field-label">Ciudad</h4>
-        <FormField 
-          label="ciudad" 
-          value={clientData.city} 
-          placeholder="Ej: Ciudad"
-          editable={true}
-          onChange={handleInputChange('city')}
-        />
+        <FormField label="ciudad" value={formData.city} placeholder="Ciudad" editable={true} onChange={handleInputChange('city')} />
 
         <h4 className="field-label">Provincia</h4>
-        <FormField 
-          label="provincia" 
-          value={clientData.state} 
-          placeholder="Ej: Provincia"
-          editable={true}
-          onChange={handleInputChange('state')}
-        />
+        <FormField label="provincia" value={formData.state} placeholder="Provincia" editable={true} onChange={handleInputChange('state')} />
 
-        
-        <BtnBlue 
-          width="100%" 
-          height="3rem" 
-          onClick={loading ? undefined : handleSubmit}
-        >
-          <span>{loading ? 'Guardando...' : 'Agregar cliente'}</span>
+        <BtnBlue width="100%" height="3rem" onClick={loading ? undefined : handleSubmit}>
+          <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
         </BtnBlue>
 
-        {/* Back Button mobile */}
         {!desktop && (
           <Link to="/Manage/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
             <BtnBlue width="100%" height="3rem">
@@ -249,4 +226,6 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
   return content;
 }
 
-export default AddClients
+export default EditClients;
+
+

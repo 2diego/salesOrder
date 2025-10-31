@@ -6,8 +6,59 @@ import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 import SearchBar from "../../../../components/SearchBar/SearchBar";
 import InfoRow from "../../../../components/InfoRow/InfoRow";
 import { LuClipboardList, LuPlus } from 'react-icons/lu';
+import { useEffect, useState } from "react";
+import { Seller, sellersService } from "../../../../services/sellersService";
+import { useNavigate } from "react-router-dom";
 
 const SellersList = () => {
+
+  const [sellers, setSellers] = useState<Seller[]>([]);
+  const [filteredSellers, setFilteredSellers] = useState<Seller[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Cargar vendedores al montar el componente
+  useEffect(() => {
+    fetchSellers();
+  }, []);
+
+  const fetchSellers = async () => {
+    try {
+      const sellersData = await sellersService.findAll();
+      setSellers(sellersData);
+      setFilteredSellers(sellersData);
+    } catch (err: any) {
+      console.error('Error al cargar vendedores:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtrar vendedores cuando cambia el término de búsqueda
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredSellers(sellers);
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    const filtered = sellers.filter(seller => 
+      seller.username.toLowerCase().includes(searchLower) ||
+      seller.name.toLowerCase().includes(searchLower) ||
+      seller.email.toLowerCase().includes(searchLower) ||
+      seller.phone.includes(searchLower)
+    );
+
+    setFilteredSellers(filtered);
+  }, [searchTerm, sellers]);
+  
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
+
   return (
     <>
       {/* Header */}  
@@ -30,42 +81,70 @@ const SellersList = () => {
         </BtnBlue>
       </div>
 
+      { /* Error Message */ }
+      {error && (
+        <div style={{ 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          border: '1px solid rgba(239, 68, 68, 0.3)', 
+          color: '#ef4444', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          margin: '1rem' 
+        }}>
+          {error}
+        </div>
+      )}
+
 
       { /* Search Bar */ }
-      <SearchBar placeholder="Buscar productos" />
+        <SearchBar placeholder="Buscar vendedores"
+          value={searchTerm}
+          onChange={handleSearch} />
 
-      { /* Products List */ }
+      { /* Sellers List */ }
       <InfoRow className="row-header"
         columns={[
-          <span key={'id'}>Código</span>,
-          <span key={'name'}>Nombre</span>
+          <span key={'name'}>Nombre</span>,
+          <span key={'phone'}>Teléfono</span>,
         ]}
         actionIcon={<LuClipboardList />}
       />
-      <InfoRow
-      columns={[
-        <span key={'id'}>120</span>,
-        <span key={'name'}>Julio Pibuel</span>
-      ]}
-      actionLabel="Editar"
-      actionIcon={<LuClipboardList />}
-      /> 
-      <InfoRow
-      columns={[
-        <span key={'id'}>120</span>,
-        <span key={'name'}>Niyen Pibuel</span>
-      ]}
-      actionLabel="Editar"
-      actionIcon={<LuClipboardList />}
-      />
-      <InfoRow
-      columns={[
-        <span key={'id'}>120</span>,
-        <span key={'name'}>Jonatan Navarro</span>
-      ]}
-      actionLabel="Editar"
-      actionIcon={<LuClipboardList />}
-      />
+      
+      { /* Loading state */ }
+      {loading && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          Cargando vendedores...
+        </div>
+      )}
+      
+      { /* Empty state */ }
+      {!loading && filteredSellers.length === 0 && searchTerm && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No se encontraron vendedores con "{searchTerm}"
+        </div>
+      )}
+      
+      { /* Sellers list */ }
+      {filteredSellers.map((seller) => (
+        <InfoRow
+          key={seller.id}
+          columns={[
+            <span key={'name'}>{seller.name}</span>,
+            <span key={'phone'}>{seller.phone}</span>,
+          ]}
+          actionLabel="Editar"
+          actionIcon={<LuClipboardList />}
+          onActionClick={() => navigate(`/Manage/EditSeller/${seller.id}`)}
+          onRowClick={() => navigate(`/Manage/EditSeller/${seller.id}`)}
+        />
+      ))}
+
+      { /* Empty state */ }
+      {!loading && filteredSellers.length === 0 && !searchTerm && sellers.length === 0 && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No hay vendedores disponibles
+        </div>
+      )}
 
       {/* Back Button */}
       <Link to="/Manage/AdminSellers" style={{ textDecoration: 'none', color: 'inherit' }}>

@@ -21,6 +21,9 @@ import SellersList from './pages/Admin/Manage/Sellers/SellersList';
 import AddClients from './pages/Admin/Manage/Clients/AddClients';
 import AddProducts from './pages/Admin/Manage/Products/AddProducts';
 import AddSellers from './pages/Admin/Manage/Sellers/AddSellers';
+import EditClients from './pages/Admin/Manage/Clients/EditClients';
+import EditProducts from './pages/Admin/Manage/Products/EditProducts';
+import EditSellers from './pages/Admin/Manage/Sellers/EditSellers';
 import CreateLink from './pages/Admin/Orders/CreateLink';
 import ValidateOrder from './pages/Admin/Orders/ValidateOrder';
 import EditPassword from './pages/Admin/Profile/EditPassword';
@@ -106,6 +109,18 @@ const router = createBrowserRouter([
       {
         path: "/Manage/AddSellers",
         element: <AddSellers />
+      },
+      {
+        path: "/Manage/EditClient/:id",
+        element: <EditClients />
+      },
+      {
+        path: "/Manage/EditProduct/:id",
+        element: <EditProducts />
+      },
+      {
+        path: "/Manage/EditSeller/:id",
+        element: <EditSellers />
       }
     ]
   },

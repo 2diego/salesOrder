@@ -78,10 +78,11 @@ export class ClientsService {
       throw new ConflictException('Cannot delete client that has orders');
     }
 
-    await this.clientRepository.remove(client); //Eliminar o desactivar? Si se elimina hay que eliminar ordenes asociadas?
+    //Eliminar o desactivar? Si se elimina hay que eliminar ordenes asociadas?
+    // await this.clientRepository.remove(client); ELIMINAR
     // desactivar:
-    // client.isActive = false;
-    // await this.clientRepository.save(client);
+    client.isActive = false;
+    await this.clientRepository.save(client);
 
     return { message: `Client "${client.name}" has been deleted` };
   }

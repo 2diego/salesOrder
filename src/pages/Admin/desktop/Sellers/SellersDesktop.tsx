@@ -1,15 +1,41 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import AddSellers from "../../Manage/Sellers/AddSellers";
+import EditSellers from "../../Manage/Sellers/EditSellers";
+import { Seller, sellersService } from '../../../../services/sellersService';
 
 const SellersDesktop = () => {
   const [showAddSellerPopup, setShowAddSellerPopup] = useState(false);
+  const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
+	const [sellers, setSellers] = useState<Seller[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	// Cargar vendedores al montar el componente
+	useEffect(() => {
+		fetchSellers();
+	}, []);
+
+	const fetchSellers = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			const sellersData = await sellersService.findAll();
+			setSellers(sellersData);
+		} catch (err: any) {
+			console.error('Error al cargar vendedores:', err);
+			setError(err.message || 'Error al cargar la lista de vendedores');
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	const columns: TableColumn[] = [
-		{ key: 'id', label: 'ID Vendedor', sortable: true, width: '120px' },
+		{ key: 'id', label: 'ID Vendedor', sortable: true},
+		{ key: 'username', label: 'Nombre de usuario', sortable: true},
 		{ key: 'name', label: 'Vendedor', sortable: true },
-		{ key: 'phone', label: 'Teléfono', sortable: true, width: '120px' },
-		{ key: 'address', label: 'Dirección', sortable: true},
+		{ key: 'phone', label: 'Teléfono', sortable: true},
+		{ key: 'email', label: 'Correo electrónico', sortable: true},
 		{ 
 			key: 'edit', 
 			label: '', 
@@ -17,25 +43,39 @@ const SellersDesktop = () => {
 			width: '50px'
 		}
 	];
-	const data = [
-		{ id: '000001', name: 'Vendedor 1', phone: '1234567890', address: 'Av. Principal 123', edit: 'Selecciona para editar' },
-		{ id: '000002', name: 'Vendedor 2', phone: '1234567890', address: 'Calle Secundaria 456', edit: 'Selecciona para editar' },
-		{ id: '000003', name: 'Vendedor 3', phone: '1234567890', address: 'Plaza Central 789', edit: 'Selecciona para editar' },
-		{ id: '000004', name: 'Vendedor 4', phone: '1234567890', address: 'Boulevard Norte 321', edit: 'Selecciona para editar' },
-		{ id: '000005', name: 'Vendedor 5', phone: '1234567890', address: 'Avenida Sur 654', edit: 'Selecciona para editar' },
-	];
+
+	// Transformar datos de vendedores para la tabla
+	const tableData = sellers.map(seller => ({
+		id: seller.id.toString().padStart(6, '0'), // Formatear ID con ceros a la izquierda
+		username: seller.username,
+		name: seller.name,
+		email: seller.email,
+		phone: seller.phone,
+		edit: 'Selecciona para editar'
+	}));
 
 	const handleAddNew = () => {
 		setShowAddSellerPopup(true);
 	};
 
-	const handleCloseAddSellerPopup = () => {
+  const handleCloseAddSellerPopup = () => {
 		setShowAddSellerPopup(false);
 	};
 
-	const handleRowClick = (order: any) => {
-		console.log('Editar fila', order);
+  const handleCloseEditSellerPopup = () => {
+    setEditingSeller(null);
+  };
+
+	// Callback que se ejecuta cuando se agrega un vendedor exitosamente
+	const handleSellerAdded = () => {
+		fetchSellers(); // Recargar la lista de vendedores
+		console.log('Vendedor agregado, lista actualizada');
 	};
+
+  const handleRowClick = (row: any) => {
+    const found = sellers.find(s => s.id.toString().padStart(6, '0') === row.id);
+    if (found) setEditingSeller(found);
+  };
 
   return (
 		<>
@@ -46,15 +86,29 @@ const SellersDesktop = () => {
 				color: 'var(--mainBlack)',
 				marginTop: '4rem'
 			}}>
+				{/* Mostrar error si hay */}
+				{error && (
+					<div style={{ 
+						background: 'rgba(239, 68, 68, 0.1)', 
+						border: '1px solid rgba(239, 68, 68, 0.3)', 
+						color: '#ef4444', 
+						padding: '1rem', 
+						borderRadius: '8px', 
+						marginBottom: '1rem' 
+					}}>
+						{error}
+					</div>
+				)}
 				<Table
 					title="Gestión de Vendedores"
 					subtitle="Crear, editar y eliminar vendedores"
 					columns={columns}
-					data={data}
+					data={tableData}
 					onAddNew={handleAddNew}
 					onRowClick={handleRowClick}
+					loading={loading}
 					searchPlaceholder="Buscar por vendedor, ID o email..."
-					addButtonText="Nuevo Vendedor"
+            addButtonText="Nuevo Vendedor"
 					emptyMessage="No hay vendedores disponibles"
 				/>
 			</div>
@@ -64,8 +118,21 @@ const SellersDesktop = () => {
 				<AddSellers 
 					desktop={true} 
 					onClose={handleCloseAddSellerPopup}
+					onSellerAdded={handleSellerAdded}
 				/>
 			)}
+
+          {editingSeller && (
+            <EditSellers
+              desktop={true}
+              onClose={handleCloseEditSellerPopup}
+              seller={editingSeller}
+              onSellerUpdated={() => {
+                fetchSellers();
+                handleCloseEditSellerPopup();
+              }}
+            />
+          )}
 		</>
   );
 }

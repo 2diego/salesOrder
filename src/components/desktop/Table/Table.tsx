@@ -37,6 +37,7 @@ const Table: React.FC<TableProps> = ({
   addButtonText = "Agregar nuevo"
 }) => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -46,10 +47,23 @@ const Table: React.FC<TableProps> = ({
     setSortConfig({ key, direction });
   };
 
-  const sortedData = React.useMemo(() => {
-    if (!sortConfig) return data;
+  // Filtrar datos según el término de búsqueda
+  const filteredData = React.useMemo(() => {
+    if (!searchTerm.trim()) return data;
     
-    return [...data].sort((a, b) => {
+    const searchLower = searchTerm.toLowerCase();
+    return data.filter(row => {
+      // Buscar en todos los valores de la fila
+      return Object.values(row).some(value => 
+        String(value).toLowerCase().includes(searchLower)
+      );
+    });
+  }, [data, searchTerm]);
+
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig) return filteredData;
+    
+    return [...filteredData].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
       
@@ -57,7 +71,7 @@ const Table: React.FC<TableProps> = ({
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, sortConfig]);
+  }, [filteredData, sortConfig]);
 
   const renderCell = (column: TableColumn, row: any) => {
     const value = row[column.key];
@@ -80,7 +94,12 @@ const Table: React.FC<TableProps> = ({
           
           <div className="table-controls">
             {/* Search Input */}
-            <SearchBar placeholder={searchPlaceholder} mobile={false} />
+            <SearchBar 
+              placeholder={searchPlaceholder} 
+              mobile={false}
+              value={searchTerm}
+              onChange={(value) => setSearchTerm(value)}
+            />
 
             {/* Add Button */}
             <BtnBlue width="auto" height="2.75rem" borderRadius="0.5rem" isBackButton={false} background='linear-gradient(195deg, rgba(43, 118, 184, 0.699), rgba(15, 55, 107, 0.459))' onClick={onAddNew}>

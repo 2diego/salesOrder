@@ -6,8 +6,62 @@ import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 import SearchBar from "../../../../components/SearchBar/SearchBar";
 import InfoRow from "../../../../components/InfoRow/InfoRow";
 import { LuClipboardList, LuPlus } from 'react-icons/lu';
+import { useState, useEffect } from 'react';
+import { clientsService, Client } from "../../../../services/clientsService";
+import { useNavigate } from 'react-router-dom';
 
 const ClientsList = () => {
+  const [clients, setClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Cargar clientes al montar
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const clientsData = await clientsService.findAll();
+        setClients(clientsData);
+        setFilteredClients(clientsData);
+      } catch (err: any) {
+        console.error('Error al cargar clientes:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  // Filtrar clientes cuando cambia el término de búsqueda
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredClients(clients);
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    const filtered = clients.filter(client => 
+      client.name.toLowerCase().includes(searchLower) ||
+      client.id.toString().padStart(6, '0').includes(searchLower) ||
+      client.email.toLowerCase().includes(searchLower) ||
+      client.phone.includes(searchLower) ||
+      client.city.toLowerCase().includes(searchLower) ||
+      client.address.toLowerCase().includes(searchLower)
+    );
+    
+    setFilteredClients(filtered);
+  }, [searchTerm, clients]);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
+
   return (
     <>
       {/* Header */}  
@@ -31,29 +85,74 @@ const ClientsList = () => {
       </div>
 
 
+      { /* Error Message */ }
+      {error && (
+        <div style={{ 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          border: '1px solid rgba(239, 68, 68, 0.3)', 
+          color: '#ef4444', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          margin: '1rem' 
+        }}>
+          {error}
+        </div>
+      )}
+
       { /* Search Bar */ }
-      <SearchBar placeholder="Buscar clientes" />
+      <SearchBar 
+        placeholder="Buscar clientes" 
+        value={searchTerm}
+        onChange={handleSearch}
+      />
 
       { /* Clients List */ }
-        <InfoRow className="row-header"
-          columns={[
-            <span key={'name'}>Cliente</span>,
-            <span key={'id'}>Código</span>,
-            <span key={'localidad'}>Localidad</span>,
-            <span key={'direccion'}>Dirección</span>,
-          ]}
-          actionIcon={<LuClipboardList />}
-        />
-        <InfoRow
+      <InfoRow className="row-header"
         columns={[
-          <span key={'client'}>Juan Pérez</span>,
-          <span key={'id'}>00000456</span>,
-          <span key={'localidad'}>Olavarría</span>,
-          <span key={'direccion'}>Colon 123</span>,
+          <span key={'name'}>Cliente</span>,
+          <span key={'id'}>Código</span>,
+          <span key={'localidad'}>Ciudad</span>,
+          <span key={'direccion'}>Dirección</span>,
         ]}
-        actionLabel="Editar"
         actionIcon={<LuClipboardList />}
-      /> 
+      />
+      
+      {/* Loading state */}
+      {loading && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          Cargando clientes...
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && filteredClients.length === 0 && searchTerm && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No se encontraron clientes con "{searchTerm}"
+        </div>
+      )}
+
+      {!loading && filteredClients.length === 0 && !searchTerm && clients.length === 0 && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No hay clientes disponibles
+        </div>
+      )}
+
+      {/* Clients list */}
+      {filteredClients.map((client) => (
+        <InfoRow
+          key={client.id}
+          columns={[
+            <span key={'client'}>{client.name}</span>,
+            <span key={'id'}>{client.id.toString().padStart(6, '0')}</span>,
+            <span key={'localidad'}>{client.city}</span>,
+            <span key={'direccion'}>{client.address}</span>,
+          ]}
+          actionLabel="Editar"
+          actionIcon={<LuClipboardList />}
+          onActionClick={() => navigate(`/Manage/EditClient/${client.id}`)}
+          onRowClick={() => navigate(`/Manage/EditClient/${client.id}`)}
+        />
+      ))} 
 
       {/* Back Button */}
       <Link to="/Manage/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>

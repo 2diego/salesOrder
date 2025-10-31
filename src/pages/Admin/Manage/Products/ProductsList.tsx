@@ -6,8 +6,61 @@ import BtnBlue from "../../../../components/BtnBlue/BtnBlue";
 import SearchBar from "../../../../components/SearchBar/SearchBar";
 import InfoRow from "../../../../components/InfoRow/InfoRow";
 import { LuClipboardList, LuPlus } from 'react-icons/lu';
+import { useState, useEffect } from 'react';
+import { productsService, Product } from "../../../../services/productsService";
+import { useNavigate } from 'react-router-dom';
 
 const ProductsList = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Cargar productos al montar
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const productsData = await productsService.findAll();
+        setProducts(productsData);
+        setFilteredProducts(productsData);
+      } catch (err: any) {
+        console.error('Error al cargar productos:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Filtrar productos cuando cambia el término de búsqueda
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredProducts(products);
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    const filtered = products.filter(product => 
+      product.name.toLowerCase().includes(searchLower) ||
+      product.id.toString().includes(searchLower) ||
+      (product.description && product.description.toLowerCase().includes(searchLower)) ||
+      (product.category?.name && product.category.name.toLowerCase().includes(searchLower)) ||
+      (product.sku && product.sku.toLowerCase().includes(searchLower))
+    );
+    
+    setFilteredProducts(filtered);
+  }, [searchTerm, products]);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
+
   return (
     <>
       {/* Header */}  
@@ -31,41 +84,72 @@ const ProductsList = () => {
       </div>
 
 
+      { /* Error Message */ }
+      {error && (
+        <div style={{ 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          border: '1px solid rgba(239, 68, 68, 0.3)', 
+          color: '#ef4444', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          margin: '1rem' 
+        }}>
+          {error}
+        </div>
+      )}
+
       { /* Search Bar */ }
-      <SearchBar placeholder="Buscar productos" />
+      <SearchBar 
+        placeholder="Buscar productos" 
+        value={searchTerm}
+        onChange={handleSearch}
+      />
 
       { /* Products List */ }
       <InfoRow className="row-header"
         columns={[
           <span key={'id'}>Código</span>,
-          <span key={'description'}>Descripción</span>
+          <span key={'name'}>Nombre</span>,
+          <span key={'category'}>Categoría</span>
         ]}
         actionIcon={<LuClipboardList />}
       />
-      <InfoRow
-      columns={[
-        <span key={'id'}>100</span>,
-        <span key={'description'}>Sulleg Extra Blanco 12x4x30</span>
-      ]}
-      actionLabel="Editar"
-      actionIcon={<LuClipboardList />}
-      /> 
-      <InfoRow
-      columns={[
-        <span key={'id'}>900</span>,
-        <span key={'description'}>Elegante 4x120m</span>
-      ]}
-      actionLabel="Editar"
-      actionIcon={<LuClipboardList />}
-      /> 
-      <InfoRow
-        columns={[
-          <span key={'id'}>904</span>,
-          <span key={'description'}>Elegante 6x30m S/H</span>
-        ]}
-        actionLabel="Editar"
-        actionIcon={<LuClipboardList />}
-      /> 
+      
+      {/* Loading state */}
+      {loading && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          Cargando productos...
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && filteredProducts.length === 0 && searchTerm && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No se encontraron productos con "{searchTerm}"
+        </div>
+      )}
+
+      {!loading && filteredProducts.length === 0 && !searchTerm && products.length === 0 && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No hay productos disponibles
+        </div>
+      )}
+
+      {/* Products list */}
+      {filteredProducts.map((product) => (
+        <InfoRow
+          key={product.id}
+          columns={[
+            <span key={'id'}>{product.id}</span>,
+            <span key={'name'}>{product.name}</span>,
+            <span key={'category'}>{product.category?.name || 'Sin categoría'}</span>
+          ]}
+          actionLabel="Editar"
+          actionIcon={<LuClipboardList />}
+          onActionClick={() => navigate(`/Manage/EditProduct/${product.id}`)}
+          onRowClick={() => navigate(`/Manage/EditProduct/${product.id}`)}
+        />
+      ))}
 
       {/* Back Button */}
       <Link to="/Manage/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>

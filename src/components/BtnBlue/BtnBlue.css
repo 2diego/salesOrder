@@ -44,3 +44,10 @@
   font-weight: 700;
   line-height: 21px;
 }
+
+@media (min-width: 1023px) {
+  .btn-container {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}

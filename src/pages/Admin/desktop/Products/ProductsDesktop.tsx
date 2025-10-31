@@ -1,9 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import AddProducts from "../../Manage/Products/AddProducts";
+import EditProducts from "../../Manage/Products/EditProducts";
+import { Product } from '@/services/productsService';
+import { productsService } from '../../../../services/productsService';
 
 const ProductsDesktop = () => {
   const [showAddProductPopup, setShowAddProductPopup] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+	const [products, setProducts] = useState<Product[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	// Cargar productos al montar el componente
+	useEffect(() => {
+		fetchProducts();
+	}, []);
+
+	const fetchProducts = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			const productsData = await productsService.findAll();
+			setProducts(productsData);
+		} catch (err: any) {
+			console.error('Error al cargar productos:', err);
+			setError(err.message || 'Error al cargar la lista de productos');
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	const columns: TableColumn[] = [
 		{ key: 'id', label: 'ID Producto', sortable: true, width: '120px' },
@@ -19,26 +45,38 @@ const ProductsDesktop = () => {
 		}
 	];
 
-	const data = [
-		{ id: '000001', name: 'Producto 1', category: 'Categoría 1', price: 100, stock: 50, edit: 'Selecciona para editar' },
-		{ id: '000002', name: 'Producto 2', category: 'Categoría 2', price: 200, stock: 30, edit: 'Selecciona para editar' },
-		{ id: '000003', name: 'Producto 3', category: 'Categoría 3', price: 300, stock: 20, edit: 'Selecciona para editar' },
-		{ id: '000004', name: 'Producto 4', category: 'Categoría 4', price: 400, stock: 10, edit: 'Selecciona para editar' },
-		{ id: '000005', name: 'Producto 5', category: 'Categoría 5', price: 500, stock: 5, edit: 'Selecciona para editar' },
-		{ id: '000006', name: 'Producto 6', category: 'Categoría 6', price: 600, stock: 0, edit: 'Selecciona para editar' },
-	];
+	// Transformar datos de productos para la tabla
+	const tableData = products.map(product => ({
+		id: product.id.toString().padStart(6, '0'),
+		name: product.name,
+		category: product.category?.name || '',
+		price: product.price,
+		stock: product.stock,
+		edit: 'Selecciona para editar'
+	}));
 
 	const handleAddNew = () => {
 		setShowAddProductPopup(true);
 	};
 
-	const handleCloseAddProductPopup = () => {
+  const handleCloseAddProductPopup = () => {
 		setShowAddProductPopup(false);
 	};
 
-	const handleRowClick = (order: any) => {
-		console.log('Editar fila', order);
+  const handleCloseEditProductPopup = () => {
+    setEditingProduct(null);
+  };
+
+	// Callback que se ejecuta cuando se agrega un producto exitosamente
+	const handleProductAdded = () => {
+		fetchProducts();
+		console.log('Producto agregado, lista actualizada');
 	};
+
+  const handleRowClick = (row: any) => {
+    const found = products.find(p => p.id.toString().padStart(6, '0') === row.id);
+    if (found) setEditingProduct(found);
+  };
 
   return (
 		<>
@@ -49,15 +87,29 @@ const ProductsDesktop = () => {
 				color: 'var(--mainBlack)',
 				marginTop: '4rem'
 			}}>
+				{/* Mostrar error si hay */}
+				{error && (
+					<div style={{ 
+						background: 'rgba(239, 68, 68, 0.1)', 
+						border: '1px solid rgba(239, 68, 68, 0.3)', 
+						color: '#ef4444', 
+						padding: '1rem', 
+						borderRadius: '8px', 
+						marginBottom: '1rem' 
+					}}>
+						{error}
+					</div>
+				)}
 				<Table
 					title="Gestión de Productos"
 					subtitle="Crear, editar y eliminar productos"
 					columns={columns}
-					data={data}
+					data={tableData}
 					onAddNew={handleAddNew}
 					onRowClick={handleRowClick}
+					loading={loading}
 					searchPlaceholder="Buscar por producto, ID o categoría..."
-					addButtonText="Nuevo Producto"
+            addButtonText="Nuevo Producto"
 					emptyMessage="No hay productos disponibles"
 				/>
 			</div>
@@ -67,8 +119,21 @@ const ProductsDesktop = () => {
 				<AddProducts 
 					desktop={true} 
 					onClose={handleCloseAddProductPopup}
+					onProductAdded={handleProductAdded}
 				/>
 			)}
+
+          {editingProduct && (
+            <EditProducts
+              desktop={true}
+              onClose={handleCloseEditProductPopup}
+              product={editingProduct}
+              onProductUpdated={() => {
+                fetchProducts();
+                handleCloseEditProductPopup();
+              }}
+            />
+          )}
 		</>
   );
 }
