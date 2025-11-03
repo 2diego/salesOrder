@@ -1,9 +1,13 @@
+import { useState, useEffect } from "react";
 import Header from "../../../components/Header/Header";
 import BtnBlue from "../../../components/BtnBlue/BtnBlue"
 import { LuClipboardList } from "react-icons/lu";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import FormField from "../../../components/FormField/FormField";
-import { useState } from "react";
+import { clientsService, Client } from "../../../services/clientsService";
+import { ordersService, OrderStatus } from "../../../services/ordersService";
+import { ordersLinksService, OrderLink } from "../../../services/ordersLinksService";
+import { sellersService } from "../../../services/sellersService";
 import './CreateLink.css';
 
 interface CreateLinkProps {
@@ -14,21 +18,242 @@ interface CreateLinkProps {
 const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => {
   const [clientData, setClientData] = useState({
     name: '',
-    address: ''
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [createdLink, setCreatedLink] = useState<OrderLink | null>(null);
+  const [linkUrl, setLinkUrl] = useState<string>('');
+  const [sellerId, setSellerId] = useState<number | null>(null);
+  
+  // Estados para el selector de clientes
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [loadingClients, setLoadingClients] = useState(true);
+
+  // Cargar clientes y vendedor al montar
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Cargar vendedores
+        const sellers = await sellersService.findAll();
+        if (sellers.length > 0) {
+          setSellerId(sellers[0].id);
+        } else {
+          setError('No hay vendedores disponibles. Por favor crea un vendedor primero.');
+        }
+
+        // Cargar clientes
+        setLoadingClients(true);
+        const clientsData = await clientsService.findAll();
+        setClients(clientsData);
+        setFilteredClients(clientsData);
+      } catch (err: any) {
+        console.error('Error al cargar datos:', err);
+        setError(err.message || 'Error al cargar los datos');
+      } finally {
+        setLoadingClients(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Filtrar clientes cuando cambia el termino de busqueda
+  useEffect(() => {
+    if (!clientSearchTerm.trim()) {
+      setFilteredClients(clients);
+      return;
+    }
+
+    const searchLower = clientSearchTerm.toLowerCase();
+    const filtered = clients.filter(client => 
+      client.name.toLowerCase().includes(searchLower) ||
+      client.email.toLowerCase().includes(searchLower) ||
+      client.phone.includes(searchLower) ||
+      client.address.toLowerCase().includes(searchLower) ||
+      client.city.toLowerCase().includes(searchLower) ||
+      client.state.toLowerCase().includes(searchLower)
+    );
+    
+    setFilteredClients(filtered);
+  }, [clientSearchTerm, clients]);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Si hay un cliente seleccionado, no permitir cambios
+    if (selectedClient) {
+      return;
+    }
+    
     setClientData(prev => ({
       ...prev,
       [field]: e.target.value
     }));
+    if (error) setError(null);
+    if (success) setSuccess(false);
   };
 
-  const handleSubmit = () => {
-    // Lógica para crear y compartir link
-    console.log('Creating link for:', clientData);
-    if (desktop && onClose) {
-      onClose();
+  const handleClientSearch = (value: string) => {
+    setClientSearchTerm(value);
+    setShowClientDropdown(value.length > 0);
+    // Si se limpia la busqueda, deseleccionar cliente
+    if (!value.trim() && selectedClient) {
+      handleClearClient();
+    }
+  };
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showClientDropdown && !target.closest('.client-selector-wrapper')) {
+        setShowClientDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showClientDropdown]);
+
+  const handleSelectClient = (client: Client) => {
+    setSelectedClient(client);
+    setClientData({
+      name: client.name,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+      city: client.city,
+      state: client.state
+    });
+    setClientSearchTerm(client.name);
+    setShowClientDropdown(false);
+    if (error) setError(null);
+    if (success) setSuccess(false);
+  };
+
+  const handleClearClient = () => {
+    setSelectedClient(null);
+    setClientData({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: ''
+    });
+    setClientSearchTerm('');
+    setShowClientDropdown(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!sellerId) {
+      setError('No hay vendedor disponible');
+      return;
+    }
+
+    // Validar que se haya seleccionado un cliente
+    if (!selectedClient) {
+      setError('Por favor selecciona un cliente de la lista');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    setCreatedLink(null);
+    setLinkUrl('');
+
+    try {
+      // Usar solo el cliente seleccionado - NO crear clientes nuevos
+      const client = selectedClient;
+      console.log('Usando cliente seleccionado:', client);
+
+      // 1. Crear una orden vacía (draft) solo para asociar el link
+      // El cliente completará esta orden cuando use el link
+      const order = await ordersService.create({
+        clientId: client.id,
+        createdById: sellerId,
+        status: OrderStatus.PENDING,
+        notes: `Link generado para ${client.name} - Orden pendiente de completar por el cliente`
+      });
+      console.log('Orden draft creada:', order);
+
+      // 2. Crear link para la orden
+      const link = await ordersLinksService.create({
+        orderId: order.id,
+        createdById: sellerId
+      });
+      console.log('Link creado:', link);
+
+      // 4. Generar URL del link
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/NewOrder?token=${link.token}`;
+      
+      setCreatedLink(link);
+      setLinkUrl(url);
+      setSuccess(true);
+
+      // Resetear formulario
+      setClientData({
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        state: ''
+      });
+      setSelectedClient(null);
+      setClientSearchTerm('');
+      setShowClientDropdown(false);
+
+    } catch (err: any) {
+      console.error('Error al crear link:', err);
+      setError(err.message || 'Error al crear el link');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(linkUrl);
+      alert('¡Link copiado al portapapeles!');
+    } catch (err) {
+      console.error('Error al copiar:', err);
+      // Fallback para navegadores que no soportan clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = linkUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('¡Link copiado al portapapeles!');
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Link de pedido',
+          text: `Compartir link de pedido para ${clientData.name}`,
+          url: linkUrl
+        });
+      } catch (err) {
+        console.error('Error al compartir:', err);
+      }
+    } else {
+      // Fallback: copiar al portapapeles
+      handleCopyLink();
     }
   };
 
@@ -65,29 +290,289 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
       
       {/* Form Fields */}
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
-        <h4 className="field-label">Cliente</h4>
-        <FormField 
-          label="nombre" 
-          value={clientData.name} 
-          placeholder="Ej: Juan Perez"
-          editable={true}
-          onChange={handleInputChange('name')}
-        />      
+        {/* Client Selector */}
+        <h4 className="field-label">Buscar Cliente {selectedClient ? '(✓ Seleccionado)' : ' *'}</h4>
+        {!selectedClient && (
+          <p style={{
+            fontSize: '0.75rem',
+            color: desktop ? 'rgba(255, 255, 255, 0.6)' : '#666',
+            marginTop: '-0.5rem',
+            marginBottom: '0.5rem',
+            marginLeft: desktop ? '0' : '1rem',
+            fontStyle: 'italic'
+          }}>
+            Debes seleccionar un cliente existente para generar el link
+          </p>
+        )}
+        <div className="client-selector-wrapper" style={{ position: 'relative', marginBottom: '1rem' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '0.5rem',
+            alignItems: 'center'
+          }}>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <FormField
+                label="buscar"
+                value={clientSearchTerm}
+                placeholder="Buscar por nombre, dirección, teléfono..."
+                editable={true}
+                onChange={(e) => handleClientSearch(e.target.value)}
+              />
+              
+              {/* Dropdown de resultados */}
+              {showClientDropdown && filteredClients.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  zIndex: 1000,
+                  backgroundColor: desktop ? 'rgb(31, 41, 55)' : '#fff',
+                  border: `1px solid ${desktop ? 'rgba(100, 100, 100, 0.3)' : '#ccc'}`,
+                  borderRadius: '8px',
+                  marginTop: '4px',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}>
+                  {filteredClients.map((client) => (
+                    <div
+                      key={client.id}
+                      onClick={() => handleSelectClient(client)}
+                      style={{
+                        padding: '0.75rem 1rem',
+                        cursor: 'pointer',
+                        borderBottom: `1px solid ${desktop ? 'rgba(100, 100, 100, 0.2)' : '#eee'}`,
+                        transition: 'background-color 0.2s',
+                        color: desktop ? '#fff' : '#000'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = desktop ? 'rgba(100, 100, 100, 0.3)' : '#f5f5f5';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
+                        {client.name}
+                      </div>
+                      <div style={{ fontSize: '0.875rem', opacity: 0.7 }}>
+                        {client.address} {client.city}, {client.state}
+                      </div>
+                      <div style={{ fontSize: '0.875rem', opacity: 0.7 }}>
+                        {client.email} • Tel: {client.phone}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-        <h4 className="field-label">Dirección de entrega</h4>
-        <FormField 
-          label="dirección"
-          value={clientData.address}
-          placeholder="Ej: Calle Falsa 123"
-          editable={true}
-          onChange={handleInputChange('address')}
-        />
+              {/* Mensaje si no hay resultados */}
+              {showClientDropdown && filteredClients.length === 0 && clientSearchTerm && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  zIndex: 1000,
+                  backgroundColor: desktop ? 'rgb(31, 41, 55)' : '#fff',
+                  border: `1px solid ${desktop ? 'rgba(100, 100, 100, 0.3)' : '#ccc'}`,
+                  borderRadius: '8px',
+                  marginTop: '4px',
+                  padding: '1rem',
+                  color: desktop ? '#fff' : '#666',
+                  fontSize: '0.875rem'
+                }}>
+                  No se encontraron clientes. Por favor crea el cliente desde la sección de gestión de clientes.
+                </div>
+              )}
+            </div>
 
-        <div className="button-container">
-          <BtnBlue width="100%" height="3rem" onClick={handleSubmit}>
-            <span>Crear y compartir</span>
-          </BtnBlue>
+            {selectedClient && (
+              <button
+                onClick={handleClearClient}
+                style={{
+                  padding: '0.5rem',
+                  backgroundColor: 'transparent',
+                  border: `1px solid ${desktop ? 'rgba(100, 100, 100, 0.3)' : '#ccc'}`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  color: desktop ? '#fff' : '#666',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '2.5rem',
+                  width: '2.5rem'
+                }}
+                title="Limpiar selección"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Mostrar mensaje si está cargando clientes */}
+        {loadingClients && (
+          <div style={{
+            padding: '1rem',
+            textAlign: 'center',
+            color: desktop ? '#999' : '#666',
+            fontSize: '0.875rem',
+            marginBottom: '1rem'
+          }}>
+            Cargando clientes...
+          </div>
+        )}
+
+        {/* Mostrar campos del formulario solo cuando hay un cliente seleccionado */}
+        {selectedClient && (
+          <>
+            <h4 className="field-label">Nombre</h4>
+            <FormField 
+              label="nombre" 
+              value={clientData.name} 
+              placeholder="Ej: Juan Perez"
+              editable={false}
+              onChange={handleInputChange('name')}
+            />      
+
+            <h4 className="field-label">Email</h4>
+            <FormField 
+              label="email"
+              value={clientData.email}
+              placeholder="Ej: juan.perez@email.com"
+              editable={false}
+              onChange={handleInputChange('email')}
+            />
+
+            <h4 className="field-label">Teléfono</h4>
+            <FormField 
+              label="teléfono"
+              value={clientData.phone}
+              placeholder="Ej: 1234567890"
+              editable={false}
+              onChange={handleInputChange('phone')}
+            />
+
+            <h4 className="field-label">Dirección</h4>
+            <FormField 
+              label="dirección"
+              value={clientData.address}
+              placeholder="Ej: Calle Falsa 123"
+              editable={false}
+              onChange={handleInputChange('address')}
+            />
+
+            <h4 className="field-label">Ciudad</h4>
+            <FormField 
+              label="ciudad"
+              value={clientData.city}
+              placeholder="Ej: Buenos Aires"
+              editable={false}
+              onChange={handleInputChange('city')}
+            />
+
+            <h4 className="field-label">Provincia</h4>
+            <FormField 
+              label="provincia"
+              value={clientData.state}
+              placeholder="Ej: Buenos Aires"
+              editable={false}
+              onChange={handleInputChange('state')}
+            />
+          </>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#ef4444',
+            fontSize: '0.875rem'
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Success Message and Link */}
+        {success && createdLink && linkUrl && (
+          <div style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            color: '#22c55e'
+          }}>
+            <div style={{ marginBottom: '1rem', fontWeight: 600 }}>
+              ✅ Link creado exitosamente
+            </div>
+            
+            <div style={{ 
+              marginBottom: '1rem',
+              padding: '0.75rem',
+              backgroundColor: 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '6px',
+              wordBreak: 'break-all',
+              fontSize: '0.875rem',
+              fontFamily: 'monospace'
+            }}>
+              {linkUrl}
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: desktop ? 'row' : 'column' }}>
+              <BtnBlue 
+                width="100%" 
+                height="2.5rem" 
+                onClick={handleCopyLink}
+                borderRadius="6px"
+              >
+                <span>📋 Copiar link</span>
+              </BtnBlue>
+              
+              {typeof navigator !== 'undefined' && 'share' in navigator && (
+                <BtnBlue 
+                  width="100%" 
+                  height="2.5rem" 
+                  onClick={handleShare}
+                  borderRadius="6px"
+                  background="linear-gradient(195deg, rgba(43, 118, 184, 0.699), rgba(15, 55, 107, 0.459))"
+                >
+                  <span>📤 Compartir</span>
+                </BtnBlue>
+              )}
+            </div>
+
+            <div style={{ 
+              marginTop: '1rem', 
+              fontSize: '0.75rem', 
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontStyle: 'italic'
+            }}>
+              ⏰ Este link caduca en 24 horas
+            </div>
+          </div>
+        )}
+
+        {/* Mostrar botón solo cuando hay un cliente seleccionado */}
+        {selectedClient && (
+          <div className="button-container">
+            <BtnBlue 
+              width="100%" 
+              height="3rem" 
+              onClick={loading ? undefined : handleSubmit}
+            >
+              <span>{loading ? 'Creando link...' : 'Crear y compartir'}</span>
+            </BtnBlue>
+          </div>
+        )}
       </div>
     </>
   );

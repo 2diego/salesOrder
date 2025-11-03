@@ -39,7 +39,7 @@ export interface OrderLink {
 export const ordersLinksService = {
   async create(linkData: CreateOrderLinkDTO): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl('/orders-links'), {
+      const response = await fetch(getApiUrl('/order-links'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export const ordersLinksService = {
       if (filters?.createdById) params.append('createdById', filters.createdById.toString());
       if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
 
-      const url = `${getApiUrl('/orders-links')}${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `${getApiUrl('/order-links')}${params.toString() ? `?${params.toString()}` : ''}`;
       
       const response = await fetch(url, {
         method: 'GET',
@@ -111,7 +111,7 @@ export const ordersLinksService = {
 
   async findOne(id: number): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/orders-links/${id}`), {
+      const response = await fetch(getApiUrl(`/order-links/${id}`), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ export const ordersLinksService = {
 
   async findByToken(token: string): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/orders-links/token/${token}`), {
+      const response = await fetch(getApiUrl(`/order-links/token/${token}`), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ export const ordersLinksService = {
 
   async update(id: number, updateData: UpdateOrderLinkDTO): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/orders-links/${id}`), {
+      const response = await fetch(getApiUrl(`/order-links/${id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export const ordersLinksService = {
 
   async deactivate(id: number): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/orders-links/${id}/deactivate`), {
+      const response = await fetch(getApiUrl(`/order-links/${id}/deactivate`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ export const ordersLinksService = {
 
   async remove(id: number): Promise<void> {
     try {
-      const response = await fetch(getApiUrl(`/orders-links/${id}`), {
+      const response = await fetch(getApiUrl(`/order-links/${id}`), {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

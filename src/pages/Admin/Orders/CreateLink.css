@@ -20,6 +20,7 @@
   box-shadow: rgba(0, 0, 0, 0.3) 0rem 1.25rem 1.6875rem 0rem;
   width: 90%;
   max-width: 500px;
+  min-height: 450px;
   max-height: 80vh;
   overflow-y: auto;
   animation: popupSlideIn 0.3s ease-out;
@@ -74,6 +75,7 @@
 /* Desktop Form Styles */
 .desktop-form {
   padding: 2rem;
+  margin-top: 2rem;
 }
 
 .desktop-form .field-label {
@@ -112,4 +114,25 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0 1rem;
+}
+
+/* Client Selector Styles */
+.client-selector-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.desktop-form .client-selector-dropdown {
+  background-color: rgb(31, 41, 55);
+  border-color: rgba(100, 100, 100, 0.3);
 }
