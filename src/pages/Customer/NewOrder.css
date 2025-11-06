@@ -70,3 +70,27 @@ body {
   font-weight: 700;
   line-height: 28px;
 }
+
+/* Products List Full con margen para el bottom actions */
+.products-list-full {
+  margin-bottom: 14rem;
+}
+
+/* Bottom Actions */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #F7FAFC;
+  padding: 1rem;
+  z-index: 100;
+}
+
+.expiration-text {
+  text-align: center;
+  padding-top: 1rem;
+  color: #4D7099;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+}

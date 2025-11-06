@@ -34,7 +34,7 @@
 }
 
 .product-detail {
-  width: 78px;
+  /*width: 78px;*/
   display: flex;
   flex-direction: column;
 }

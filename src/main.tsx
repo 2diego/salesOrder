@@ -47,7 +47,7 @@ const router = createBrowserRouter([
         element: <CreateLink />
       },
       {
-        path: "/ValidateOrder",
+        path: "/ValidateOrder/:id",
         element: <ValidateOrder />
       },
       {
@@ -136,10 +136,10 @@ const router = createBrowserRouter([
     path: "/CustomerOrderHistory",
     element: <CustomerOrderHistory />
   },
-  {
-    path: "/HistoryOrderDetails",
-    element: <HistoryOrderDetails />
-  }
+      {
+        path: "/HistoryOrderDetails/:id",
+        element: <HistoryOrderDetails />
+      }
 ]);
 
 const rootElement = document.getElementById('root');

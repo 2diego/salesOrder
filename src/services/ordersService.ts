@@ -31,6 +31,10 @@ export interface Order {
   client?: {
     id: number;
     name: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
   };
   createdBy?: {
     id: number;

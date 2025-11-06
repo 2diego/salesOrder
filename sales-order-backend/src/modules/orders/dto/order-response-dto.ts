@@ -13,6 +13,9 @@ export class OrderResponseDto {
     id: number;
     name: string;
     email: string;
+    phone: string;
+    address: string;
+    city?: string;
   };
   createdBy?: {
     id: number;

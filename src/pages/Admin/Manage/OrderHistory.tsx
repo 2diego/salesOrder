@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from "../../../components/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
@@ -5,8 +7,72 @@ import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import BtnBlue from "../../../components/BtnBlue/BtnBlue";
 import InfoRow from "../../../components/InfoRow/InfoRow";
 import { LuClipboardList } from 'react-icons/lu';
+import { ordersService, Order, OrderStatus } from "../../../services/ordersService";
 
 const OrderHistory = () => {
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Cargar todos los pedidos al montar
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const ordersData = await ordersService.findAll();
+        
+        // Filtrar órdenes vacías (sin items) que son solo para generar links
+        // Estas órdenes se crean solo como contenedor para el link y no deben mostrarse
+        // hasta que el cliente las complete con items
+        const ordersWithItems = ordersData.filter(order => 
+          order.orderItems && order.orderItems.length > 0
+        );
+        
+        // Ordenar por fecha de creación (más recientes primero)
+        const sortedOrders = ordersWithItems.sort((a, b) => {
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          return dateB - dateA;
+        });
+        
+        setOrders(sortedOrders);
+      } catch (err: any) {
+        console.error('Error al cargar pedidos:', err);
+        setError(err.message || 'Error al cargar los pedidos');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Formatear fecha
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day}/${month}/${year}`;
+  };
+
+  // Formatear número de pedido
+  const formatOrderNumber = (orderId: number): string => {
+    return orderId.toString().padStart(6, '0');
+  };
+
+  // Formatear estado
+  const formatStatus = (status: OrderStatus): { text: string; color: string } => {
+    const statusMap: Record<OrderStatus, { text: string; color: string }> = {
+      [OrderStatus.PENDING]: { text: 'Pendiente', color: '#8d2121ff' },
+      [OrderStatus.VALIDATED]: { text: 'Validado', color: '#3c9234ff' },
+      [OrderStatus.CANCELLED]: { text: 'Cancelado', color: '#8d2121ff' },
+    };
+    return statusMap[status] || { text: status, color: '#4D7099' };
+  };
+
   return (
     <>
       {/* Header */}  
@@ -22,36 +88,67 @@ const OrderHistory = () => {
         <h2>Historial de pedidos</h2>
       </SectionTitle>
 
-      {/* Order History Options */}
-      <InfoRow className="row-header"
-        columns={[
-          <span key={'date'}>Fecha</span>,
-          <span key={'id'}>Nro de pedido</span>,
-          <span key={'client'}>Cliente</span>,
-          <span key={'status'}>Estado</span>,
-        ]}
-        actionIcon={<LuClipboardList />}
-      />
-      <InfoRow
-        columns={[
-          <span key={'date'}>12/02/24</span>,
-          <span key={'id'}>00000456</span>,
-          <span key={'client'}>Juan Pérez</span>,
-          <span key={'status'} style={{ color: '#8d2121ff', fontWeight: 'bold' }}>S/V</span>,
-        ]}
-        actionLabel="Ver más"
-        actionIcon={<LuClipboardList />}
-      />
-      <InfoRow
-        columns={[
-          <span key={'date'}>12/02/24</span>,
-          <span key={'id'}>00000456</span>,
-          <span key={'client'}>Juan Pérez</span>,
-          <span key={'status'} style={{ color: '#3c9234ff', fontWeight: 'bold' }}>V</span>,
-        ]}
-        actionLabel="Ver más"
-        actionIcon={<LuClipboardList />}
-      />
+      {/* Error Message */}
+      {error && (
+        <div style={{ 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          border: '1px solid rgba(239, 68, 68, 0.3)', 
+          color: '#ef4444', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          margin: '1rem' 
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loading && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          Cargando pedidos...
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && orders.length === 0 && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No hay pedidos disponibles
+        </div>
+      )}
+
+      {/* Order History Header */}
+      {!loading && orders.length > 0 && (
+        <InfoRow className="row-header"
+          columns={[
+            <span key={'date'}>Fecha</span>,
+            <span key={'id'}>Nro de pedido</span>,
+            <span key={'client'}>Cliente</span>,
+            <span key={'status'}>Estado</span>,
+          ]}
+          actionIcon={<LuClipboardList />}
+        />
+      )}
+
+      {/* Orders List */}
+      {orders.map((order) => {
+        const statusInfo = formatStatus(order.status);
+        return (
+          <InfoRow
+            key={order.id}
+            columns={[
+              <span key={'date'}>{formatDate(order.createdAt)}</span>,
+              <span key={'id'}>{formatOrderNumber(order.id)}</span>,
+              <span key={'client'}>{order.client?.name || 'Sin cliente'}</span>,
+              <span key={'status'} style={{ color: statusInfo.color, fontWeight: 'bold' }}>
+                {statusInfo.text}
+              </span>,
+            ]}
+            actionLabel="Ver más"
+            actionIcon={<LuClipboardList />}
+            onActionClick={() => navigate(`/HistoryOrderDetails/${order.id}`)}
+          />
+        );
+      })}
 
       {/* Back Button */}
       <Link to="/Manage" style={{ textDecoration: 'none', color: 'inherit' }}>

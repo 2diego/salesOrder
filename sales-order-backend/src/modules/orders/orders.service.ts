@@ -131,6 +131,9 @@ export class OrdersService {
         id: order.client.id,
         name: order.client.name,
         email: order.client.email,
+        phone: order.client.phone,
+        address: order.client.address,
+        city: order.client.city,
       } : undefined,
       createdBy: order.createdBy ? {
         id: order.createdBy.id,

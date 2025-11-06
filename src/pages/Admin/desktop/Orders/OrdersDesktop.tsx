@@ -46,8 +46,8 @@ const OrdersDesktop = () => {
 	const tableData = ordersWithItems.map(order => ({
 		id: order.id,
 		name: order.client?.name || 'Sin cliente',
-		phone: (order.client as any)?.phone || 'N/A',
-		address: (order.client as any)?.address || 'N/A',
+		phone: order.client?.phone || 'N/A',
+		address: order.client?.address || 'N/A',
 		status: formatStatus(order.status),
 		rawStatus: order.status, // Para mantener el estado original para el render
 		order: order // Mantener referencia completa del pedido

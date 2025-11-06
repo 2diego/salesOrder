@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from "../../../components/Header/Header";
 import BtnBlue from "../../../components/BtnBlue/BtnBlue"
 import { LuClipboardList } from "react-icons/lu";
@@ -9,6 +10,7 @@ import SearchBar from '../../../components/SearchBar/SearchBar';
 import { ordersService, Order, OrderStatus } from "../../../services/ordersService";
 
 const Orders = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,7 +143,7 @@ const Orders = () => {
           ]}
           actionLabel="Ver pedido"
           actionIcon={<LuClipboardList />}
-          onActionClick={() => {/* validar */}}
+          onActionClick={() => navigate(`/ValidateOrder/${order.id}`)}
         />
       ))}
 

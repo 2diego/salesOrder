@@ -31,7 +31,7 @@ export const ordersValidationsService = {
   
   async create(validationData: CreateOrderValidationDTO): Promise<OrderValidation> {
     try {
-      const response = await fetch(getApiUrl('/orders-validations'), {
+      const response = await fetch(getApiUrl('/order-validations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export const ordersValidationsService = {
       if (filters?.orderId) params.append('orderId', filters.orderId.toString());
       if (filters?.validatedById) params.append('validatedById', filters.validatedById.toString());
 
-      const url = `${getApiUrl('/orders-validations')}${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `${getApiUrl('/order-validations')}${params.toString() ? `?${params.toString()}` : ''}`;
       
       const response = await fetch(url, {
         method: 'GET',
@@ -102,7 +102,7 @@ export const ordersValidationsService = {
 
   async findOne(id: number): Promise<OrderValidation> {
     try {
-      const response = await fetch(getApiUrl(`/orders-validations/${id}`), {
+      const response = await fetch(getApiUrl(`/order-validations/${id}`), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ export const ordersValidationsService = {
 
   async findByOrderId(orderId: number): Promise<OrderValidation[]> {
     try {
-      const response = await fetch(getApiUrl(`/orders-validations/order/${orderId}`), {
+      const response = await fetch(getApiUrl(`/order-validations/order/${orderId}`), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ export const ordersValidationsService = {
 
   async validateOrder(orderId: number, validatedById: number, status: OrderStatus, notes?: string): Promise<OrderValidation> {
     try {
-      const response = await fetch(getApiUrl(`/orders-validations/validate`), {
+      const response = await fetch(getApiUrl(`/order-validations/validate`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
