@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
+import { clientsService } from "../../../../services/clientsService";
 
 const OrdersDesktop = () => {
 	const [orders, setOrders] = useState<Order[]>([]);
@@ -13,7 +14,58 @@ const OrdersDesktop = () => {
 				setLoading(true);
 				setError(null);
 				const ordersData = await ordersService.findAll();
-				setOrders(ordersData);
+				
+				// Load full client data for orders where client data is missing or incomplete
+				const ordersWithFullClientData: Order[] = await Promise.all(
+					ordersData.map(async (order): Promise<Order> => {
+						// Check if client data is missing or incomplete
+						const needsFullClient = order.client && (
+							!order.client.phone || (typeof order.client.phone === 'string' && order.client.phone.trim() === '') ||
+							!order.client.address || (typeof order.client.address === 'string' && order.client.address.trim() === '')
+						);
+						
+						if (needsFullClient && order.client) {
+							try {
+								const fullClient = await clientsService.findOne(order.clientId);
+								return {
+									...order,
+									client: {
+										...order.client,
+										phone: fullClient.phone || order.client.phone || '',
+										address: fullClient.address || order.client.address || '',
+										city: fullClient.city || order.client.city || '',
+									}
+								} as Order;
+							} catch (err: any) {
+								console.warn(`Error loading client data for order ${order.id}:`, err);
+								return order;
+							}
+						} else if (!order.client && order.clientId) {
+							// If client is not loaded at all, try to load it
+							try {
+								const fullClient = await clientsService.findOne(order.clientId);
+								return {
+									...order,
+									client: {
+										id: fullClient.id,
+										name: fullClient.name,
+										email: fullClient.email,
+										phone: fullClient.phone || '',
+										address: fullClient.address || '',
+										city: fullClient.city || '',
+									}
+								} as Order;
+							} catch (err: any) {
+								console.warn(`Error loading client data for order ${order.id}:`, err);
+								return order;
+							}
+						}
+						
+						return order;
+					})
+				);
+				
+				setOrders(ordersWithFullClientData);
 			} catch (err: any) {
 				console.error('Error al cargar pedidos:', err);
 				setError(err.message || 'Error al cargar los pedidos');

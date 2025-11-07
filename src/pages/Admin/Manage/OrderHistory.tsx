@@ -7,12 +7,15 @@ import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import BtnBlue from "../../../components/BtnBlue/BtnBlue";
 import InfoRow from "../../../components/InfoRow/InfoRow";
 import { LuClipboardList } from 'react-icons/lu';
+import SearchBar from '../../../components/SearchBar/SearchBar';
 import { ordersService, Order, OrderStatus } from "../../../services/ordersService";
 
 const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   // Cargar todos los pedidos al montar
@@ -38,6 +41,7 @@ const OrderHistory = () => {
         });
         
         setOrders(sortedOrders);
+        setFilteredOrders(sortedOrders);
       } catch (err: any) {
         console.error('Error al cargar pedidos:', err);
         setError(err.message || 'Error al cargar los pedidos');
@@ -48,6 +52,28 @@ const OrderHistory = () => {
 
     fetchOrders();
   }, []);
+
+  // Filtrar pedidos
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredOrders(orders);
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    const filtered = orders.filter(order => 
+      order.id.toString().includes(searchLower) ||
+      order.client?.name.toLowerCase().includes(searchLower) ||
+      (order.client as any)?.email?.toLowerCase().includes(searchLower) ||
+      (order.client as any)?.phone?.includes(searchLower)
+    );
+    
+    setFilteredOrders(filtered);
+  }, [searchTerm, orders]);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
 
   // Formatear fecha
   const formatDate = (dateString: string): string => {
@@ -88,6 +114,13 @@ const OrderHistory = () => {
         <h2>Historial de pedidos</h2>
       </SectionTitle>
 
+      {/* Search Bar */}
+      <SearchBar 
+        placeholder="Buscar por cliente o nro de pedido" 
+        value={searchTerm}
+        onChange={handleSearch}
+      />
+
       {/* Error Message */}
       {error && (
         <div style={{ 
@@ -109,15 +142,22 @@ const OrderHistory = () => {
         </div>
       )}
 
-      {/* Empty state */}
-      {!loading && orders.length === 0 && (
+      {/* Empty state - con búsqueda */}
+      {!loading && filteredOrders.length === 0 && searchTerm && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
+          No se encontraron pedidos con "{searchTerm}"
+        </div>
+      )}
+
+      {/* Empty state - sin pedidos */}
+      {!loading && filteredOrders.length === 0 && !searchTerm && orders.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
           No hay pedidos disponibles
         </div>
       )}
 
       {/* Order History Header */}
-      {!loading && orders.length > 0 && (
+      {!loading && filteredOrders.length > 0 && (
         <InfoRow className="row-header"
           columns={[
             <span key={'date'}>Fecha</span>,
@@ -130,7 +170,7 @@ const OrderHistory = () => {
       )}
 
       {/* Orders List */}
-      {orders.map((order) => {
+      {filteredOrders.map((order) => {
         const statusInfo = formatStatus(order.status);
         return (
           <InfoRow

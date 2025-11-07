@@ -9,6 +9,7 @@ import { ordersService, Order, OrderStatus } from "../../../services/ordersServi
 import { ordersItemsService, OrderItem } from "../../../services/ordersItemsService";
 import { ordersValidationsService } from "../../../services/ordersValidationsService";
 import { productsService, Product } from "../../../services/productsService";
+import { clientsService } from "../../../services/clientsService";
 
 interface ProductItem {
   id: string;
@@ -57,6 +58,47 @@ const ValidateOrder = () => {
 
         // 1. Load order
         const orderData = await ordersService.findOne(parseInt(id));
+        
+        // Debug: Log client data
+        console.log('Order client data:', orderData.client);
+        
+        // 1.1. Load full client data if address or city is missing or empty
+        const addressMissing = !orderData.client?.address || (typeof orderData.client.address === 'string' && orderData.client.address.trim() === '');
+        const cityMissing = !orderData.client?.city || (typeof orderData.client.city === 'string' && orderData.client.city.trim() === '');
+        const needsFullClient = orderData.client && (addressMissing || cityMissing);
+        
+        if (needsFullClient && orderData.client) {
+          try {
+            console.log('Loading full client data for clientId:', orderData.clientId);
+            const fullClient = await clientsService.findOne(orderData.clientId);
+            console.log('Full client data loaded:', { address: fullClient.address, city: fullClient.city });
+            orderData.client = {
+              ...orderData.client,
+              address: (fullClient.address && fullClient.address.trim()) || orderData.client.address || '',
+              city: (fullClient.city && fullClient.city.trim()) || orderData.client.city || '',
+            };
+          } catch (err: any) {
+            console.warn('Error loading full client data:', err);
+            // Continue with partial client data
+          }
+        } else if (!orderData.client && orderData.clientId) {
+          // If client is not loaded at all, try to load it
+          try {
+            console.log('Client not in order, loading full client data for clientId:', orderData.clientId);
+            const fullClient = await clientsService.findOne(orderData.clientId);
+            orderData.client = {
+              id: fullClient.id,
+              name: fullClient.name,
+              email: fullClient.email,
+              phone: fullClient.phone,
+              address: fullClient.address || '',
+              city: fullClient.city || '',
+            };
+          } catch (err: any) {
+            console.warn('Error loading client data:', err);
+          }
+        }
+        
         setOrder(orderData);
         setNotes(orderData.notes || '');
 
@@ -412,7 +454,7 @@ const ValidateOrder = () => {
                 </g>
               </g>
             </svg>
-            <span>Vista previa</span>
+            <span>Compartir</span>
           </BtnBlue>
         </div>
       </SectionTitle>
@@ -503,7 +545,8 @@ const ValidateOrder = () => {
                   cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '0.875rem',
-                  fontWeight: 500
+                  fontWeight: 500,
+                  alignSelf: 'center'
                 }}
               >
                 Cancelar
@@ -629,7 +672,8 @@ const ValidateOrder = () => {
                   cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '0.875rem',
-                  fontWeight: 500
+                  fontWeight: 500,
+                  alignSelf: 'center'
                 }}
               >
                 Cancelar
