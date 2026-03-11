@@ -19,7 +19,7 @@ export class ClientsService {
     });
 
     if (existingClient) {
-      throw new ConflictException('Client with this email already exists');
+      throw new ConflictException('Ya existe un cliente con este correo electrónico');
     }
 
     const client = this.clientRepository.create(createClientDto);
@@ -38,7 +38,7 @@ export class ClientsService {
     });
 
     if (!client) {
-      throw new NotFoundException(`Client with ID ${id} not found`);
+      throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
     }
 
     return client;
@@ -54,7 +54,7 @@ export class ClientsService {
       });
 
       if (existingClient) {
-        throw new ConflictException('Client with this email already exists');
+        throw new ConflictException('Ya existe un cliente con este correo electrónico');
       }
     }
 
@@ -75,7 +75,7 @@ export class ClientsService {
       .getCount();
 
     if (ordersCount > 0) {
-      throw new ConflictException('Cannot delete client that has orders');
+      throw new ConflictException('No se puede eliminar un cliente que tiene pedidos asociados');
     }
 
     //Eliminar o desactivar? Si se elimina hay que eliminar ordenes asociadas?
@@ -84,7 +84,7 @@ export class ClientsService {
     client.isActive = false;
     await this.clientRepository.save(client);
 
-    return { message: `Client "${client.name}" has been deleted` };
+    return { message: `Cliente "${client.name}" ha sido eliminado` };
   }
 
   async findByEmail(email: string): Promise<Client | null> {

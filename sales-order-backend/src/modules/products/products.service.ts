@@ -22,7 +22,7 @@ export class ProductsService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Category with ID ${createProductDto.categoryId} not found`);
+      throw new NotFoundException(`Categoría con ID ${createProductDto.categoryId} no encontrada`);
     }
 
     // Verificar si ya existe un producto con el mismo SKU
@@ -32,7 +32,7 @@ export class ProductsService {
       });
 
       if (existingProduct) {
-        throw new ConflictException('Product with this SKU already exists');
+        throw new ConflictException('Ya existe un producto con este SKU');
       }
     }
 
@@ -58,7 +58,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
     }
 
     return product;
@@ -74,7 +74,7 @@ export class ProductsService {
       });
 
       if (!category) {
-        throw new NotFoundException(`Category with ID ${updateProductDto.categoryId} not found`);
+        throw new NotFoundException(`Categoría con ID ${updateProductDto.categoryId} no encontrada`);
       }
     }
 
@@ -85,7 +85,7 @@ export class ProductsService {
       });
 
       if (existingProduct) {
-        throw new ConflictException('Product with this SKU already exists');
+        throw new ConflictException('Ya existe un producto con este SKU');
       }
     }
 
@@ -106,12 +106,12 @@ export class ProductsService {
       .getCount();
 
     if (orderItemsCount > 0) {
-      throw new ConflictException('Cannot delete product that has been ordered'); //Poner opcion para que no se pueda ordenar mas o solo bajar a 0 el stock?
+      throw new ConflictException('No se puede eliminar un producto que ya ha sido pedido');
     }
 
     await this.productRepository.remove(product);
     
-    return { message: `Product "${product.name}" has been deleted` };
+    return { message: `Producto "${product.name}" ha sido eliminado` };
   }
 
   async findByCategory(categoryId: number): Promise<Product[]> {

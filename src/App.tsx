@@ -1,4 +1,4 @@
-import Orders from './pages/Admin/Orders/Orders';
+import Orders from './pages/Admin/mobile/Orders/Orders';
 import OrdersDesktop from './pages/Admin/desktop/Orders/OrdersDesktop';
 
 // function App() {

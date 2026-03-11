@@ -25,7 +25,7 @@ export class OrdersLinksService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${createOrderLinkDto.orderId} not found`);
+      throw new NotFoundException(`Pedido con ID ${createOrderLinkDto.orderId} no encontrado`);
     }
 
     // Verificar que no existe ya un link activo para esta orden
@@ -37,7 +37,7 @@ export class OrdersLinksService {
     });
 
     if (existingLink) {
-      throw new BadRequestException('An active link already exists for this order');
+      throw new BadRequestException('Ya existe un enlace activo para este pedido');
     }
 
     // Generar token único
@@ -88,7 +88,7 @@ export class OrdersLinksService {
     });
 
     if (!orderLink) {
-      throw new NotFoundException(`Order link with ID ${id} not found`);
+      throw new NotFoundException(`Enlace de pedido con ID ${id} no encontrado`);
     }
 
     return this.formatOrderLinkResponse(orderLink);
@@ -101,16 +101,16 @@ export class OrdersLinksService {
     });
 
     if (!orderLink) {
-      throw new NotFoundException(`Order link with token ${token} not found`);
+      throw new NotFoundException(`Enlace de pedido con token ${token} no encontrado`);
     }
 
     // Verificar si el link está activo y no ha expirado
     if (!orderLink.isActive) {
-      throw new BadRequestException('Order link is not active');
+      throw new BadRequestException('El enlace del pedido no está activo');
     }
 
     if (new Date() > orderLink.expiresAt) {
-      throw new BadRequestException('Order link has expired');
+      throw new BadRequestException('El enlace del pedido ha expirado');
     }
 
     return this.formatOrderLinkResponse(orderLink);

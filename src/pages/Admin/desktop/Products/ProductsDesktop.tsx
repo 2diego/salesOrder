@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
-import AddProducts from "../../Manage/Products/AddProducts";
-import EditProducts from "../../Manage/Products/EditProducts";
+import AddProducts from "../../mobile/Manage/Products/AddProducts";
+import EditProducts from "../../mobile/Manage/Products/EditProducts";
 import { Product } from '@/services/productsService';
 import { productsService } from '../../../../services/productsService';
 

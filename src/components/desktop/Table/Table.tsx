@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Table.css';
-import BtnBlue from '../../../components/BtnBlue/BtnBlue';
-import SearchBar from '../../../components/SearchBar/SearchBar';
+import BtnBlue from '../../common/BtnBlue/BtnBlue';
+import SearchBar from '../../common/SearchBar/SearchBar';
 
 export interface TableColumn {
   key: string; // Tiene que coincidir con las variables del objeto data

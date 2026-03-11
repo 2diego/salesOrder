@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
-import AddClients from "../../Manage/Clients/AddClients";
-import EditClients from "../../Manage/Clients/EditClients";
+import AddClients from "../../mobile/Manage/Clients/AddClients";
+import EditClients from "../../mobile/Manage/Clients/EditClients";
 import { clientsService, Client } from "../../../../services/clientsService";
 
 const ClientsDesktop = () => {

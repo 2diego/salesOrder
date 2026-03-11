@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
-import AddSellers from "../../Manage/Sellers/AddSellers";
-import EditSellers from "../../Manage/Sellers/EditSellers";
+import AddSellers from "../../mobile/Manage/Sellers/AddSellers";
+import EditSellers from "../../mobile/Manage/Sellers/EditSellers";
 import { Seller, sellersService } from '../../../../services/sellersService';
 
 const SellersDesktop = () => {

@@ -67,7 +67,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
+      throw new NotFoundException(`Pedido con ID ${id} no encontrado`);
     }
 
     return this.formatOrderResponse(order);
@@ -77,7 +77,7 @@ export class OrdersService {
     const order = await this.findOne(id);
     
     if (order.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('Cannot update a validated order');
+      throw new BadRequestException('No se puede actualizar un pedido validado');
     }
 
     await this.orderRepository.update(id, updateOrderDto);
@@ -88,7 +88,7 @@ export class OrdersService {
     const order = await this.findOne(id);
     
     if (order.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('Cannot delete a validated order');
+      throw new BadRequestException('No se puede eliminar un pedido validado');
     }
 
     await this.orderRepository.delete(id);
@@ -101,7 +101,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${orderId} not found`);
+      throw new NotFoundException(`Pedido con ID ${orderId} no encontrado`);
     }
 
     const totalAmount = order.orderItems.reduce((total, item) => {

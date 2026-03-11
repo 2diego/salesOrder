@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import BottomNav from '../components/BottomNav/BottomNav';
+import BottomNav from '../components/mobile/BottomNav/BottomNav';
 import { useMediaQuery } from 'react-responsive';
 import AdminDesktopLayout from './AdminDesktopLayout';
 

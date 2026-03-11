@@ -1,17 +1,17 @@
 
-// Clients Service
+// Servicio de Clientes
 export * from './clientsService';
 
-// Products Service
+// Servicio de Productos
 export * from './productsService';
 
-// Categories Service
+// Servicio de Categorías
 export * from './categoriesService';
 
-// Sellers Service (Usuarios con rol de vendedor)
+// Servicio de Vendedores (Usuarios con rol de vendedor)
 export * from './sellersService';
 
-// Orders Services
+// Servicios de Pedidos
 export * from './ordersService';
 export * from './ordersItemsService';
 export * from './ordersLinksService';

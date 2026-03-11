@@ -15,10 +15,10 @@ const OrdersDesktop = () => {
 				setError(null);
 				const ordersData = await ordersService.findAll();
 				
-				// Load full client data for orders where client data is missing or incomplete
+				// Cargar datos completos del cliente para las órdenes donde los datos del cliente están incompletos o faltan
 				const ordersWithFullClientData: Order[] = await Promise.all(
 					ordersData.map(async (order): Promise<Order> => {
-						// Check if client data is missing or incomplete
+						// Verificar si los datos del cliente están incompletos o faltan
 						const needsFullClient = order.client && (
 							!order.client.phone || (typeof order.client.phone === 'string' && order.client.phone.trim() === '') ||
 							!order.client.address || (typeof order.client.address === 'string' && order.client.address.trim() === '')
@@ -41,7 +41,7 @@ const OrdersDesktop = () => {
 								return order;
 							}
 						} else if (!order.client && order.clientId) {
-							// If client is not loaded at all, try to load it
+							// Si el cliente no está cargado, intentar cargarlo
 							try {
 								const fullClient = await clientsService.findOne(order.clientId);
 								return {

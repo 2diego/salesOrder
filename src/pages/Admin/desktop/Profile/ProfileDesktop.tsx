@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import EditProfile from "../../Profile/EditProfile";
-import EditPassword from "../../Profile/EditPassword";
+import EditProfile from "../../mobile/Profile/EditProfile";
+import EditPassword from "../../mobile/Profile/EditPassword";
 
 const ProfileDesktop = () => {
   const [activeSection, setActiveSection] = useState<'profile' | 'password'>('profile');

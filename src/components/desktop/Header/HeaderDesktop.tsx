@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BtnBlue from '../../BtnBlue/BtnBlue';
+import BtnBlue from '../../common/BtnBlue/BtnBlue';
 import HeaderNotification from '../HeaderNotification/HeaderNotification';
-import CreateLink from '../../../pages/Admin/Orders/CreateLink';
+import CreateLink from '../../../pages/Admin/mobile/Orders/CreateLink';
 import './HeaderDesktop.css';
 
 const HeaderDesktop = () => {

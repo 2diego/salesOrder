@@ -23,17 +23,17 @@ export class OrdersValidationsService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${createOrderValidationDto.orderId} not found`);
+      throw new NotFoundException(`Pedido con ID ${createOrderValidationDto.orderId} no encontrado`);
     }
 
     // Verificar que la orden no esté ya validada
     if (order.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('Order is already validated');
+      throw new BadRequestException('El pedido ya está validado');
     }
 
     // Verificar que la orden no esté cancelada
     if (order.status === OrderStatus.CANCELLED) {
-      throw new BadRequestException('Cannot validate a cancelled order');
+      throw new BadRequestException('No se puede validar un pedido cancelado');
     }
 
     // Crear la validación
@@ -76,7 +76,7 @@ export class OrdersValidationsService {
     });
 
     if (!orderValidation) {
-      throw new NotFoundException(`Order validation with ID ${id} not found`);
+      throw new NotFoundException(`Validación de pedido con ID ${id} no encontrada`);
     }
 
     return this.formatOrderValidationResponse(orderValidation);
@@ -88,12 +88,12 @@ export class OrdersValidationsService {
 
   async update(id: number, updateOrderValidationDto: UpdateOrderValidationDto): Promise<OrderValidationResponseDto> {
     // Las validaciones son inmutables una vez creadas
-    throw new BadRequestException('Order validations cannot be updated once created');
+    throw new BadRequestException('Las validaciones de pedido no se pueden actualizar una vez creadas');
   }
 
   async remove(id: number): Promise<void> {
     // Las validaciones no se pueden eliminar
-    throw new BadRequestException('Order validations cannot be deleted');
+    throw new BadRequestException('Las validaciones de pedido no se pueden eliminar');
   }
 
   async validateOrder(orderId: number, validatedById: number, status: OrderStatus, notes?: string): Promise<OrderValidationResponseDto> {

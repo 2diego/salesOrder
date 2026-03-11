@@ -25,7 +25,7 @@ export class UsersService {
     });
   
     if (existingUser) {
-      throw new ConflictException('Username or email already exists');
+      throw new ConflictException('El nombre de usuario o correo electrónico ya existe');
     }
   
     // Hash de la contraseña y mapeo correcto
@@ -60,7 +60,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
 
     return this.mapToResponseDTO(user);
@@ -78,7 +78,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
 
     // Si se va a actualizar username o email, verificar que no existan
@@ -91,7 +91,7 @@ export class UsersService {
       });
 
       if (existingUser && existingUser.id !== id) {
-        throw new ConflictException('Username or email already exists');
+        throw new ConflictException('El nombre de usuario o correo electrónico ya existe');
       }
     }
 
@@ -120,7 +120,7 @@ export class UsersService {
     });
 
     if (!updatedUser) {
-      throw new NotFoundException(`User with ID ${id} not found after update`);
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado tras la actualización`);
     }
 
     return this.mapToResponseDTO(updatedUser);
@@ -132,13 +132,13 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
 
     // Soft delete: marcar como inactivo en lugar de eliminar
     await this.userRepository.update(id, { isActive: false });
 
-    return { message: `User with ID ${id} has been deactivated` };
+    return { message: `Usuario con ID ${id} ha sido desactivado` };
   }
 
   // Método auxiliar para mapear User a UserResponseDTO

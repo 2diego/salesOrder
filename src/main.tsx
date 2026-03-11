@@ -2,37 +2,37 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import Orders from './pages/Admin/Orders/Orders';
-import Reports from './pages/Admin/Reports/Reports';
-import Manage from './pages/Admin/Manage/Manage';
-import Profile from './pages/Admin/Profile/Profile';
+import Orders from './pages/Admin/mobile/Orders/Orders';
+import Reports from './pages/Admin/mobile/Reports/Reports';
+import Manage from './pages/Admin/mobile/Manage/Manage';
+import Profile from './pages/Admin/mobile/Profile/Profile';
 import NewOrder from './pages/Customer/NewOrder';
-import Adminlayout from './layouts/AdminLayout';
-import OrderHistory from './pages/Admin/Manage/OrderHistory';
+import AdminLayout from './layouts/AdminLayout';
+import OrderHistory from './pages/Admin/mobile/Manage/OrderHistory';
 import Cart from './pages/Customer/Cart';
-import AdminSellers from './pages/Admin/Manage/Sellers/AdminSellers';
-import AdminProducts from './pages/Admin/Manage/Products/AdminProducts';
-import AdminClients from './pages/Admin/Manage/Clients/AdminClients';
+import AdminSellers from './pages/Admin/mobile/Manage/Sellers/AdminSellers';
+import AdminProducts from './pages/Admin/mobile/Manage/Products/AdminProducts';
+import AdminClients from './pages/Admin/mobile/Manage/Clients/AdminClients';
 import CustomerOrderHistory from './pages/Customer/CustomerOrderHistory';
 import HistoryOrderDetails from './pages/Customer/HistoryOrderDetails';
-import ClientsList from './pages/Admin/Manage/Clients/ClientsList';
-import ProductsList from './pages/Admin/Manage/Products/ProductsList';
-import SellersList from './pages/Admin/Manage/Sellers/SellersList';
-import AddClients from './pages/Admin/Manage/Clients/AddClients';
-import AddProducts from './pages/Admin/Manage/Products/AddProducts';
-import AddSellers from './pages/Admin/Manage/Sellers/AddSellers';
-import EditClients from './pages/Admin/Manage/Clients/EditClients';
-import EditProducts from './pages/Admin/Manage/Products/EditProducts';
-import EditSellers from './pages/Admin/Manage/Sellers/EditSellers';
-import CreateLink from './pages/Admin/Orders/CreateLink';
-import ValidateOrder from './pages/Admin/Orders/ValidateOrder';
-import EditPassword from './pages/Admin/Profile/EditPassword';
-import EditProfile from './pages/Admin/Profile/EditProfile';
+import ClientsList from './pages/Admin/mobile/Manage/Clients/ClientsList';
+import ProductsList from './pages/Admin/mobile/Manage/Products/ProductsList';
+import SellersList from './pages/Admin/mobile/Manage/Sellers/SellersList';
+import AddClients from './pages/Admin/mobile/Manage/Clients/AddClients';
+import AddProducts from './pages/Admin/mobile/Manage/Products/AddProducts';
+import AddSellers from './pages/Admin/mobile/Manage/Sellers/AddSellers';
+import EditClients from './pages/Admin/mobile/Manage/Clients/EditClients';
+import EditProducts from './pages/Admin/mobile/Manage/Products/EditProducts';
+import EditSellers from './pages/Admin/mobile/Manage/Sellers/EditSellers';
+import CreateLink from './pages/Admin/mobile/Orders/CreateLink';
+import ValidateOrder from './pages/Admin/mobile/Orders/ValidateOrder';
+import EditPassword from './pages/Admin/mobile/Profile/EditPassword';
+import EditProfile from './pages/Admin/mobile/Profile/EditProfile';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Adminlayout />,  
+    element: <AdminLayout />,  
     children: [
       {
         path: "/",
@@ -136,10 +136,10 @@ const router = createBrowserRouter([
     path: "/CustomerOrderHistory",
     element: <CustomerOrderHistory />
   },
-      {
-        path: "/HistoryOrderDetails/:id",
-        element: <HistoryOrderDetails />
-      }
+  {
+    path: "/HistoryOrderDetails/:id",
+    element: <HistoryOrderDetails />
+  }
 ]);
 
 const rootElement = document.getElementById('root');

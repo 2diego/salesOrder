@@ -19,7 +19,7 @@ export class CategoriesService {
     });
 
     if (existingCategory) {
-      throw new ConflictException('Category with this name already exists');
+      throw new ConflictException('Ya existe una categoría con este nombre');
     }
 
     const category = this.categoryRepository.create(createCategoryDto);
@@ -38,7 +38,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+      throw new NotFoundException(`Categoría con ID ${id} no encontrada`);
     }
 
     return category;
@@ -54,7 +54,7 @@ export class CategoriesService {
       });
 
       if (existingCategory) {
-        throw new ConflictException('Category with this name already exists');
+        throw new ConflictException('Ya existe una categoría con este nombre');
       }
     }
 
@@ -74,11 +74,11 @@ export class CategoriesService {
       .getCount();
 
     if (productsCount > 0) {
-      throw new ConflictException('Cannot delete category that has products');
+      throw new ConflictException('No se puede eliminar una categoría que tiene productos asociados');
     }
 
     await this.categoryRepository.remove(category);
     
-    return { message: `Category "${category.name}" has been deleted` };
+    return { message: `Categoría "${category.name}" ha sido eliminada` };
   }
 }

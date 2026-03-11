@@ -1,28 +1,28 @@
 import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
 
 export class CreateClientDTO {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El nombre debe ser texto' })
+  @IsNotEmpty({ message: 'El nombre es obligatorio' })
   name: string;
 
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
+  @IsNotEmpty({ message: 'El correo electrónico es obligatorio' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El teléfono debe ser texto' })
+  @IsNotEmpty({ message: 'El teléfono es obligatorio' })
   phone: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'La dirección debe ser texto' })
+  @IsNotEmpty({ message: 'La dirección es obligatoria' })
   address: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'La ciudad debe ser texto' })
+  @IsNotEmpty({ message: 'La ciudad es obligatoria' })
   city: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El estado/provincia debe ser texto' })
+  @IsNotEmpty({ message: 'El estado/provincia es obligatorio' })
   state: string;
 
   @IsString()

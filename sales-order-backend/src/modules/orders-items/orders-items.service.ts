@@ -23,11 +23,11 @@ export class OrdersItemsService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${createOrderItemDto.orderId} not found`);
+      throw new NotFoundException(`Pedido con ID ${createOrderItemDto.orderId} no encontrado`);
     }
 
     if (order.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('Cannot add items to a validated order');
+      throw new BadRequestException('No se pueden agregar items a un pedido validado');
     }
 
     // Verificar si ya existe un item para este producto en la orden
@@ -81,7 +81,7 @@ export class OrdersItemsService {
     });
 
     if (!orderItem) {
-      throw new NotFoundException(`Order item with ID ${id} not found`);
+      throw new NotFoundException(`Item de pedido con ID ${id} no encontrado`);
     }
 
     return this.formatOrderItemResponse(orderItem);
@@ -92,7 +92,7 @@ export class OrdersItemsService {
     
     // Verificar que la orden no esté validada
     if (orderItem.order?.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('Cannot update items in a validated order');
+      throw new BadRequestException('No se pueden actualizar items en un pedido validado');
     }
 
     await this.orderItemRepository.update(id, updateOrderItemDto);
@@ -108,7 +108,7 @@ export class OrdersItemsService {
     
     // Verificar que la orden no esté validada
     if (orderItem.order?.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('Cannot remove items from a validated order');
+      throw new BadRequestException('No se pueden eliminar items de un pedido validado');
     }
 
     await this.orderItemRepository.delete(id);
