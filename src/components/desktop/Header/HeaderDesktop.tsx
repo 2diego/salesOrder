@@ -1,17 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BtnBlue from '../../common/BtnBlue/BtnBlue';
 import HeaderNotification from '../HeaderNotification/HeaderNotification';
 import CreateLink from '../../../pages/Admin/mobile/Orders/CreateLink';
+import { ordersService, OrderStatus } from '../../../services/ordersService';
 import './HeaderDesktop.css';
 
 const HeaderDesktop = () => {
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateLinkPopup, setShowCreateLinkPopup] = useState(false);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
-  const handleNavigateToOrders = () => {
-    navigate('/Orders');
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      try {
+        const ordersData = await ordersService.findAll({ status: OrderStatus.PENDING });
+        const ordersWithItems = ordersData.filter(order =>
+          order.orderItems && order.orderItems.length > 0
+        );
+        setPendingOrdersCount(ordersWithItems.length);
+      } catch (err) {
+        console.warn('Error al cargar conteo de pedidos pendientes:', err);
+        setPendingOrdersCount(0);
+      }
+    };
+    fetchPendingCount();
+  }, []);
+
+  const handleNavigateToUnvalidatedOrders = () => {
+    navigate('/Orders?status=pending');
   };
 
   const handleNavigateToCreateLink = () => {
@@ -36,7 +54,7 @@ const HeaderDesktop = () => {
   return (
     <header className="header-desktop">
       <div className="header-left">
-        <div className="button-with-notification" onClick={handleNavigateToOrders}>
+        <div className="button-with-notification" onClick={handleNavigateToUnvalidatedOrders}>
           <BtnBlue
             width="12rem"
             height="2.75rem"
@@ -47,7 +65,7 @@ const HeaderDesktop = () => {
             Pedidos sin validar
           </BtnBlue>
           <HeaderNotification 
-            count={3} 
+            count={pendingOrdersCount} 
             variant="warning" 
             showZero={false}
           />

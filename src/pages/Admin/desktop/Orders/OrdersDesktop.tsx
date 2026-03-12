@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
 import { clientsService } from "../../../../services/clientsService";
 
 const OrdersDesktop = () => {
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const statusFilter = searchParams.get('status');
+	const showOnlyPending = statusFilter === 'pending';
+
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -13,7 +19,8 @@ const OrdersDesktop = () => {
 			try {
 				setLoading(true);
 				setError(null);
-				const ordersData = await ordersService.findAll();
+				const filters = showOnlyPending ? { status: OrderStatus.PENDING } : undefined;
+				const ordersData = await ordersService.findAll(filters);
 				
 				// Cargar datos completos del cliente para las órdenes donde los datos del cliente están incompletos o faltan
 				const ordersWithFullClientData: Order[] = await Promise.all(
@@ -75,7 +82,7 @@ const OrdersDesktop = () => {
 		};
 
 		fetchOrders();
-	}, []);
+	}, [showOnlyPending]);
 
 	// Formatear el estado a español
 	const formatStatus = (status: OrderStatus): string => {
@@ -128,7 +135,9 @@ const OrdersDesktop = () => {
 	};
 
 	const handleRowClick = (row: any) => {
-		console.log('Pedido seleccionado:', row.order);
+		if (row.rawStatus === OrderStatus.PENDING) {
+			navigate(`/ValidateOrder/${row.order.id}`);
+		}
 	};
 
   return (
@@ -152,8 +161,8 @@ const OrdersDesktop = () => {
 				</div>
 			)}
 			<Table
-				title="Gestión de Pedidos"
-				subtitle="Administra todos los pedidos del sistema"
+				title={showOnlyPending ? 'Pedidos sin validar' : 'Gestión de Pedidos'}
+				subtitle={showOnlyPending ? 'Pedidos con estado pendiente de validación' : 'Administra todos los pedidos del sistema'}
 				columns={columns}
 				data={tableData}
 				onAddNew={handleAddNew}
@@ -161,7 +170,7 @@ const OrdersDesktop = () => {
 				loading={loading}
 				searchPlaceholder="Buscar por cliente, ID o teléfono..."
 				addButtonText="Nuevo Pedido"
-				emptyMessage="No hay pedidos disponibles"
+				emptyMessage={showOnlyPending ? 'No hay pedidos sin validar' : 'No hay pedidos disponibles'}
 			/>
 		</div>
   );
