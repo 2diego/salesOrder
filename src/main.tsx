@@ -28,6 +28,28 @@ import CreateLink from './pages/Admin/mobile/Orders/CreateLink';
 import ValidateOrder from './pages/Admin/mobile/Orders/ValidateOrder';
 import EditPassword from './pages/Admin/mobile/Profile/EditPassword';
 import EditProfile from './pages/Admin/mobile/Profile/EditProfile';
+import { useIsDesktop } from './hooks/useIsDesktop';
+import CustomerDesktop from './pages/Customer/desktop/CustomerDesktop';
+
+const NewOrderRoute = () => {
+  const isDesktop = useIsDesktop();
+  return isDesktop ? <CustomerDesktop /> : <NewOrder />;
+};
+
+const CartRoute = () => {
+  const isDesktop = useIsDesktop();
+  return isDesktop ? <CustomerDesktop /> : <Cart />;
+};
+
+const CustomerOrderHistoryRoute = () => {
+  const isDesktop = useIsDesktop();
+  return isDesktop ? <CustomerDesktop /> : <CustomerOrderHistory />;
+};
+
+const HistoryOrderDetailsRoute = () => {
+  const isDesktop = useIsDesktop();
+  return isDesktop ? <CustomerDesktop /> : <HistoryOrderDetails />;
+};
 
 const router = createBrowserRouter([
   {
@@ -126,19 +148,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/NewOrder",
-    element: <NewOrder />
+    element: <NewOrderRoute />
   },
   {
     path: "/Cart",
-    element: <Cart />
+    element: <CartRoute />
   },
   {
     path: "/CustomerOrderHistory",
-    element: <CustomerOrderHistory />
+    element: <CustomerOrderHistoryRoute />
   },
   {
     path: "/HistoryOrderDetails/:id",
-    element: <HistoryOrderDetails />
+    element: <HistoryOrderDetailsRoute />
   }
 ]);
 
