@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
-import Header from "../../components/common/Header/Header"
-import SectionTitle from "../../components/common/SectionTitle/SectionTitle"
-import ProductList from "../../components/common/ProductList/ProductList"
-import BtnBlue from "../../components/common/BtnBlue/BtnBlue"
-import { ordersLinksService } from '../../services/ordersLinksService'
-import { clientsService } from '../../services/clientsService'
-import { ordersService, Order } from '../../services/ordersService'
-import { ordersItemsService } from '../../services/ordersItemsService'
+import Header from "../../../components/common/Header/Header"
+import SectionTitle from "../../../components/common/SectionTitle/SectionTitle"
+import ProductList from "../../../components/common/ProductList/ProductList"
+import BtnBlue from "../../../components/common/BtnBlue/BtnBlue"
+import { ordersLinksService } from '../../../services/ordersLinksService'
+import { clientsService } from '../../../services/clientsService'
+import { ordersService, Order } from '../../../services/ordersService'
+import { ordersItemsService } from '../../../services/ordersItemsService'
 
 interface ProductItem {
   id: string

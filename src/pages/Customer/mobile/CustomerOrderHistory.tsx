@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import Header from "../../components/common/Header/Header";
-import SectionTitle from "../../components/common/SectionTitle/SectionTitle";
-import BtnBlue from "../../components/common/BtnBlue/BtnBlue";
-import InfoRow from '../../components/common/InfoRow/InfoRow'
+import Header from "../../../components/common/Header/Header";
+import SectionTitle from "../../../components/common/SectionTitle/SectionTitle";
+import BtnBlue from "../../../components/common/BtnBlue/BtnBlue";
+import InfoRow from '../../../components/common/InfoRow/InfoRow'
 import { LuClipboardList } from 'react-icons/lu'
-import { ordersLinksService } from '../../services/ordersLinksService'
-import { clientsService } from '../../services/clientsService'
-import { ordersService, Order } from '../../services/ordersService'
+import { ordersLinksService } from '../../../services/ordersLinksService'
+import { clientsService } from '../../../services/clientsService'
+import { ordersService, Order } from '../../../services/ordersService'
 import { useNavigate } from 'react-router-dom'
 
 const CustomerOrderHistory = () => {
