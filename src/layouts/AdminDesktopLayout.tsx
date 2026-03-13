@@ -1,7 +1,8 @@
-import { useLocation, Outlet } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../components/desktop/Sidebar/Sidebar';
 import HeaderDesktop from '../components/desktop/Header/HeaderDesktop';
 import OrdersDesktop from '../pages/Admin/desktop/Orders/OrdersDesktop';
+import ValidateOrderDesktop from '../pages/Admin/desktop/Orders/ValidateOrderDesktop';
 import './AdminDesktopLayout.css';
 import ClientsDesktop from '../pages/Admin/desktop/Clients/ClientsDesktop';
 import ProductsDesktop from '../pages/Admin/desktop/Products/ProductsDesktop';
@@ -12,9 +13,8 @@ const AdminDesktopLayout = () => {
   const location = useLocation();
   
   const renderPage = () => {
-    // Rutas que se renderizan via Outlet (ej. ValidateOrder)
     if (location.pathname.startsWith('/ValidateOrder/')) {
-      return <Outlet />;
+      return <ValidateOrderDesktop />;
     }
     switch (location.pathname) {
       case '/Orders':

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
 import Header from "../../../../components/common/Header/Header"
