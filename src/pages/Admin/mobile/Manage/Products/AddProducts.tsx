@@ -26,7 +26,7 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
   });
 
   const [priceString, setPriceString] = useState('');
-  const [stockString, setStockString] = useState('');
+  // const [stockString, setStockString] = useState(''); // Stock no usado por el momento
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
 
@@ -74,19 +74,15 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
     if (error) setError(null);
   };
 
-  const handleStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Permitir vacío y números enteros
-    if (value === '' || /^\d+$/.test(value)) {
-      setStockString(value);
-      setProductData(prev => ({
-        ...prev,
-        stock: value === '' ? 0 : parseInt(value) || 0
-      }));
-    }
-    // Limpiar errores cuando el usuario empiece a escribir
-    if (error) setError(null);
-  };
+  // Stock no usado por el momento
+  // const handleStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = e.target.value;
+  //   if (value === '' || /^\d+$/.test(value)) {
+  //     setStockString(value);
+  //     setProductData(prev => ({ ...prev, stock: value === '' ? 0 : parseInt(value) || 0 }));
+  //   }
+  //   if (error) setError(null);
+  // };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -343,6 +339,7 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
           onChange={handlePriceChange}
         />
 
+        {/* Stock no usado por el momento
         <h4 className="field-label">Stock</h4>
         <FormField
           label="stock"
@@ -351,6 +348,7 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
           editable={true}
           onChange={handleStockChange}
         />
+        */}
 
         <BtnBlue
           width="100%"

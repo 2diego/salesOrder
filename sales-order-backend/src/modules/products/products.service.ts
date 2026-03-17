@@ -25,6 +25,17 @@ export class ProductsService {
       throw new NotFoundException(`Categoría con ID ${createProductDto.categoryId} no encontrada`);
     }
 
+    // Verificar si ya existe un producto activo con el mismo código (name)
+    const nameTrimmed = createProductDto.name?.trim();
+    if (nameTrimmed) {
+      const existingByName = await this.productRepository.findOne({
+        where: { name: nameTrimmed, isActive: true },
+      });
+      if (existingByName) {
+        throw new ConflictException('Ya existe un producto con este código');
+      }
+    }
+
     // Verificar si ya existe un producto con el mismo SKU
     if (createProductDto.sku) {
       const existingProduct = await this.productRepository.findOne({
@@ -76,6 +87,17 @@ export class ProductsService {
 
       if (!category) {
         throw new NotFoundException(`Categoría con ID ${updateProductDto.categoryId} no encontrada`);
+      }
+    }
+
+    // Si se va a actualizar el código (name), verificar que no exista en otro producto activo
+    const nameTrimmed = updateProductDto.name?.trim();
+    if (nameTrimmed && nameTrimmed !== product.name) {
+      const existingByName = await this.productRepository.findOne({
+        where: { name: nameTrimmed, isActive: true },
+      });
+      if (existingByName) {
+        throw new ConflictException('Ya existe un producto con este código');
       }
     }
 

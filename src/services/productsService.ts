@@ -53,7 +53,7 @@ export const productsService = {
         const errorData = await response.json().catch(() => ({}));
         
         if (response.status === 409) {
-          throw new Error('Ya existe un producto con este SKU');
+          throw new Error(errorData.message || 'Ya existe un producto con este código o SKU');
         }
         
         if (response.status === 404) {
@@ -177,7 +177,7 @@ export const productsService = {
         }
         
         if (response.status === 409) {
-          throw new Error('Ya existe un producto con este SKU');
+          throw new Error(errorData.message || 'Ya existe un producto con este código o SKU');
         }
         
         if (response.status === 400) {

@@ -83,29 +83,29 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
 
   const hasChanges = useMemo(() => {
     const priceNum = formData.priceString === '' ? 0 : parseFloat(formData.priceString) || 0;
-    const stockNum = formData.stockString === '' ? 0 : parseInt(formData.stockString) || 0;
+    // const stockNum = formData.stockString === '' ? 0 : parseInt(formData.stockString) || 0; // Stock no usado por el momento
     const base = currentProduct || product;
     if (!base) return false;
     return (
       formData.name !== base.name ||
       formData.description !== (base.description || '') ||
       formData.categoryId !== base.categoryId ||
-      priceNum !== base.price ||
-      stockNum !== base.stock
+      priceNum !== base.price
+      // || stockNum !== base.stock
     );
   }, [formData, currentProduct, product]);
 
   const buildDiff = (): UpdateProductDTO => {
     const diff: UpdateProductDTO = {};
     const priceNum = formData.priceString === '' ? 0 : parseFloat(formData.priceString) || 0;
-    const stockNum = formData.stockString === '' ? 0 : parseInt(formData.stockString) || 0;
+    // const stockNum = formData.stockString === '' ? 0 : parseInt(formData.stockString) || 0; // Stock no usado por el momento
     const base = currentProduct || product;
     if (!base) return diff;
     if (formData.name !== base.name) diff.name = formData.name;
     if (formData.description !== (base.description || '')) diff.description = formData.description || undefined;
     if (formData.categoryId !== base.categoryId) diff.categoryId = formData.categoryId;
     if (priceNum !== base.price) diff.price = priceNum;
-    if (stockNum !== base.stock) diff.stock = stockNum;
+    // if (stockNum !== base.stock) diff.stock = stockNum;
     return diff;
   };
 
@@ -252,8 +252,10 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
         <h4 className="field-label">Precio</h4>
         <FormField label="precio" value={formData.priceString} placeholder="Ej: 100" editable={true} onChange={handleInputChange('priceString')} />
 
+        {/* Stock no usado por el momento
         <h4 className="field-label">Stock</h4>
         <FormField label="stock" value={formData.stockString} placeholder="Ej: 50" editable={true} onChange={handleInputChange('stockString')} />
+        */}
 
         <BtnBlue width="100%" height="3rem" onClick={(loading || deleting) ? undefined : handleSubmit} disabled={loading || deleting}>
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
