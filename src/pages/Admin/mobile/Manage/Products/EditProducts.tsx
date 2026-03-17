@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -14,9 +14,10 @@ interface EditProductsProps {
   onClose?: () => void;
   product?: Product;
   onProductUpdated?: (updated: Product) => void;
+  onProductDeleted?: () => void;
 }
 
-const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, product, onProductUpdated }) => {
+const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, product, onProductUpdated, onProductDeleted }) => {
   const navigate = useNavigate();
   const params = useParams();
 
@@ -52,8 +53,10 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -122,6 +125,7 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
       if (!base) return;
       const updated = await productsService.update(base.id, diff);
       setSuccess(true);
+      setSuccessMessage('¡Producto actualizado!');
       onProductUpdated && onProductUpdated(updated);
       setTimeout(() => {
         if (desktop && onClose) onClose(); else navigate('/Manage/AdminProducts');
@@ -130,6 +134,30 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
       setError(err.message || 'Error al actualizar el producto');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const base = currentProduct || product;
+    if (!base) return;
+
+    const confirmed = window.confirm('¿Seguro que quieres desactivar este producto? No se podrá usar en nuevos pedidos, pero los pedidos históricos se mantienen.');
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+    try {
+      await productsService.remove(base.id);
+      setSuccess(true);
+      setSuccessMessage('Producto eliminado correctamente');
+      onProductDeleted && onProductDeleted();
+      setTimeout(() => {
+        if (desktop && onClose) onClose(); else navigate('/Manage/AdminProducts');
+      }, 900);
+    } catch (err: any) {
+      setError(err.message || 'Error al eliminar el producto');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -175,7 +203,7 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="currentColor"/>
           </svg>
-          <span>¡Producto actualizado!</span>
+          <span>{successMessage || '¡Producto actualizado!'}</span>
         </div>
       )}
 
@@ -216,8 +244,18 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
         <h4 className="field-label">Stock</h4>
         <FormField label="stock" value={formData.stockString} placeholder="Ej: 50" editable={true} onChange={handleInputChange('stockString')} />
 
-        <BtnBlue width="100%" height="3rem" onClick={loading ? undefined : handleSubmit}>
+        <BtnBlue width="100%" height="3rem" onClick={(loading || deleting) ? undefined : handleSubmit} disabled={loading || deleting}>
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
+        </BtnBlue>
+
+        <BtnBlue
+          width="100%"
+          height="3rem"
+          background="rgba(239, 68, 68, 0.9)"
+          onClick={(loading || deleting) ? undefined : handleDelete}
+          disabled={loading || deleting}
+        >
+          <span>{deleting ? 'Desactivando...' : 'Desactivar producto'}</span>
         </BtnBlue>
 
         {!desktop && (

@@ -126,6 +126,10 @@ const ClientsDesktop = () => {
               fetchClients();
               handleCloseEditClientPopup();
             }}
+            onClientDeleted={() => {
+              fetchClients();
+              handleCloseEditClientPopup();
+            }}
           />
         )}
 		</>

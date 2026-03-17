@@ -214,10 +214,6 @@ export const productsService = {
           throw new Error('Producto no encontrado');
         }
         
-        if (response.status === 409) {
-          throw new Error('No se puede eliminar un producto que ha sido ordenado');
-        }
-
         throw new Error(errorData.message || 'Error al eliminar el producto');
       }
 

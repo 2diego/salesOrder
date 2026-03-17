@@ -28,13 +28,14 @@ export class ClientsService {
 
   async findAll(): Promise<Client[]> {
     return this.clientRepository.find({
+      where: { isActive: true },
       order: { name: 'ASC' }
     });
   }
 
   async findOne(id: number): Promise<Client> {
     const client = await this.clientRepository.findOne({
-      where: { id }
+      where: { id, isActive: true }
     });
 
     if (!client) {
@@ -65,26 +66,12 @@ export class ClientsService {
 
   async remove(id: number): Promise<{ message: string }> {
     const client = await this.findOne(id);
-    
-    // Verificar si hay órdenes usando este cliente (solo pendientes?)
-    const ordersCount = await this.clientRepository
-      .createQueryBuilder('client')
-      .leftJoin('client.orders', 'order')
-      .where('client.id = :id', { id })
-      //.andWhere('order.status = :status', { status: 'PENDING' })
-      .getCount();
 
-    if (ordersCount > 0) {
-      throw new ConflictException('No se puede eliminar un cliente que tiene pedidos asociados');
-    }
-
-    //Eliminar o desactivar? Si se elimina hay que eliminar ordenes asociadas?
-    // await this.clientRepository.remove(client); ELIMINAR
-    // desactivar:
+    // Soft delete (desactivar) para no romper historial de pedidos
     client.isActive = false;
     await this.clientRepository.save(client);
 
-    return { message: `Cliente "${client.name}" ha sido eliminado` };
+    return { message: `Cliente "${client.name}" ha sido desactivado` };
   }
 
   async findByEmail(email: string): Promise<Client | null> {

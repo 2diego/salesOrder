@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -13,9 +13,10 @@ interface EditClientsProps {
   onClose?: () => void;
   client?: Client;
   onClientUpdated?: (updated: Client) => void;
+  onClientDeleted?: () => void;
 }
 
-const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, client, onClientUpdated }) => {
+const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, client, onClientUpdated, onClientDeleted }) => {
   const navigate = useNavigate();
   const params = useParams();
   const [currentClient, setCurrentClient] = useState<Client | null>(client || null);
@@ -28,8 +29,10 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
     state: client?.state || ''
   });
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Cargar cliente vía ruta
   useEffect(() => {
@@ -118,6 +121,7 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
       if (!currentClient) return;
       const updated = await clientsService.update(currentClient.id, diff);
       setSuccess(true);
+      setSuccessMessage('¡Cliente actualizado!');
       onClientUpdated && onClientUpdated(updated);
       setTimeout(() => {
         if (desktop && onClose) {
@@ -130,6 +134,28 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
       setError(err.message || 'Error al actualizar el cliente');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!currentClient) return;
+    const confirmed = window.confirm('¿Seguro que quieres desactivar este cliente? No se podrá usar en nuevos pedidos, pero el historial se mantiene.');
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+    try {
+      await clientsService.remove(currentClient.id);
+      setSuccess(true);
+      setSuccessMessage('Cliente eliminado correctamente');
+      onClientDeleted && onClientDeleted();
+      setTimeout(() => {
+        if (desktop && onClose) onClose(); else navigate('/Manage/AdminClients');
+      }, 900);
+    } catch (err: any) {
+      setError(err.message || 'Error al eliminar el cliente');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -175,7 +201,7 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="currentColor"/>
           </svg>
-          <span>¡Cliente actualizado!</span>
+          <span>{successMessage || '¡Cliente actualizado!'}</span>
         </div>
       )}
 
@@ -198,8 +224,18 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
         <h4 className="field-label">Provincia</h4>
         <FormField label="provincia" value={formData.state} placeholder="Provincia" editable={true} onChange={handleInputChange('state')} />
 
-        <BtnBlue width="100%" height="3rem" onClick={loading ? undefined : handleSubmit}>
+        <BtnBlue width="100%" height="3rem" onClick={(loading || deleting) ? undefined : handleSubmit} disabled={loading || deleting}>
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
+        </BtnBlue>
+
+        <BtnBlue
+          width="100%"
+          height="3rem"
+          background="rgba(239, 68, 68, 0.9)"
+          onClick={(loading || deleting) ? undefined : handleDelete}
+          disabled={loading || deleting}
+        >
+          <span>{deleting ? 'Desactivando...' : 'Desactivar cliente'}</span>
         </BtnBlue>
 
         {!desktop && (

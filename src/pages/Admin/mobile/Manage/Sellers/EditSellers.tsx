@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -13,9 +13,10 @@ interface EditSellersProps {
   onClose?: () => void;
   seller?: Seller;
   onSellerUpdated?: (updated: Seller) => void;
+  onSellerDeleted?: () => void;
 }
 
-const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, seller, onSellerUpdated }) => {
+const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, seller, onSellerUpdated, onSellerDeleted }) => {
   const navigate = useNavigate();
   const params = useParams();
   const [currentSeller, setCurrentSeller] = useState<Seller | null>(seller || null);
@@ -48,8 +49,10 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
     load();
   }, [currentSeller, params.id]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
@@ -101,6 +104,7 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
       if (!currentSeller) return;
       const updated = await sellersService.update(currentSeller.id, diff);
       setSuccess(true);
+      setSuccessMessage('¡Vendedor actualizado!');
       onSellerUpdated && onSellerUpdated(updated);
       setTimeout(() => {
         if (desktop && onClose) onClose(); else navigate('/Manage/AdminSellers');
@@ -109,6 +113,28 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
       setError(err.message || 'Error al actualizar el vendedor');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!currentSeller) return;
+    const confirmed = window.confirm('¿Seguro que quieres desactivar este vendedor? No podrá ingresar ni crear pedidos, pero el historial se mantiene.');
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+    try {
+      await sellersService.remove(currentSeller.id);
+      setSuccess(true);
+      setSuccessMessage('Vendedor eliminado correctamente');
+      onSellerDeleted && onSellerDeleted();
+      setTimeout(() => {
+        if (desktop && onClose) onClose(); else navigate('/Manage/AdminSellers');
+      }, 900);
+    } catch (err: any) {
+      setError(err.message || 'Error al eliminar el vendedor');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -154,7 +180,7 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="currentColor"/>
           </svg>
-          <span>¡Vendedor actualizado!</span>
+          <span>{successMessage || '¡Vendedor actualizado!'}</span>
         </div>
       )}
 
@@ -174,8 +200,18 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
         <h4 className="field-label">Teléfono</h4>
         <FormField label="telefono" value={formData.phone} placeholder="Teléfono" editable={true} onChange={handleInputChange('phone')} />
 
-        <BtnBlue width="100%" height="3rem" onClick={loading ? undefined : handleSubmit}>
+        <BtnBlue width="100%" height="3rem" onClick={(loading || deleting) ? undefined : handleSubmit} disabled={loading || deleting}>
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
+        </BtnBlue>
+
+        <BtnBlue
+          width="100%"
+          height="3rem"
+          background="rgba(239, 68, 68, 0.9)"
+          onClick={(loading || deleting) ? undefined : handleDelete}
+          disabled={loading || deleting}
+        >
+          <span>{deleting ? 'Desactivando...' : 'Desactivar vendedor'}</span>
         </BtnBlue>
 
         {!desktop && (

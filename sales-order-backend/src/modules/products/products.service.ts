@@ -46,6 +46,7 @@ export class ProductsService {
 
   async findAll(): Promise<Product[]> {
     return this.productRepository.find({
+      where: { isActive: true },
       relations: ['category'],
       order: { name: 'ASC' }
     });
@@ -53,7 +54,7 @@ export class ProductsService {
 
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
-      where: { id },
+      where: { id, isActive: true },
       relations: ['category']
     });
 
@@ -96,27 +97,17 @@ export class ProductsService {
 
   async remove(id: number): Promise<{ message: string }> {
     const product = await this.findOne(id);
-    
-    // Verificar si hay ordenes usando este producto (deberia ser ordenes pendientes?)
-    const orderItemsCount = await this.productRepository
-      .createQueryBuilder('product')
-      .leftJoin('product.orderItems', 'orderItem')
-      .where('product.id = :id', { id })
-      //.andWhere('orderItem.status = :status', { status: 'PENDING' })
-      .getCount();
 
-    if (orderItemsCount > 0) {
-      throw new ConflictException('No se puede eliminar un producto que ya ha sido pedido');
-    }
+    // Soft delete (archivar/desactivar) para no romper historial de pedidos
+    product.isActive = false;
+    await this.productRepository.save(product);
 
-    await this.productRepository.remove(product);
-    
-    return { message: `Producto "${product.name}" ha sido eliminado` };
+    return { message: `Producto "${product.name}" ha sido desactivado` };
   }
 
   async findByCategory(categoryId: number): Promise<Product[]> {
     return this.productRepository.find({
-      where: { category: { id: categoryId } },
+      where: { category: { id: categoryId }, isActive: true },
       relations: ['category'],
       order: { name: 'ASC' }
     });

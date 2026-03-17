@@ -199,10 +199,6 @@ export const clientsService = {
           throw new Error('Cliente no encontrado');
         }
         
-        if (response.status === 409) {
-          throw new Error('No se puede eliminar un cliente que tiene pedidos asociados');
-        }
-
         throw new Error(errorData.message || 'Error al eliminar el cliente');
       }
 

@@ -124,6 +124,10 @@ const SellersDesktop = () => {
                 fetchSellers();
                 handleCloseEditSellerPopup();
               }}
+              onSellerDeleted={() => {
+                fetchSellers();
+                handleCloseEditSellerPopup();
+              }}
             />
           )}
 		</>

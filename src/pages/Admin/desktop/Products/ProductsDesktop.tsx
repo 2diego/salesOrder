@@ -129,6 +129,10 @@ const ProductsDesktop = () => {
                 fetchProducts();
                 handleCloseEditProductPopup();
               }}
+              onProductDeleted={() => {
+                fetchProducts();
+                handleCloseEditProductPopup();
+              }}
             />
           )}
 		</>
