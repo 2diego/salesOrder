@@ -22,6 +22,7 @@ export interface TableProps {
   emptyMessage?: string;
   searchPlaceholder?: string;
   addButtonText?: string;
+  stickyHeader?: boolean;
 }
 
 const Table: React.FC<TableProps> = ({
@@ -34,7 +35,8 @@ const Table: React.FC<TableProps> = ({
   loading = false,
   emptyMessage = "No hay datos disponibles",
   searchPlaceholder = "Buscar...",
-  addButtonText = "Agregar nuevo"
+  addButtonText = "Agregar nuevo",
+  stickyHeader = false
 }) => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,15 +116,14 @@ const Table: React.FC<TableProps> = ({
       </div>
 
       {/* Table */}
-      <div className="table-wrapper">
-        <div className="table-scroll">
-          <div className="table-content">
+      {stickyHeader ? (
+        <div className="table-wrapper table-wrapper-sticky">
+          <div className="table-header-fixed">
             <table className="data-table">
-
               <thead className="table-head">
                 <tr>
                   {columns.map((column) => (
-                    <th 
+                    <th
                       key={column.key}
                       className={`table-header-cell ${column.sortable ? 'sortable' : ''}`}
                       style={{ width: column.width }}
@@ -138,7 +139,10 @@ const Table: React.FC<TableProps> = ({
                   ))}
                 </tr>
               </thead>
-
+            </table>
+          </div>
+          <div className="table-body-scroll">
+            <table className="data-table">
               <tbody className="table-body">
                 {loading ? (
                   <tr>
@@ -162,13 +166,17 @@ const Table: React.FC<TableProps> = ({
                   </tr>
                 ) : (
                   sortedData.map((row, index) => (
-                    <tr 
-                      key={index} 
+                    <tr
+                      key={index}
                       className={`table-row ${index % 2 === 0 ? 'even' : 'odd'} ${onRowClick ? 'clickable' : ''}`}
                       onClick={() => onRowClick?.(row)}
                     >
                       {columns.map((column) => (
-                        <td key={column.key} className="table-cell">
+                        <td
+                          key={column.key}
+                          className="table-cell"
+                          style={column.width ? { width: column.width } : undefined}
+                        >
                           {renderCell(column, row)}
                         </td>
                       ))}
@@ -176,11 +184,76 @@ const Table: React.FC<TableProps> = ({
                   ))
                 )}
               </tbody>
-
             </table>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="table-wrapper">
+          <div className="table-scroll">
+            <div className="table-content">
+              <table className="data-table">
+                <thead className="table-head">
+                  <tr>
+                    {columns.map((column) => (
+                      <th
+                        key={column.key}
+                        className={`table-header-cell ${column.sortable ? 'sortable' : ''}`}
+                        style={{ width: column.width }}
+                        onClick={() => column.sortable && handleSort(column.key)}
+                      >
+                        {column.label}
+                        {column.sortable && (
+                          <svg className="sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                          </svg>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody className="table-body">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={columns.length} className="loading-cell">
+                        <div className="loading-spinner">
+                          <div className="spinner"></div>
+                          <span>Cargando...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : sortedData.length === 0 ? (
+                    <tr>
+                      <td colSpan={columns.length} className="empty-cell">
+                        <div className="empty-message">
+                          <svg className="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                          </svg>
+                          <span>{emptyMessage}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    sortedData.map((row, index) => (
+                      <tr
+                        key={index}
+                        className={`table-row ${index % 2 === 0 ? 'even' : 'odd'} ${onRowClick ? 'clickable' : ''}`}
+                        onClick={() => onRowClick?.(row)}
+                      >
+                        {columns.map((column) => (
+                          <td key={column.key} className="table-cell">
+                            {renderCell(column, row)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

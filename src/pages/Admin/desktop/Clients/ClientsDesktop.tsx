@@ -31,17 +31,11 @@ const ClientsDesktop = () => {
   };
 
 	const columns: TableColumn[] = [
-		{ key: 'id', label: 'ID Cliente', sortable: true, width: '120px' },
-		{ key: 'name', label: 'Cliente', sortable: true },
-		{ key: 'phone', label: 'Teléfono', sortable: true, width: '120px' },
-		{ key: 'address', label: 'Dirección', sortable: true},
-		{ key: 'city', label: 'Ciudad', sortable: true},
-		{ 
-			key: 'edit', 
-			label: '', 
-			sortable: false, 
-			width: '50px'
-		}
+		{ key: 'id', label: 'ID Cliente', sortable: true, width: '12%' },
+		{ key: 'name', label: 'Cliente', sortable: true, width: '28%' },
+		{ key: 'phone', label: 'Teléfono', sortable: true, width: '15%' },
+		{ key: 'address', label: 'Dirección', sortable: true, width: '30%' },
+		{ key: 'city', label: 'Ciudad', sortable: true, width: '15%' }
 	];
 
 	// Transformar datos de clientes para la tabla
@@ -50,8 +44,7 @@ const ClientsDesktop = () => {
 		name: client.name,
 		phone: client.phone,
 		address: client.address,
-		city: client.city,
-		edit: 'Selecciona para editar'
+		city: client.city
 	}));
 
 	const handleAddNew = () => {

@@ -250,3 +250,57 @@
   color: rgb(239, 68, 68);
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
+
+/* Scroll específico para la tabla de productos en escritorio */
+.products-desktop-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 5rem); /* ajusta 5rem según header/márgenes reales */
+  box-sizing: border-box;
+}
+
+.products-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* permite que el hijo con overflow funcione correctamente */
+}
+
+.products-table .table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.products-table .table-wrapper {
+  flex: 1;
+}
+
+/* Layout para tabla con header fijo (usado en productos) */
+.table-wrapper-sticky {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header-fixed {
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.table-body-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.table-wrapper-sticky .data-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Mejor uso de espacio y evitar que el body se haga más ancho que el contenedor */
+.products-table .table-cell {
+  word-break: break-word;
+  white-space: normal;
+}

@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link, useNavigate } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -244,11 +244,11 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
 
       {/* Form Fields */}
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
-        <h4 className="field-label">Nombre</h4>
+        <h4 className="field-label">Código</h4>
         <FormField
-          label="nombre"
+          label="código"
           value={productData.name}
-          placeholder="Ej: Producto de ejemplo"
+          placeholder="Ej: COD-001"
           editable={true}
           onChange={handleInputChange('name')}
         />

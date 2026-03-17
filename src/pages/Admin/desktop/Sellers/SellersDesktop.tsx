@@ -31,17 +31,11 @@ const SellersDesktop = () => {
 	};
 
 	const columns: TableColumn[] = [
-		{ key: 'id', label: 'ID Vendedor', sortable: true},
-		{ key: 'username', label: 'Nombre de usuario', sortable: true},
-		{ key: 'name', label: 'Vendedor', sortable: true },
-		{ key: 'phone', label: 'Teléfono', sortable: true},
-		{ key: 'email', label: 'Correo electrónico', sortable: true},
-		{ 
-			key: 'edit', 
-			label: '', 
-			sortable: false, 
-			width: '50px'
-		}
+		{ key: 'id', label: 'ID Vendedor', sortable: true, width: '12%' },
+		{ key: 'username', label: 'Nombre de usuario', sortable: true, width: '20%' },
+		{ key: 'name', label: 'Vendedor', sortable: true, width: '23%' },
+		{ key: 'phone', label: 'Teléfono', sortable: true, width: '15%' },
+		{ key: 'email', label: 'Correo electrónico', sortable: true, width: '30%' }
 	];
 
 	// Transformar datos de vendedores para la tabla
@@ -50,8 +44,7 @@ const SellersDesktop = () => {
 		username: seller.username,
 		name: seller.name,
 		email: seller.email,
-		phone: seller.phone,
-		edit: 'Selecciona para editar'
+		phone: seller.phone
 	}));
 
 	const handleAddNew = () => {

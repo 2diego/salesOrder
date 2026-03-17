@@ -180,8 +180,8 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
       )}
 
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
-        <h4 className="field-label">Nombre</h4>
-        <FormField label="nombre" value={formData.name} placeholder="Nombre del producto" editable={true} onChange={handleInputChange('name')} />
+        <h4 className="field-label">Código</h4>
+        <FormField label="nombre" value={formData.name} placeholder="Código del producto" editable={true} onChange={handleInputChange('name')} />
 
         <h4 className="field-label">Categoría</h4>
         <div className="form-field">

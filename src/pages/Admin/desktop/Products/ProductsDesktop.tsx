@@ -32,17 +32,10 @@ const ProductsDesktop = () => {
 	};
 
 	const columns: TableColumn[] = [
-		{ key: 'id', label: 'ID Producto', sortable: true, width: '120px' },
-		{ key: 'name', label: 'Producto', sortable: true },
-		{ key: 'category', label: 'Categoría', sortable: true },
-		{ key: 'price', label: 'Precio', sortable: true, width: '120px' },
-		{ key: 'stock', label: 'Stock', sortable: true, width: '120px' },
-		{ 
-			key: 'edit', 
-			label: '', 
-			sortable: false, 
-			width: '50px'
-		}
+		{ key: 'id', label: 'ID Prod.', sortable: true, width: '15%' },
+		{ key: 'name', label: 'Código', sortable: true, width: '30%' },
+		{ key: 'category', label: 'Categoría', sortable: true, width: '20%' },
+    { key: 'description', label: 'Descripción', sortable: true, width: '35%' },
 	];
 
 	// Transformar datos de productos para la tabla
@@ -50,9 +43,7 @@ const ProductsDesktop = () => {
 		id: product.id.toString().padStart(6, '0'),
 		name: product.name,
 		category: product.category?.name || '',
-		price: product.price,
-		stock: product.stock,
-		edit: 'Selecciona para editar'
+    description: product.description,
 	}));
 
 	const handleAddNew = () => {
@@ -80,13 +71,16 @@ const ProductsDesktop = () => {
 
   return (
 		<>
-			<div style={{ 
-				padding: '2rem', 
-				backgroundColor: 'rgb(17, 24, 39)',
-				fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-				color: 'var(--mainBlack)',
-				marginTop: '4rem'
-			}}>
+			<div 
+        className="products-desktop-page"
+        style={{ 
+				  padding: '2rem', 
+				  backgroundColor: 'rgb(17, 24, 39)',
+				  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+				  color: 'var(--mainBlack)',
+				  marginTop: '4rem'
+			  }}
+      >
 				{/* Mostrar error si hay */}
 				{error && (
 					<div style={{ 
@@ -100,18 +94,21 @@ const ProductsDesktop = () => {
 						{error}
 					</div>
 				)}
-				<Table
-					title="Gestión de Productos"
-					subtitle="Crear, editar y eliminar productos"
-					columns={columns}
-					data={tableData}
-					onAddNew={handleAddNew}
-					onRowClick={handleRowClick}
-					loading={loading}
-					searchPlaceholder="Buscar por producto, ID o categoría..."
+        <div className="products-table">
+				  <Table
+					  title="Gestión de Productos"
+					  subtitle="Crear, editar y eliminar productos"
+					  columns={columns}
+					  data={tableData}
+					  onAddNew={handleAddNew}
+					  onRowClick={handleRowClick}
+					  loading={loading}
+					  searchPlaceholder="Buscar por producto, ID o categoría..."
             addButtonText="Nuevo Producto"
-					emptyMessage="No hay productos disponibles"
-				/>
+					  emptyMessage="No hay productos disponibles"
+            stickyHeader={true}
+				  />
+        </div>
 			</div>
 
 			{/* Add Product Popup */}
