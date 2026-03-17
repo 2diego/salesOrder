@@ -57,6 +57,7 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -141,15 +142,13 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
     const base = currentProduct || product;
     if (!base) return;
 
-    const confirmed = window.confirm('¿Seguro que quieres desactivar este producto? No se podrá usar en nuevos pedidos, pero los pedidos históricos se mantienen.');
-    if (!confirmed) return;
-
+    // Confirmación visual manejada por estado (showDeactivateConfirm)
     setDeleting(true);
     setError(null);
     try {
       await productsService.remove(base.id);
       setSuccess(true);
-      setSuccessMessage('Producto eliminado correctamente');
+      setSuccessMessage('Producto desactivado correctamente');
       onProductDeleted && onProductDeleted();
       setTimeout(() => {
         if (desktop && onClose) onClose(); else navigate('/Manage/AdminProducts');
@@ -158,6 +157,7 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
       setError(err.message || 'Error al eliminar el producto');
     } finally {
       setDeleting(false);
+      setShowDeactivateConfirm(false);
     }
   };
 
@@ -207,6 +207,17 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
         </div>
       )}
 
+      {showDeactivateConfirm && !success && (
+        <div className={`alert alert-error ${desktop ? 'desktop-alert' : ''}`}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM11 15H9V13H11V15ZM11 11H9V5H11V11Z" fill="currentColor"/>
+          </svg>
+          <span>
+            ¿Seguro que quieres desactivar este producto? No se podrá usar en nuevos pedidos, pero los pedidos históricos se mantienen.
+          </span>
+        </div>
+      )}
+
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
         <h4 className="field-label">Código</h4>
         <FormField label="nombre" value={formData.name} placeholder="Código del producto" editable={true} onChange={handleInputChange('name')} />
@@ -248,15 +259,38 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
         </BtnBlue>
 
-        <BtnBlue
-          width="100%"
-          height="3rem"
-          background="rgba(239, 68, 68, 0.9)"
-          onClick={(loading || deleting) ? undefined : handleDelete}
-          disabled={loading || deleting}
-        >
-          <span>{deleting ? 'Desactivando...' : 'Desactivar producto'}</span>
-        </BtnBlue>
+        {showDeactivateConfirm ? (
+          <>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              background="rgba(239, 68, 68, 0.9)"
+              onClick={(loading || deleting) ? undefined : handleDelete}
+              disabled={loading || deleting}
+            >
+              <span>{deleting ? 'Desactivando...' : 'Confirmar desactivación'}</span>
+            </BtnBlue>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              background="#6b7280"
+              onClick={deleting ? undefined : () => setShowDeactivateConfirm(false)}
+              disabled={deleting}
+            >
+              <span>Cancelar</span>
+            </BtnBlue>
+          </>
+        ) : (
+          <BtnBlue
+            width="100%"
+            height="3rem"
+            background="rgba(239, 68, 68, 0.9)"
+            onClick={(loading || deleting) ? undefined : () => setShowDeactivateConfirm(true)}
+            disabled={loading || deleting}
+          >
+            <span>Desactivar producto</span>
+          </BtnBlue>
+        )}
 
         {!desktop && (
           <Link to="/Manage/AdminProducts" style={{ textDecoration: 'none', color: 'inherit' }}>

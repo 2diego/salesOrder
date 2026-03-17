@@ -53,6 +53,7 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
@@ -118,15 +119,13 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
 
   const handleDelete = async () => {
     if (!currentSeller) return;
-    const confirmed = window.confirm('¿Seguro que quieres desactivar este vendedor? No podrá ingresar ni crear pedidos, pero el historial se mantiene.');
-    if (!confirmed) return;
 
     setDeleting(true);
     setError(null);
     try {
       await sellersService.remove(currentSeller.id);
       setSuccess(true);
-      setSuccessMessage('Vendedor eliminado correctamente');
+      setSuccessMessage('Vendedor desactivado correctamente');
       onSellerDeleted && onSellerDeleted();
       setTimeout(() => {
         if (desktop && onClose) onClose(); else navigate('/Manage/AdminSellers');
@@ -135,6 +134,7 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
       setError(err.message || 'Error al eliminar el vendedor');
     } finally {
       setDeleting(false);
+      setShowDeactivateConfirm(false);
     }
   };
 
@@ -184,6 +184,17 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
         </div>
       )}
 
+      {showDeactivateConfirm && !success && (
+        <div className={`alert alert-error ${desktop ? 'desktop-alert' : ''}`}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM11 15H9V13H11V15ZM11 11H9V5H11V11Z" fill="currentColor"/>
+          </svg>
+          <span>
+            ¿Seguro que quieres desactivar este vendedor? No podrá ingresar ni crear pedidos, pero el historial se mantiene.
+          </span>
+        </div>
+      )}
+
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
         <h4 className="field-label">Nombre de usuario</h4>
         <FormField label="username" value={formData.username} placeholder="Nombre de usuario" editable={true} onChange={handleInputChange('username')} />
@@ -204,15 +215,38 @@ const EditSellers: React.FC<EditSellersProps> = ({ desktop = false, onClose, sel
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>
         </BtnBlue>
 
-        <BtnBlue
-          width="100%"
-          height="3rem"
-          background="rgba(239, 68, 68, 0.9)"
-          onClick={(loading || deleting) ? undefined : handleDelete}
-          disabled={loading || deleting}
-        >
-          <span>{deleting ? 'Desactivando...' : 'Desactivar vendedor'}</span>
-        </BtnBlue>
+        {showDeactivateConfirm ? (
+          <>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              background="rgba(239, 68, 68, 0.9)"
+              onClick={(loading || deleting) ? undefined : handleDelete}
+              disabled={loading || deleting}
+            >
+              <span>{deleting ? 'Desactivando...' : 'Confirmar desactivación'}</span>
+            </BtnBlue>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              background="#6b7280"
+              onClick={deleting ? undefined : () => setShowDeactivateConfirm(false)}
+              disabled={deleting}
+            >
+              <span>Cancelar</span>
+            </BtnBlue>
+          </>
+        ) : (
+          <BtnBlue
+            width="100%"
+            height="3rem"
+            background="rgba(239, 68, 68, 0.9)"
+            onClick={(loading || deleting) ? undefined : () => setShowDeactivateConfirm(true)}
+            disabled={loading || deleting}
+          >
+            <span>Desactivar vendedor</span>
+          </BtnBlue>
+        )}
 
         {!desktop && (
           <Link to="/Manage/AdminSellers" style={{ textDecoration: 'none', color: 'inherit' }}>
