@@ -72,13 +72,16 @@ const SellersDesktop = () => {
 
   return (
 		<>
-			<div style={{ 
-				padding: '2rem', 
-				backgroundColor: 'rgb(17, 24, 39)',
-				fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-				color: 'var(--mainBlack)',
-				marginTop: '4rem'
-			}}>
+			<div
+        className="sellers-desktop-page"
+        style={{ 
+				  padding: '2rem', 
+				  backgroundColor: 'rgb(17, 24, 39)',
+				  fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+				  color: 'var(--mainBlack)',
+				  marginTop: '4rem'
+			  }}
+      >
 				{/* Mostrar error si hay */}
 				{error && (
 					<div style={{ 
@@ -92,18 +95,21 @@ const SellersDesktop = () => {
 						{error}
 					</div>
 				)}
-				<Table
-					title="Gestión de Vendedores"
-					subtitle="Crear, editar y eliminar vendedores"
-					columns={columns}
-					data={tableData}
-					onAddNew={handleAddNew}
-					onRowClick={handleRowClick}
-					loading={loading}
-					searchPlaceholder="Buscar por vendedor, ID o email..."
+        <div className="sellers-table">
+				  <Table
+					  title="Gestión de Vendedores"
+					  subtitle="Crear, editar y eliminar vendedores"
+					  columns={columns}
+					  data={tableData}
+					  onAddNew={handleAddNew}
+					  onRowClick={handleRowClick}
+					  loading={loading}
+					  searchPlaceholder="Buscar por vendedor, ID o email..."
             addButtonText="Nuevo Vendedor"
-					emptyMessage="No hay vendedores disponibles"
-				/>
+					  emptyMessage="No hay vendedores disponibles"
+            stickyHeader={true}
+				  />
+        </div>
 			</div>
 
 			{/* Add Seller Popup */}

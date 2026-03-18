@@ -259,6 +259,14 @@
   box-sizing: border-box;
 }
 
+.clients-desktop-page,
+.sellers-desktop-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 5rem); /* ajusta 5rem según header/márgenes reales */
+  box-sizing: border-box;
+}
+
 .products-table {
   flex: 1;
   display: flex;
@@ -266,7 +274,23 @@
   min-height: 0; /* permite que el hijo con overflow funcione correctamente */
 }
 
+.clients-table,
+.sellers-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .products-table .table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.clients-table .table-container,
+.sellers-table .table-container {
   flex: 1;
   display: flex;
   flex-direction: column;
