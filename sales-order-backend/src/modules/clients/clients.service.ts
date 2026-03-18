@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Client } from 'src/entities/client.entity';
 import { Order, OrderStatus } from 'src/entities/order.entity';
-import { CreateClientDTO } from './dto/create-client-dto';
+import { CreateClientDTO, ARG_PROVINCES } from './dto/create-client-dto';
 import { UpdateClientDTO } from './dto/update-client-dto';
 
 @Injectable()
@@ -14,6 +14,40 @@ export class ClientsService {
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
   ) {}
+
+  private normalizeTitle(text: string): string {
+    const cleaned = text.trim().replace(/\s+/g, ' ');
+    const lower = cleaned.toLocaleLowerCase('es-AR');
+    const smallWords = new Set(['de', 'del', 'la', 'las', 'los', 'y']);
+    return lower
+      .split(' ')
+      .map((w, idx) => {
+        if (idx !== 0 && smallWords.has(w)) return w;
+        return w.charAt(0).toLocaleUpperCase('es-AR') + w.slice(1);
+      })
+      .join(' ');
+  }
+
+  private assertCityNoAbbreviations(city: string) {
+    const raw = city.trim();
+    if (raw.includes('.')) {
+      throw new BadRequestException('La ciudad debe escribirse sin abreviaturas');
+    }
+  }
+
+  private normalizeCity(city: string): string {
+    this.assertCityNoAbbreviations(city);
+    return this.normalizeTitle(city);
+  }
+
+  private normalizeProvince(state: string): string {
+    const normalized = this.normalizeTitle(state);
+    // Si llega un valor fuera de catálogo, preferimos fallar con mensaje claro
+    if (!ARG_PROVINCES.includes(normalized as any)) {
+      throw new BadRequestException('La provincia debe seleccionarse de la lista');
+    }
+    return normalized;
+  }
 
   async create(createClientDto: CreateClientDTO): Promise<Client> {
     // Verificar si ya existe un cliente con el mismo email (solo si se envía email)
@@ -30,6 +64,8 @@ export class ClientsService {
 
     const client = this.clientRepository.create({
       ...createClientDto,
+      city: this.normalizeCity(createClientDto.city),
+      state: this.normalizeProvince(createClientDto.state),
       // Si no hay email, se omite y la columna queda NULL
       ...(emailTrimmed ? { email: emailTrimmed } : {}),
     });
@@ -70,10 +106,19 @@ export class ClientsService {
       }
     }
 
-    await this.clientRepository.update(id, {
+    const updatePayload: any = {
       ...updateClientDto,
       ...(emailTrimmed ? { email: emailTrimmed } : {}),
-    });
+    };
+
+    if (updateClientDto.city !== undefined) {
+      updatePayload.city = this.normalizeCity(updateClientDto.city);
+    }
+    if (updateClientDto.state !== undefined) {
+      updatePayload.state = this.normalizeProvince(updateClientDto.state);
+    }
+
+    await this.clientRepository.update(id, updatePayload);
     
     return this.findOne(id);
   }
@@ -112,5 +157,25 @@ export class ClientsService {
     return this.clientRepository.findOne({
       where: { email }
     });
+  }
+
+  async findCitiesByProvince(state: string): Promise<string[]> {
+    const normalizedState = this.normalizeProvince(state);
+    const rows = await this.clientRepository
+      .createQueryBuilder('client')
+      .select('DISTINCT client.city', 'city')
+      .where('client.isActive = :isActive', { isActive: true })
+      .andWhere('client.state = :state', { state: normalizedState })
+      .andWhere('client.city IS NOT NULL')
+      .andWhere("TRIM(client.city) <> ''")
+      .orderBy('client.city', 'ASC')
+      .getRawMany<{ city: string }>();
+
+    const normalized = rows
+      .map(r => r.city)
+      .filter(Boolean)
+      .map(c => this.normalizeCity(c));
+
+    return Array.from(new Set(normalized)).sort((a, b) => a.localeCompare(b, 'es-AR'));
   }
 }

@@ -212,5 +212,30 @@ export const clientsService = {
       throw error;
     }
   }
+  ,
+
+  async findCitiesByProvince(state: string): Promise<string[]> {
+    try {
+      const response = await fetch(getApiUrl(`/clients/cities?state=${encodeURIComponent(state)}`), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al obtener ciudades');
+      }
+
+      const cities: string[] = await response.json();
+      return cities;
+    } catch (error) {
+      if (error instanceof TypeError) {
+        throw new Error('No se pudo conectar con el servidor.');
+      }
+      throw error;
+    }
+  },
 };
 

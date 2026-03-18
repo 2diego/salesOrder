@@ -1,5 +1,32 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsNotEmpty, IsEmail, IsOptional, ValidateIf } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsOptional, ValidateIf, IsIn } from 'class-validator';
+
+export const ARG_PROVINCES = [
+  'Buenos Aires',
+  'Catamarca',
+  'Chaco',
+  'Chubut',
+  'Ciudad Autónoma de Buenos Aires',
+  'Córdoba',
+  'Corrientes',
+  'Entre Ríos',
+  'Formosa',
+  'Jujuy',
+  'La Pampa',
+  'La Rioja',
+  'Mendoza',
+  'Misiones',
+  'Neuquén',
+  'Río Negro',
+  'Salta',
+  'San Juan',
+  'San Luis',
+  'Santa Cruz',
+  'Santa Fe',
+  'Santiago del Estero',
+  'Tierra del Fuego',
+  'Tucumán',
+] as const;
 
 export class CreateClientDTO {
   @IsString({ message: 'El nombre debe ser texto' })
@@ -23,10 +50,13 @@ export class CreateClientDTO {
 
   @IsString({ message: 'La ciudad debe ser texto' })
   @IsNotEmpty({ message: 'La ciudad es obligatoria' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : value))
   city: string;
 
   @IsString({ message: 'El estado/provincia debe ser texto' })
   @IsNotEmpty({ message: 'El estado/provincia es obligatorio' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : value))
+  @IsIn(ARG_PROVINCES, { message: 'La provincia debe seleccionarse de la lista' })
   state: string;
 
   @IsString()

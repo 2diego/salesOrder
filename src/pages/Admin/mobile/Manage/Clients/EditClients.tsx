@@ -8,6 +8,33 @@ import { useEffect, useMemo, useState } from "react";
 import './AddClients.css';
 import { clientsService, Client, UpdateClientDTO } from "../../../../../services/clientsService";
 
+const ARG_PROVINCES = [
+  'Buenos Aires',
+  'Catamarca',
+  'Chaco',
+  'Chubut',
+  'Ciudad Autónoma de Buenos Aires',
+  'Córdoba',
+  'Corrientes',
+  'Entre Ríos',
+  'Formosa',
+  'Jujuy',
+  'La Pampa',
+  'La Rioja',
+  'Mendoza',
+  'Misiones',
+  'Neuquén',
+  'Río Negro',
+  'Salta',
+  'San Juan',
+  'San Luis',
+  'Santa Cruz',
+  'Santa Fe',
+  'Santiago del Estero',
+  'Tierra del Fuego',
+  'Tucumán',
+] as const;
+
 interface EditClientsProps {
   desktop?: boolean;
   onClose?: () => void;
@@ -34,6 +61,7 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
 
   // Cargar cliente vía ruta
   useEffect(() => {
@@ -65,6 +93,29 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
     }));
     if (error) setError(null);
   };
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, state: value, city: '' }));
+    setCitySuggestions([]);
+    if (error) setError(null);
+  };
+
+  const selectedProvince = formData.state;
+  const cityDatalistId = useMemo(() => `cities-edit-${selectedProvince || 'none'}`, [selectedProvince]);
+
+  useEffect(() => {
+    const loadCities = async () => {
+      if (!selectedProvince) return;
+      try {
+        const cities = await clientsService.findCitiesByProvince(selectedProvince);
+        setCitySuggestions(cities);
+      } catch {
+        setCitySuggestions([]);
+      }
+    };
+    loadCities();
+  }, [selectedProvince]);
 
   const hasChanges = useMemo(() => {
     if (!currentClient) return false;
@@ -105,6 +156,19 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
         setError('El correo no tiene un formato válido');
         return false;
       }
+    }
+    if (!formData.city.trim()) {
+      setError('La ciudad es obligatoria');
+      return false;
+    }
+    const cityRaw = formData.city.trim();
+    if (cityRaw.includes('.') || /\b(bs|baires|caba)\b/i.test(cityRaw)) {
+      setError('La ciudad debe escribirse sin abreviaturas');
+      return false;
+    }
+    if (!formData.state.trim()) {
+      setError('La provincia es obligatoria');
+      return false;
     }
     return true;
   };
@@ -232,10 +296,50 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
         <FormField label="direccion" value={formData.address} placeholder="Dirección" editable={true} onChange={handleInputChange('address')} />
 
         <h4 className="field-label">Ciudad</h4>
-        <FormField label="ciudad" value={formData.city} placeholder="Ciudad" editable={true} onChange={handleInputChange('city')} />
+        <div className="form-field">
+          <div className="field-input">
+            <input
+              type="text"
+              value={formData.city}
+              onChange={handleInputChange('city')}
+              placeholder="Ej: Benito Juárez"
+              list={cityDatalistId}
+              autoComplete="off"
+            />
+            <datalist id={cityDatalistId}>
+              {citySuggestions.map(city => (
+                <option key={city} value={city} />
+              ))}
+            </datalist>
+          </div>
+        </div>
+        <div style={{ marginTop: '0.25rem', color: 'var(--mainGray)', fontSize: '0.85rem', paddingLeft: '1rem' }}>
+          Escribí el nombre completo, sin abreviaturas.
+        </div>
 
         <h4 className="field-label">Provincia</h4>
-        <FormField label="provincia" value={formData.state} placeholder="Provincia" editable={true} onChange={handleInputChange('state')} />
+        <div className="form-field">
+          <div className="field-input">
+            <select
+              value={formData.state}
+              onChange={handleProvinceChange}
+              style={{
+                width: '100%',
+                height: '100%',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1rem',
+                fontFamily: 'Inter, sans-serif',
+                outline: 'none'
+              }}
+            >
+              <option value="">Seleccione una provincia</option>
+              {ARG_PROVINCES.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <BtnBlue width="100%" height="3rem" onClick={(loading || deleting) ? undefined : handleSubmit} disabled={loading || deleting}>
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>

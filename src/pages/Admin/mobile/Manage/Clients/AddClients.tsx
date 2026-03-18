@@ -4,9 +4,36 @@ import { Link, useNavigate } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
 import BtnBlue from "../../../../../components/common/BtnBlue/BtnBlue";
 import FormField from "../../../../../components/common/FormField/FormField";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import './AddClients.css';
 import { clientsService, CreateClientDTO } from "../../../../../services/clientsService";
+
+const ARG_PROVINCES = [
+  'Buenos Aires',
+  'Catamarca',
+  'Chaco',
+  'Chubut',
+  'Ciudad Autónoma de Buenos Aires',
+  'Córdoba',
+  'Corrientes',
+  'Entre Ríos',
+  'Formosa',
+  'Jujuy',
+  'La Pampa',
+  'La Rioja',
+  'Mendoza',
+  'Misiones',
+  'Neuquén',
+  'Río Negro',
+  'Salta',
+  'San Juan',
+  'San Luis',
+  'Santa Cruz',
+  'Santa Fe',
+  'Santiago del Estero',
+  'Tierra del Fuego',
+  'Tucumán',
+] as const;
 
 interface AddClientsProps {
   desktop?: boolean;
@@ -24,6 +51,7 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
     city: '',
     state: ''
   });
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -36,6 +64,33 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
     // Limpiar errores cuando el usuario empiece a escribir
     if (error) setError(null);
   };
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setClientData(prev => ({
+      ...prev,
+      state: value,
+      city: '' // reset para evitar inconsistencias
+    }));
+    setCitySuggestions([]);
+    if (error) setError(null);
+  };
+
+  const selectedProvince = clientData.state;
+  const cityDatalistId = useMemo(() => `cities-${selectedProvince || 'none'}`, [selectedProvince]);
+
+  useEffect(() => {
+    const loadCities = async () => {
+      if (!selectedProvince) return;
+      try {
+        const cities = await clientsService.findCitiesByProvince(selectedProvince);
+        setCitySuggestions(cities);
+      } catch {
+        setCitySuggestions([]);
+      }
+    };
+    loadCities();
+  }, [selectedProvince]);
 
   const validateForm = (): boolean => {
     if (!clientData.name.trim()) {
@@ -61,6 +116,12 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
     }
     if (!clientData.city.trim()) {
       setError('La ciudad es obligatoria');
+      return false;
+    }
+    // Ciudad sin abreviaturas
+    const cityRaw = clientData.city.trim();
+    if (cityRaw.includes('.') || /\b(bs|baires|caba)\b/i.test(cityRaw)) {
+      setError('La ciudad debe escribirse sin abreviaturas');
       return false;
     }
     if (!clientData.state.trim()) {
@@ -202,22 +263,50 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
         />
 
         <h4 className="field-label">Ciudad</h4>
-        <FormField 
-          label="ciudad" 
-          value={clientData.city} 
-          placeholder="Ej: Ciudad"
-          editable={true}
-          onChange={handleInputChange('city')}
-        />
+        <div className="form-field">
+          <div className="field-input">
+            <input
+              type="text"
+              value={clientData.city}
+              onChange={handleInputChange('city')}
+              placeholder="Ej: Benito Juárez"
+              list={cityDatalistId}
+              autoComplete="off"
+            />
+            <datalist id={cityDatalistId}>
+              {citySuggestions.map(city => (
+                <option key={city} value={city} />
+              ))}
+            </datalist>
+          </div>
+        </div>
+        <div style={{ marginTop: '0.25rem', color: 'var(--mainGray)', fontSize: '0.85rem', paddingLeft: '1rem' }}>
+          Escribí el nombre completo, sin abreviaturas.
+        </div>
 
         <h4 className="field-label">Provincia</h4>
-        <FormField 
-          label="provincia" 
-          value={clientData.state} 
-          placeholder="Ej: Provincia"
-          editable={true}
-          onChange={handleInputChange('state')}
-        />
+        <div className="form-field">
+          <div className="field-input">
+            <select
+              value={clientData.state}
+              onChange={handleProvinceChange}
+              style={{
+                width: '100%',
+                height: '100%',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1rem',
+                fontFamily: 'Inter, sans-serif',
+                outline: 'none'
+              }}
+            >
+              <option value="">Seleccione una provincia</option>
+              {ARG_PROVINCES.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         
         <BtnBlue 

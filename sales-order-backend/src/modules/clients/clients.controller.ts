@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, ParseIntPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDTO } from './dto/create-client-dto';
 import { UpdateClientDTO } from './dto/update-client-dto';
@@ -17,6 +17,11 @@ export class ClientsController {
   @Get()
   findAll(): Promise<Client[]> {
     return this.clientsService.findAll();
+  }
+
+  @Get('cities')
+  findCitiesByProvince(@Query('state') state: string): Promise<string[]> {
+    return this.clientsService.findCitiesByProvince(state);
   }
 
   @Get(':id')
