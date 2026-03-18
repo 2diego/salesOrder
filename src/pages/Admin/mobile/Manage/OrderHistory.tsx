@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
@@ -91,7 +91,7 @@ const OrderHistory = () => {
   // Formatear estado
   const formatStatus = (status: OrderStatus): { text: string; color: string } => {
     const statusMap: Record<OrderStatus, { text: string; color: string }> = {
-      [OrderStatus.PENDING]: { text: 'Pendiente', color: '#8d2121ff' },
+      [OrderStatus.PENDING]: { text: 'Pendiente', color: '#c99715ff' },
       [OrderStatus.VALIDATED]: { text: 'Validado', color: '#3c9234ff' },
       [OrderStatus.CANCELLED]: { text: 'Cancelado', color: '#8d2121ff' },
     };
@@ -157,14 +157,11 @@ const OrderHistory = () => {
 
       {/* Order History Header */}
       {!loading && filteredOrders.length > 0 && (
-        <InfoRow className="row-header"
+        <InfoRow className="row-header mobile-compact"
           columns={[
-            <span key={'date'}>Fecha</span>,
-            <span key={'id'}>Nro de pedido</span>,
-            <span key={'client'}>Cliente</span>,
-            <span key={'status'}>Estado</span>,
+            <span key={'order'}>Pedido</span>,
+            <span key={'client'}>Cliente / Estado</span>,
           ]}
-          actionIcon={<LuClipboardList />}
         />
       )}
 
@@ -174,13 +171,18 @@ const OrderHistory = () => {
         return (
           <InfoRow
             key={order.id}
+            className="mobile-compact"
             columns={[
-              <span key={'date'}>{formatDate(order.createdAt)}</span>,
-              <span key={'id'}>{formatOrderNumber(order.id)}</span>,
-              <span key={'client'}>{order.client?.name || 'Sin cliente'}</span>,
-              <span key={'status'} style={{ color: statusInfo.color, fontWeight: 'bold' }}>
-                {statusInfo.text}
-              </span>,
+              <div key={'order'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                <span style={{ fontWeight: 600 }}>{formatOrderNumber(order.id)}</span>
+                <span style={{ fontSize: '0.85rem' }}>{formatDate(order.createdAt)}</span>
+              </div>,
+              <div key={'client'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                <span>{order.client?.name || 'Sin cliente'}</span>
+                <span style={{ color: statusInfo.color, fontWeight: 700, fontSize: '0.85rem' }}>
+                  {statusInfo.text}
+                </span>
+              </div>,
             ]}
             actionLabel="Ver más"
             actionIcon={<LuClipboardList />}

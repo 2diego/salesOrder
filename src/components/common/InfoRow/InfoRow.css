@@ -24,6 +24,24 @@
 	text-align: center;
 }
 
+/* Filas compactas para mobile: evita desbordamientos en tablas anchas */
+.info-row.mobile-compact {
+	/* 3ra columna fija para alinear header y filas (acción) */
+	grid-template-columns: 0.75fr 1.25fr 88px;
+	gap: 0.5rem;
+}
+
+.info-row.mobile-compact .info-cell {
+	text-align: left;
+	min-width: 0;
+}
+
+.info-row.mobile-compact .info-cell > * {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .action-cell {
 	display: flex;
 	justify-content: flex-end;
@@ -59,6 +77,12 @@
 	font-weight: 600;
 	gap: 1.5rem;
 	height: 3rem;
+}
+
+/* Ocultar visualmente el ícono de acción en headers sin perder alineación */
+.row-header.hide-header-action .row-action {
+	visibility: hidden;
+	pointer-events: none;
 }
 
 

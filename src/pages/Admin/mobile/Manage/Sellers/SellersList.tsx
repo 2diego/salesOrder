@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -102,7 +102,7 @@ const SellersList = () => {
           onChange={handleSearch} />
 
       { /* Sellers List */ }
-      <InfoRow className="row-header"
+      <InfoRow className="row-header hide-header-action"
         columns={[
           <span key={'name'}>Nombre</span>,
           <span key={'phone'}>Teléfono</span>,

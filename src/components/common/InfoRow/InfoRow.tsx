@@ -17,7 +17,9 @@ const InfoRow = ({
   onRowClick,
   className = ''
 }: InfoRowProps) => {
-  const totalColumns = columns.length + (actionLabel || actionIcon ? 1 : 0)
+  // Reservar columna de acción si hay label o icon para mantener alineación (en header se oculta el icono)
+  const hasActionColumn = Boolean(actionLabel || actionIcon)
+  const totalColumns = columns.length + (hasActionColumn ? 1 : 0)
 
   return (
     <div
@@ -31,13 +33,20 @@ const InfoRow = ({
         </div>
       ))}
 
-      {actionLabel && (
+      {hasActionColumn && (
         <div className="info-cell action-cell">
-          <button type="button" className="row-action" onClick={(e) => { e.stopPropagation(); onActionClick && onActionClick() }}>
+          <button
+            type="button"
+            className="row-action"
+            onClick={(e) => {
+              e.stopPropagation();
+              onActionClick && onActionClick();
+            }}
+          >
             {actionIcon && (
               <span className="action-icon">{actionIcon}</span>
             )}
-            <span>{actionLabel}</span>
+            {actionLabel && <span>{actionLabel}</span>}
           </button>
         </div>
       )}

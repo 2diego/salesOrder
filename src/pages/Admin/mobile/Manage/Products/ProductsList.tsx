@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -106,10 +106,9 @@ const ProductsList = () => {
       />
 
       { /* Products List */ }
-      <InfoRow className="row-header"
+      <InfoRow className="row-header hide-header-action"
         columns={[
-          <span key={'id'}>Código</span>,
-          <span key={'name'}>Nombre</span>,
+          <span key={'code'}>Código</span>,
           <span key={'category'}>Categoría</span>
         ]}
         actionIcon={<LuClipboardList />}
@@ -140,8 +139,7 @@ const ProductsList = () => {
         <InfoRow
           key={product.id}
           columns={[
-            <span key={'id'}>{product.id}</span>,
-            <span key={'name'}>{product.name}</span>,
+            <span key={'code'}>{product.name}</span>,
             <span key={'category'}>{product.category?.name || 'Sin categoría'}</span>
           ]}
           actionLabel="Editar"

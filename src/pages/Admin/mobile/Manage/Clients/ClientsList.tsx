@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -107,12 +107,10 @@ const ClientsList = () => {
       />
 
       { /* Clients List */ }
-      <InfoRow className="row-header"
+      <InfoRow className="row-header mobile-compact hide-header-action"
         columns={[
-          <span key={'name'}>Cliente</span>,
-          <span key={'id'}>Código</span>,
-          <span key={'localidad'}>Ciudad</span>,
-          <span key={'direccion'}>Dirección</span>,
+          <span key={'client'}>Cliente</span>,
+          <span key={'location'}>Ciudad / Dirección</span>,
         ]}
         actionIcon={<LuClipboardList />}
       />
@@ -141,11 +139,18 @@ const ClientsList = () => {
       {filteredClients.map((client) => (
         <InfoRow
           key={client.id}
+          className="mobile-compact"
           columns={[
-            <span key={'client'}>{client.name}</span>,
-            <span key={'id'}>{client.id.toString().padStart(6, '0')}</span>,
-            <span key={'localidad'}>{client.city}</span>,
-            <span key={'direccion'}>{client.address}</span>,
+            <div key={'client'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+              <span style={{ fontWeight: 600 }}>{client.name}</span>
+              <span style={{ fontSize: '0.85rem' }}>
+                {client.id.toString().padStart(6, '0')}
+              </span>
+            </div>,
+            <div key={'location'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+              <span>{client.city}</span>
+              <span style={{ fontSize: '0.85rem' }}>{client.address}</span>
+            </div>,
           ]}
           actionLabel="Editar"
           actionIcon={<LuClipboardList />}
