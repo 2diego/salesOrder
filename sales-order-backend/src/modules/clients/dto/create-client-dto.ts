@@ -1,13 +1,17 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsString, IsNotEmpty, IsEmail, IsOptional, ValidateIf } from 'class-validator';
 
 export class CreateClientDTO {
   @IsString({ message: 'El nombre debe ser texto' })
   @IsNotEmpty({ message: 'El nombre es obligatorio' })
   name: string;
 
+  // Si viene vacío (""), se omite para que @IsOptional lo ignore.
+  @Transform(({ value }) => (typeof value === 'string' ? (value.trim() === '' ? undefined : value.trim()) : value))
+  @ValidateIf((o) => o.email !== undefined)
   @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
-  @IsNotEmpty({ message: 'El correo electrónico es obligatorio' })
-  email: string;
+  @IsOptional()
+  email?: string;
 
   @IsString({ message: 'El teléfono debe ser texto' })
   @IsNotEmpty({ message: 'El teléfono es obligatorio' })

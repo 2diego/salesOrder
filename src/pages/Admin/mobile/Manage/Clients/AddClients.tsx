@@ -1,4 +1,4 @@
-﻿import Header from "../../../../../components/common/Header/Header"
+import Header from "../../../../../components/common/Header/Header"
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link, useNavigate } from "react-router-dom";
 import SectionTitle from "../../../../../components/common/SectionTitle/SectionTitle";
@@ -42,15 +42,14 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
       setError('El nombre es obligatorio');
       return false;
     }
-    if (!clientData.email.trim()) {
-      setError('El correo es obligatorio');
-      return false;
-    }
-    // Validación básica de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(clientData.email)) {
-      setError('El correo no tiene un formato válido');
-      return false;
+    // Correo opcional: si se ingresa, validar formato
+    const emailTrimmed = clientData.email?.trim() || '';
+    if (emailTrimmed) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailTrimmed)) {
+        setError('El correo no tiene un formato válido');
+        return false;
+      }
     }
     if (!clientData.phone.trim()) {
       setError('El teléfono es obligatorio');
@@ -82,7 +81,12 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
 
     try {
       // Llamar al servicio para crear el cliente
-      const newClient = await clientsService.create(clientData);
+      const payload: CreateClientDTO = {
+        ...clientData,
+        email: clientData.email?.trim() ? clientData.email.trim() : undefined,
+      };
+
+      const newClient = await clientsService.create(payload);
       console.log('Cliente creado exitosamente:', newClient);
       
       setSuccess(true);

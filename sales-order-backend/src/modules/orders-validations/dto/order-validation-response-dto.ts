@@ -14,7 +14,7 @@ export class OrderValidationResponseDto {
     client?: {
       id: number;
       name: string;
-      email: string;
+      email: string | null;
     };
   };
   validatedBy?: {

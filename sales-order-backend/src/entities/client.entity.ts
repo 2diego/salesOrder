@@ -9,7 +9,7 @@ export class Client {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255, nullable: true })
   email: string;
 
   @Column()

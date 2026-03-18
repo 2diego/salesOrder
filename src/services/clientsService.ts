@@ -5,7 +5,7 @@ import { getApiUrl } from '../config/api.config';
 // Interface del back
 export interface CreateClientDTO {
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   address: string;
   city: string;
@@ -64,7 +64,7 @@ export const clientsService = {
         
         // Manejar errores específicos del backend
         if (response.status === 409) {
-          throw new Error('Ya existe un cliente con este correo electrónico');
+          throw new Error(errorData.message || 'Ya existe un cliente con este correo electrónico');
         }
         
         if (response.status === 400) {

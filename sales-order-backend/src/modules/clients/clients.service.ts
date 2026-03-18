@@ -16,16 +16,23 @@ export class ClientsService {
   ) {}
 
   async create(createClientDto: CreateClientDTO): Promise<Client> {
-    // Verificar si ya existe un cliente con el mismo email
-    const existingClient = await this.clientRepository.findOne({
-      where: { email: createClientDto.email }
-    });
+    // Verificar si ya existe un cliente con el mismo email (solo si se envía email)
+    const emailTrimmed = createClientDto.email?.trim();
+    if (emailTrimmed) {
+      const existingClient = await this.clientRepository.findOne({
+        where: { email: emailTrimmed }
+      });
 
-    if (existingClient) {
-      throw new ConflictException('Ya existe un cliente con este correo electrónico');
+      if (existingClient) {
+        throw new ConflictException('Ya existe un cliente con este correo electrónico');
+      }
     }
 
-    const client = this.clientRepository.create(createClientDto);
+    const client = this.clientRepository.create({
+      ...createClientDto,
+      // Si no hay email, se omite y la columna queda NULL
+      ...(emailTrimmed ? { email: emailTrimmed } : {}),
+    });
     return this.clientRepository.save(client);
   }
 
@@ -52,9 +59,10 @@ export class ClientsService {
     const client = await this.findOne(id);
 
     // Si se va a actualizar el email, verificar que no exista
-    if (updateClientDto.email && updateClientDto.email !== client.email) {
+    const emailTrimmed = updateClientDto.email?.trim();
+    if (emailTrimmed && emailTrimmed !== client.email) {
       const existingClient = await this.clientRepository.findOne({
-        where: { email: updateClientDto.email }
+        where: { email: emailTrimmed }
       });
 
       if (existingClient) {
@@ -62,7 +70,10 @@ export class ClientsService {
       }
     }
 
-    await this.clientRepository.update(id, updateClientDto);
+    await this.clientRepository.update(id, {
+      ...updateClientDto,
+      ...(emailTrimmed ? { email: emailTrimmed } : {}),
+    });
     
     return this.findOne(id);
   }

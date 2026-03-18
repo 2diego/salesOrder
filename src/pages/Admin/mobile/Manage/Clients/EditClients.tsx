@@ -82,7 +82,9 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
     const diff: UpdateClientDTO = {};
     if (!currentClient) return diff;
     if (formData.name !== currentClient.name) diff.name = formData.name;
-    if (formData.email !== currentClient.email) diff.email = formData.email;
+    if (formData.email !== currentClient.email) {
+      diff.email = formData.email?.trim() ? formData.email.trim() : undefined;
+    }
     if (formData.phone !== currentClient.phone) diff.phone = formData.phone;
     if (formData.address !== currentClient.address) diff.address = formData.address;
     if (formData.city !== currentClient.city) diff.city = formData.city;
@@ -95,14 +97,14 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
       setError('El nombre es obligatorio');
       return false;
     }
-    if (!formData.email.trim()) {
-      setError('El correo es obligatorio');
-      return false;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError('El correo no tiene un formato válido');
-      return false;
+    // Correo opcional: si se ingresa, validar formato
+    const emailTrimmed = formData.email?.trim() || '';
+    if (emailTrimmed) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailTrimmed)) {
+        setError('El correo no tiene un formato válido');
+        return false;
+      }
     }
     return true;
   };
