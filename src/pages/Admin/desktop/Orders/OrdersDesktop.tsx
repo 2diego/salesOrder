@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
-import { clientsService } from "../../../../services/clientsService";
 
 const OrdersDesktop = () => {
 	const navigate = useNavigate();
@@ -13,66 +12,34 @@ const OrdersDesktop = () => {
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
 	useEffect(() => {
 		const fetchOrders = async () => {
 			try {
 				setLoading(true);
 				setError(null);
-				const filters = showOnlyPending ? { status: OrderStatus.PENDING } : undefined;
-				const ordersData = await ordersService.findAll(filters);
-				
-				// Cargar datos completos del cliente para las órdenes donde los datos del cliente están incompletos o faltan
-				const ordersWithFullClientData: Order[] = await Promise.all(
-					ordersData.map(async (order): Promise<Order> => {
-						// Verificar si los datos del cliente están incompletos o faltan
-						const needsFullClient = order.client && (
-							!order.client.phone || (typeof order.client.phone === 'string' && order.client.phone.trim() === '') ||
-							!order.client.address || (typeof order.client.address === 'string' && order.client.address.trim() === '')
-						);
-						
-						if (needsFullClient && order.client) {
-							try {
-								const fullClient = await clientsService.findOne(order.clientId);
-								return {
-									...order,
-									client: {
-										...order.client,
-										phone: fullClient.phone || order.client.phone || '',
-										address: fullClient.address || order.client.address || '',
-										city: fullClient.city || order.client.city || '',
-									}
-								} as Order;
-							} catch (err: any) {
-								console.warn(`Error loading client data for order ${order.id}:`, err);
-								return order;
-							}
-						} else if (!order.client && order.clientId) {
-							// Si el cliente no está cargado, intentar cargarlo
-							try {
-								const fullClient = await clientsService.findOne(order.clientId);
-								return {
-									...order,
-									client: {
-										id: fullClient.id,
-										name: fullClient.name,
-										email: fullClient.email,
-										phone: fullClient.phone || '',
-										address: fullClient.address || '',
-										city: fullClient.city || '',
-									}
-								} as Order;
-							} catch (err: any) {
-								console.warn(`Error loading client data for order ${order.id}:`, err);
-								return order;
-							}
-						}
-						
-						return order;
-					})
-				);
-				
-				setOrders(ordersWithFullClientData);
+				const result = await ordersService.findPaged({
+          page,
+          limit,
+          status: showOnlyPending ? OrderStatus.PENDING : undefined,
+          q: debouncedSearch.trim() ? debouncedSearch.trim() : undefined
+        });
+				const ordersData = result.data;
+        setTotalPages(result.totalPages || 1);
+        setTotal(result.total || 0);
+
+				setOrders(ordersData);
 			} catch (err: any) {
 				console.error('Error al cargar pedidos:', err);
 				setError(err.message || 'Error al cargar los pedidos');
@@ -82,7 +49,7 @@ const OrdersDesktop = () => {
 		};
 
 		fetchOrders();
-	}, [showOnlyPending]);
+	}, [showOnlyPending, page, limit, debouncedSearch]);
 
 	// Formatear el estado a español
 	const formatStatus = (status: OrderStatus): string => {
@@ -94,15 +61,8 @@ const OrdersDesktop = () => {
 		return statusMap[status] || status;
 	};
 
-	// Filtrar órdenes vacías (sin items) que son solo para generar links
-	// Estas órdenes se crean solo como contenedor para el link y no deben mostrarse
-	// hasta que el cliente las complete con items
-	const ordersWithItems = orders.filter(order => 
-		order.orderItems && order.orderItems.length > 0
-	);
-
 	// Mapear los datos de Order a formato de tabla
-	const tableData = ordersWithItems.map(order => ({
+	const tableData = orders.map(order => ({
 		id: order.id,
 		name: order.client?.name || 'Sin cliente',
 		phone: order.client?.phone || 'N/A',
@@ -162,16 +122,89 @@ const OrdersDesktop = () => {
 			)}
 			<Table
 				title={showOnlyPending ? 'Pedidos sin validar' : 'Gestión de Pedidos'}
-				subtitle={showOnlyPending ? 'Pedidos con estado pendiente de validación' : 'Administra todos los pedidos del sistema'}
+				subtitle={
+          showOnlyPending
+            ? `Pedidos con estado pendiente de validación (${total})`
+            : `Administra todos los pedidos del sistema (${total})`
+        }
 				columns={columns}
 				data={tableData}
 				onAddNew={handleAddNew}
 				onRowClick={handleRowClick}
 				loading={loading}
 				searchPlaceholder="Buscar por cliente, ID o teléfono..."
+        searchValue={searchTerm}
+        onSearchChange={(value) => {
+          setPage(1);
+          setSearchTerm(value);
+        }}
 				addButtonText="Nuevo Pedido"
 				emptyMessage={showOnlyPending ? 'No hay pedidos sin validar' : 'No hay pedidos disponibles'}
+        stickyHeader={true}
 			/>
+
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', color: 'rgb(233, 232, 232)' }}>
+          <span style={{ fontSize: '0.875rem', opacity: 0.8 }}>Filas:</span>
+          <select
+            value={limit}
+            onChange={(e) => {
+              setPage(1);
+              setLimit(parseInt(e.target.value));
+            }}
+            style={{
+              background: 'rgb(31, 41, 55)',
+              border: '1px solid rgba(100,100,100,0.4)',
+              color: 'rgb(233, 232, 232)',
+              borderRadius: '8px',
+              padding: '0.35rem 0.5rem',
+              outline: 'none'
+            }}
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button
+            type="button"
+            disabled={loading || page <= 1}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            style={{
+              background: 'rgb(31, 41, 55)',
+              border: '1px solid rgba(100,100,100,0.4)',
+              color: 'rgb(233, 232, 232)',
+              borderRadius: '8px',
+              padding: '0.4rem 0.75rem',
+              opacity: loading || page <= 1 ? 0.5 : 1,
+              cursor: loading || page <= 1 ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Anterior
+          </button>
+          <span style={{ color: 'rgb(233, 232, 232)', fontSize: '0.875rem', opacity: 0.9 }}>
+            Página {page} de {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={loading || page >= totalPages}
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            style={{
+              background: 'rgb(31, 41, 55)',
+              border: '1px solid rgba(100,100,100,0.4)',
+              color: 'rgb(233, 232, 232)',
+              borderRadius: '8px',
+              padding: '0.4rem 0.75rem',
+              opacity: loading || page >= totalPages ? 0.5 : 1,
+              cursor: loading || page >= totalPages ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
 		</div>
   );
 }

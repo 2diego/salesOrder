@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BtnBlue from '../../common/BtnBlue/BtnBlue';
 import HeaderNotification from '../HeaderNotification/HeaderNotification';
 import CreateLink from '../../../pages/Admin/mobile/Orders/CreateLink';
@@ -8,6 +8,7 @@ import './HeaderDesktop.css';
 
 const HeaderDesktop = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateLinkPopup, setShowCreateLinkPopup] = useState(false);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
@@ -15,18 +16,23 @@ const HeaderDesktop = () => {
   useEffect(() => {
     const fetchPendingCount = async () => {
       try {
-        const ordersData = await ordersService.findAll({ status: OrderStatus.PENDING });
-        const ordersWithItems = ordersData.filter(order =>
-          order.orderItems && order.orderItems.length > 0
-        );
-        setPendingOrdersCount(ordersWithItems.length);
+        const result = await ordersService.findPaged({
+          page: 1,
+          limit: 1,
+          status: OrderStatus.PENDING,
+        });
+        setPendingOrdersCount(result.total || 0);
       } catch (err) {
         console.warn('Error al cargar conteo de pedidos pendientes:', err);
         setPendingOrdersCount(0);
       }
     };
     fetchPendingCount();
-  }, []);
+    // También refrescar al volver al tab
+    const onFocus = () => fetchPendingCount();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [location.pathname, location.search]);
 
   const handleNavigateToUnvalidatedOrders = () => {
     navigate('/Orders?status=pending');

@@ -6,6 +6,30 @@ import { CreateOrderDto } from './dto/create-order-dto';
 import { UpdateOrderDto } from './dto/update-order-dto';
 import { OrderResponseDto } from './dto/order-response-dto';
 
+export type OrderListItemDto = {
+  id: number;
+  clientId: number;
+  createdById: number;
+  status: OrderStatus;
+  createdAt: Date;
+  client?: {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string;
+    address: string;
+    city: string;
+  };
+};
+
+export type PagedResultDto<T> = {
+  data: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
 @Injectable()
 export class OrdersService {
   constructor(
@@ -50,6 +74,96 @@ export class OrdersService {
 
     const orders = await query.getMany();
     return orders.map(order => this.formatOrderResponse(order));
+  }
+
+  async findPaged(params: {
+    page: number;
+    limit: number;
+    status?: OrderStatus;
+    q?: string;
+  }): Promise<PagedResultDto<OrderListItemDto>> {
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(100, Math.max(1, params.limit || 10));
+    const offset = (page - 1) * limit;
+
+    const q = (params.q || '').trim();
+
+    const query = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.client', 'client')
+      .where('1=1')
+      // Excluir órdenes vacías (sin items)
+      .andWhere('EXISTS (SELECT 1 FROM order_items oi WHERE oi.order_id = order.id)')
+      .orderBy('order.createdAt', 'DESC')
+      .skip(offset)
+      .take(limit);
+
+    if (params.status) {
+      query.andWhere('order.status = :status', { status: params.status });
+    }
+
+    if (q) {
+      const qLike = `%${q}%`;
+      const qNum = Number(q);
+      query.andWhere(
+        qNum && Number.isFinite(qNum)
+          ? '(order.id = :qNum OR client.name LIKE :qLike OR client.email LIKE :qLike OR client.phone LIKE :qLike)'
+          : '(client.name LIKE :qLike OR client.email LIKE :qLike OR client.phone LIKE :qLike)',
+        { qLike, qNum },
+      );
+    }
+
+    // Count (distinct orders) with same filters
+    const countQuery = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoin('order.client', 'client')
+      .select('order.id')
+      .distinct(true)
+      .where('1=1')
+      .andWhere('EXISTS (SELECT 1 FROM order_items oi WHERE oi.order_id = order.id)');
+
+    if (params.status) {
+      countQuery.andWhere('order.status = :status', { status: params.status });
+    }
+
+    if (q) {
+      const qLike = `%${q}%`;
+      const qNum = Number(q);
+      countQuery.andWhere(
+        qNum && Number.isFinite(qNum)
+          ? '(order.id = :qNum OR client.name LIKE :qLike OR client.email LIKE :qLike OR client.phone LIKE :qLike)'
+          : '(client.name LIKE :qLike OR client.email LIKE :qLike OR client.phone LIKE :qLike)',
+        { qLike, qNum },
+      );
+    }
+
+    const [orders, total] = await Promise.all([query.getMany(), countQuery.getCount()]);
+
+    const data: OrderListItemDto[] = orders.map(order => ({
+      id: order.id,
+      clientId: order.clientId,
+      createdById: order.createdById,
+      status: order.status,
+      createdAt: order.createdAt,
+      client: order.client ? {
+        id: order.client.id,
+        name: order.client.name,
+        email: order.client.email,
+        phone: order.client.phone,
+        address: order.client.address,
+        city: order.client.city,
+      } : undefined,
+    }));
+
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    return {
+      data,
+      page,
+      limit,
+      total,
+      totalPages,
+    };
   }
 
   async findOne(id: number): Promise<OrderResponseDto> {

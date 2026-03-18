@@ -28,6 +28,21 @@ export class OrdersController {
     return this.ordersService.findAll(filters);
   }
 
+  @Get('paged')
+  findPaged(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: OrderStatus,
+    @Query('q') q?: string,
+  ) {
+    return this.ordersService.findPaged({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10,
+      status,
+      q,
+    });
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<OrderResponseDto> {
     return this.ordersService.findOne(id);

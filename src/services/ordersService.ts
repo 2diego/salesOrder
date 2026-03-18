@@ -46,6 +46,14 @@ export interface Order {
   orderValidations?: any[];
 }
 
+export type PagedResult<T> = {
+  data: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
 export const ordersService = {
   async create(orderData: CreateOrderDTO): Promise<Order> {
     try {
@@ -103,6 +111,37 @@ export const ordersService = {
       const orders: Order[] = await response.json();
       return orders;
 
+    } catch (error) {
+      if (error instanceof TypeError) {
+        throw new Error('No se pudo conectar con el servidor.');
+      }
+      throw error;
+    }
+  },
+
+  async findPaged(params: { page: number; limit: number; status?: OrderStatus; q?: string }): Promise<PagedResult<Order>> {
+    try {
+      const qs = new URLSearchParams();
+      qs.append('page', String(params.page));
+      qs.append('limit', String(params.limit));
+      if (params.status) qs.append('status', params.status);
+      if (params.q) qs.append('q', params.q);
+
+      const url = `${getApiUrl('/orders/paged')}?${qs.toString()}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al obtener la lista de órdenes');
+      }
+
+      const result: PagedResult<Order> = await response.json();
+      return result;
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');

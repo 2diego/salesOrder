@@ -23,6 +23,8 @@ export interface TableProps {
   searchPlaceholder?: string;
   addButtonText?: string;
   stickyHeader?: boolean;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 const Table: React.FC<TableProps> = ({
@@ -36,10 +38,13 @@ const Table: React.FC<TableProps> = ({
   emptyMessage = "No hay datos disponibles",
   searchPlaceholder = "Buscar...",
   addButtonText = "Agregar nuevo",
-  stickyHeader = false
+  stickyHeader = false,
+  searchValue,
+  onSearchChange
 }) => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [internalSearchTerm, setInternalSearchTerm] = useState('');
+  const searchTerm = searchValue ?? internalSearchTerm;
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -100,7 +105,10 @@ const Table: React.FC<TableProps> = ({
               placeholder={searchPlaceholder} 
               mobile={false}
               value={searchTerm}
-              onChange={(value) => setSearchTerm(value)}
+              onChange={(value) => {
+                if (onSearchChange) onSearchChange(value);
+                else setInternalSearchTerm(value);
+              }}
             />
 
             {/* Add Button */}
