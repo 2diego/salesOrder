@@ -68,6 +68,28 @@ const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ ord
 
   const statusClass = `status-badge ${order?.status?.toLowerCase() || ''}`;
 
+  const latestValidation = useMemo(() => {
+    if (!order?.orderValidations?.length) return null;
+    const validations = [...order.orderValidations];
+    validations.sort((a: any, b: any) => {
+      const ta = a?.validatedAt ? new Date(a.validatedAt).getTime() : 0;
+      const tb = b?.validatedAt ? new Date(b.validatedAt).getTime() : 0;
+      return tb - ta;
+    });
+    return validations[0] || null;
+  }, [order]);
+
+  const generatorName =
+    order?.createdBy?.name || (order?.createdBy as any)?.username || `ID ${order?.createdById ?? '-'}`;
+
+  const validationLabel =
+    order?.status === OrderStatus.VALIDATED ? 'Validado' : order?.status === OrderStatus.CANCELLED ? 'Cancelado' : 'Estado';
+
+  const validationByName =
+    latestValidation?.validatedBy?.name ||
+    latestValidation?.validatedBy?.username ||
+    (latestValidation?.validatedById ? `ID ${latestValidation.validatedById}` : 'Sin validación');
+
   return (
     <div className="desktop-popup-overlay" onClick={onClose}>
       <div className="desktop-popup order-details-popup" onClick={(e) => e.stopPropagation()}>
@@ -99,6 +121,15 @@ const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ ord
                 <p>{order.client?.address || 'Sin dirección'}</p>
                 <p>{order.client?.city || 'Sin ciudad'}{order.client?.phone ? ` - Tel: ${order.client.phone}` : ''}</p>
                 <p>{order.client?.email || 'Sin email'}</p>
+
+                <div className="order-details-sellers">
+                  <p>
+                    <strong>Generado:</strong> {generatorName}
+                  </p>
+                  <p>
+                    <strong>{validationLabel}:</strong> {validationByName}
+                  </p>
+                </div>
               </div>
 
               <div className="order-details-items-wrapper">

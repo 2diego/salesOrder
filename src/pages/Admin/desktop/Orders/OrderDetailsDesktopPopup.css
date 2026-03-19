@@ -113,6 +113,16 @@
   font-size: 0.875rem;
 }
 
+.order-details-sellers {
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(100, 100, 100, 0.25);
+}
+
+.order-details-sellers p {
+  margin: 0.25rem 0;
+}
+
 .order-details-items-wrapper {
   border: 1px solid rgba(100, 100, 100, 0.25);
   border-radius: 10px;
