@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "../../../../components/common/Header/Header";
 import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue"
 import { LuClipboardList } from "react-icons/lu";
@@ -76,11 +76,11 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
     const searchLower = clientSearchTerm.toLowerCase();
     const filtered = clients.filter(client => 
       client.name.toLowerCase().includes(searchLower) ||
-      client.email.toLowerCase().includes(searchLower) ||
-      client.phone.includes(searchLower) ||
-      client.address.toLowerCase().includes(searchLower) ||
-      client.city.toLowerCase().includes(searchLower) ||
-      client.state.toLowerCase().includes(searchLower)
+      (client.email ?? '').toLowerCase().includes(searchLower) ||
+      (client.phone ?? '').includes(searchLower) ||
+      (client.address ?? '').toLowerCase().includes(searchLower) ||
+      (client.city ?? '').toLowerCase().includes(searchLower) ||
+      (client.state ?? '').toLowerCase().includes(searchLower)
     );
     
     setFilteredClients(filtered);
@@ -128,11 +128,11 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
     setSelectedClient(client);
     setClientData({
       name: client.name,
-      email: client.email,
-      phone: client.phone,
-      address: client.address,
-      city: client.city,
-      state: client.state
+      email: client.email || '',
+      phone: client.phone || '',
+      address: client.address || '',
+      city: client.city || '',
+      state: client.state || ''
     });
     setClientSearchTerm(client.name);
     setShowClientDropdown(false);
@@ -360,7 +360,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
                         {client.address} {client.city}, {client.state}
                       </div>
                       <div style={{ fontSize: '0.875rem', opacity: 0.7 }}>
-                        {client.email} • Tel: {client.phone}
+                        {client.email ? client.email : 'Sin email'} • Tel: {client.phone || 'N/A'}
                       </div>
                     </div>
                   ))}
