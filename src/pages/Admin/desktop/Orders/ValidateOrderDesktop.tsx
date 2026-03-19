@@ -18,14 +18,15 @@ interface ProductItem {
 const modalOverlayStyle: React.CSSProperties = {
   position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
   backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-  zIndex: 1000, padding: '1rem'
+  zIndex: 2001, padding: '1rem'
 };
 const modalContentStyle: React.CSSProperties = {
-  borderRadius: '12px', padding: '2rem', maxWidth: '500px', width: '100%', maxHeight: '80vh', overflow: 'auto'
+  borderRadius: '12px', padding: '2rem', maxWidth: '560px', width: '100%', maxHeight: '80vh', overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box'
 };
 const desktopTextareaStyle: React.CSSProperties = {
   width: '100%', minHeight: '150px', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(100,100,100,0.3)',
-  fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', resize: 'vertical', backgroundColor: 'rgb(31,41,55)', color: 'rgb(233,232,232)'
+  fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', resize: 'vertical', backgroundColor: 'rgb(31,41,55)', color: 'rgb(233,232,232)',
+  boxSizing: 'border-box', overflowX: 'hidden', whiteSpace: 'pre-wrap'
 };
 const desktopInputStyle: React.CSSProperties = {
   width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(100,100,100,0.3)',
@@ -47,6 +48,16 @@ const desktopBtnRejectStyle: React.CSSProperties = {
 const desktopWarningStyle: React.CSSProperties = {
   padding: '0.75rem', backgroundColor: 'rgba(245,158,11,0.2)', border: '1px solid rgba(245,158,11,0.5)',
   borderRadius: '8px', marginBottom: '1rem', color: '#fcd34d'
+};
+const desktopInfoCardStyle: React.CSSProperties = {
+  padding: '0.75rem 1rem',
+  backgroundColor: 'rgba(59, 130, 246, 0.12)',
+  border: '1px solid rgba(96, 165, 250, 0.35)',
+  borderRadius: '8px',
+  marginBottom: '1rem',
+  color: 'rgb(233,232,232)',
+  fontSize: '0.875rem',
+  lineHeight: 1.5,
 };
 
 const ValidateOrderDesktop = () => {
@@ -209,13 +220,31 @@ const ValidateOrderDesktop = () => {
 
   const handleSaveNotes = async () => {
     if (!order) return;
+    const previousNotes = order.notes || '';
+    const cleanedNotes = notes.trim();
+    // UX: cerrar inmediatamente al guardar
+    setShowNotesModal(false);
+    // Reflejar de inmediato en la pantalla de validación
+    setOrder(prev => (prev ? { ...prev, notes: cleanedNotes } : prev));
+
     try {
       setError(null);
-      await ordersService.update(order.id, { notes });
-      setShowNotesModal(false);
+      const updatedOrder = await ordersService.update(order.id, { notes: cleanedNotes || undefined });
+      setOrder(updatedOrder);
+      setNotes(updatedOrder.notes || '');
     } catch (err: any) {
+      // Si falla, restaurar estado previo para no desincronizar UI
+      setOrder(prev => (prev ? { ...prev, notes: previousNotes } : prev));
+      setNotes(previousNotes);
       setError(err.message || 'Error al guardar las observaciones');
     }
+  };
+
+  const openNotesModal = () => {
+    if (!order) return;
+    setError(null);
+    setNotes(order.notes || '');
+    setShowNotesModal(true);
   };
 
   const handleValidateOrder = () => {
@@ -272,7 +301,7 @@ const ValidateOrderDesktop = () => {
     );
   }
 
-  if (error && !order) {
+  if (error && error.trim() && !order) {
     return (
       <div className="validate-order-desktop">
         <div className="desktop-error">{error}</div>
@@ -290,14 +319,9 @@ const ValidateOrderDesktop = () => {
 
   return (
     <div className="validate-order-desktop">
-      {error && <div className="desktop-error">{error}</div>}
+      {error && error.trim() && <div className="desktop-error">{error}</div>}
 
       <div className="desktop-header">
-        <button className="desktop-back-btn" onClick={() => navigate('/Orders?status=pending')} aria-label="Volver">
-          <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-        </button>
         <div className="desktop-order-info">
           <h1 className="desktop-order-title">{formatOrderNumber(order.id)}</h1>
           <p className="desktop-order-date">{formatDate(order.createdAt)}</p>
@@ -311,6 +335,13 @@ const ValidateOrderDesktop = () => {
             {order.client?.address || 'Sin dirección'}, {order.client?.city || 'Sin ciudad'}
           </p>
         </div>
+
+        {order.notes && order.notes.trim() && (
+          <div className="desktop-notes-section">
+            <h3 className="desktop-notes-title">Observaciones</h3>
+            <p className="desktop-notes-text">{order.notes}</p>
+          </div>
+        )}
 
         <div className="desktop-products-section">
           <h3 className="desktop-products-title">Productos</h3>
@@ -348,7 +379,7 @@ const ValidateOrderDesktop = () => {
         </div>
 
         <div className="desktop-actions-row">
-          <button className="desktop-btn-secondary" onClick={() => setShowNotesModal(true)}>Observaciones</button>
+          <button className="desktop-btn-secondary" onClick={openNotesModal}>Observaciones</button>
           <button className="desktop-btn-secondary" onClick={() => setShowAddProductModal(true)}>Agregar productos</button>
           <button className="desktop-btn-validate" onClick={handleValidateOrder} disabled={validating || rejecting}>
             {validating ? 'Validando...' : 'Validar pedido'}
@@ -363,6 +394,11 @@ const ValidateOrderDesktop = () => {
         <div style={modalOverlayStyle}>
           <div style={{ ...modalContentStyle, backgroundColor: '#1f2937' }}>
             <h3 style={{ marginBottom: '1rem', color: 'rgb(233,232,232)' }}>Observaciones</h3>
+            <div style={desktopInfoCardStyle}>
+              <div><strong>Vendedor que generó:</strong> {order.createdBy?.name || order.createdBy?.username || `ID ${order.createdById}`}</div>
+              <div><strong>Cliente:</strong> {order.client?.name || 'Sin cliente'}</div>
+              <div><strong>Fecha del pedido:</strong> {formatDate(order.createdAt)}</div>
+            </div>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Agregar observaciones..." style={desktopTextareaStyle} />
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <button style={desktopBtnPrimaryStyle} onClick={handleSaveNotes}>Guardar</button>

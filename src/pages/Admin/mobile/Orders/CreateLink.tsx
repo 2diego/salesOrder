@@ -182,8 +182,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
       const order = await ordersService.create({
         clientId: client.id,
         createdById: sellerId,
-        status: OrderStatus.PENDING,
-        notes: `Link generado para ${client.name} - Orden pendiente de completar por el cliente`
+        status: OrderStatus.PENDING
       });
       console.log('Orden draft creada:', order);
 

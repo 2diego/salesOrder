@@ -183,7 +183,7 @@ export const ordersService = {
   async update(id: number, updateData: UpdateOrderDTO): Promise<Order> {
     try {
       const response = await fetch(getApiUrl(`/orders/${id}`), {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
