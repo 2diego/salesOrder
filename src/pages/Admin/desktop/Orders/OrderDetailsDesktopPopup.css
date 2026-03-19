@@ -1,0 +1,234 @@
+.desktop-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1201;
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.desktop-popup {
+  background-color: rgb(17, 24, 39);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  box-shadow: rgba(0, 0, 0, 0.3) 0rem 1.25rem 1.6875rem 0rem;
+  width: 90%;
+  overflow-y: auto;
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+.desktop-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.desktop-popup-header h3 {
+  color: var(--mainWhite);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  color: var(--mainGray);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--mainWhite);
+  transform: scale(1.06);
+}
+
+.order-details-popup {
+  max-width: 860px;
+  min-height: auto;
+  max-height: 85vh;
+}
+
+.order-details-content {
+  padding: 1.5rem 2rem 2rem;
+}
+
+.order-details-muted {
+  color: rgba(233, 232, 232, 0.7);
+  margin: 0.5rem 0 0;
+}
+
+.order-details-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.order-details-meta h4 {
+  margin: 0;
+  color: var(--mainWhite);
+  font-size: 1.15rem;
+}
+
+.order-details-meta p {
+  margin: 0.35rem 0 0;
+  color: rgba(233, 232, 232, 0.75);
+  font-size: 0.875rem;
+}
+
+.order-details-client {
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(100, 100, 100, 0.25);
+  border-radius: 10px;
+  background: rgba(31, 41, 55, 0.4);
+}
+
+.order-details-client h5 {
+  margin: 0 0 0.3rem;
+  color: var(--mainWhite);
+  font-size: 1rem;
+}
+
+.order-details-client p {
+  margin: 0.2rem 0;
+  color: rgba(233, 232, 232, 0.8);
+  font-size: 0.875rem;
+}
+
+.order-details-items-wrapper {
+  border: 1px solid rgba(100, 100, 100, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.order-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: rgb(233, 232, 232);
+  font-size: 0.875rem;
+}
+
+.order-details-table thead {
+  background: rgb(55, 65, 81);
+}
+
+.order-details-table th,
+.order-details-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+  text-align: left;
+}
+
+.order-details-table th:nth-child(2),
+.order-details-table th:nth-child(3),
+.order-details-table th:nth-child(4),
+.order-details-table td:nth-child(2),
+.order-details-table td:nth-child(3),
+.order-details-table td:nth-child(4) {
+  white-space: nowrap;
+}
+
+.order-details-empty {
+  text-align: center !important;
+  color: rgba(233, 232, 232, 0.7);
+}
+
+.order-details-total {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mainWhite);
+}
+
+.order-details-notes {
+  margin-top: 1rem;
+  border: 1px solid rgba(100, 100, 100, 0.25);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.order-details-notes h5 {
+  margin: 0 0 0.5rem;
+  color: var(--mainWhite);
+}
+
+.order-details-notes p {
+  margin: 0;
+  color: rgba(233, 232, 232, 0.85);
+  white-space: pre-wrap;
+}
+
+.order-details-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.order-details-popup .status-badge {
+  white-space: nowrap;
+}
+
+@media print {
+  .desktop-popup-overlay {
+    position: static !important;
+    background: white !important;
+  }
+
+  .order-details-popup {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .desktop-popup-header,
+  .order-details-actions {
+    display: none !important;
+  }
+
+  .order-details-content,
+  .order-details-meta h4,
+  .order-details-meta p,
+  .order-details-client h5,
+  .order-details-client p,
+  .order-details-total,
+  .order-details-notes h5,
+  .order-details-notes p,
+  .order-details-table {
+    color: black !important;
+  }
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

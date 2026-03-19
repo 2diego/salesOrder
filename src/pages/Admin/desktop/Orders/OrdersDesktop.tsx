@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
+import OrderDetailsDesktopPopup from './OrderDetailsDesktopPopup';
 
 const OrdersDesktop = () => {
 	const navigate = useNavigate();
@@ -18,6 +19,7 @@ const OrdersDesktop = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [total, setTotal] = useState(0);
+  const [selectedReadOnlyOrderId, setSelectedReadOnlyOrderId] = useState<number | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
@@ -97,7 +99,9 @@ const OrdersDesktop = () => {
 	const handleRowClick = (row: any) => {
 		if (row.rawStatus === OrderStatus.PENDING) {
 			navigate(`/ValidateOrder/${row.order.id}`);
+      return;
 		}
+    setSelectedReadOnlyOrderId(row.order.id);
 	};
 
   return (
@@ -211,6 +215,13 @@ const OrdersDesktop = () => {
           </button>
         </div>
       </div>
+
+      {selectedReadOnlyOrderId && (
+        <OrderDetailsDesktopPopup
+          orderId={selectedReadOnlyOrderId}
+          onClose={() => setSelectedReadOnlyOrderId(null)}
+        />
+      )}
 		</div>
   );
 }
