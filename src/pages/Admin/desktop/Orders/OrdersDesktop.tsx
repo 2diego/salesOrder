@@ -73,15 +73,15 @@ const OrdersDesktop = () => {
 	}));
 
 	const columns: TableColumn[] = [
-		{ key: 'id', label: 'ID Pedido', sortable: true, width: '120px' },
-		{ key: 'name', label: 'Cliente', sortable: true },
-		{ key: 'phone', label: 'Teléfono', sortable: true, width: '120px' },
-		{ key: 'address', label: 'Dirección', sortable: true },
+		{ key: 'id', label: 'ID Pedido', sortable: true, width: '12%' },
+		{ key: 'name', label: 'Cliente', sortable: true, width: '28%' },
+		{ key: 'phone', label: 'Teléfono', sortable: true, width: '16%' },
+		{ key: 'address', label: 'Dirección', sortable: true, width: '26%' },
 		{ 
 			key: 'status', 
 			label: 'Estado', 
 			sortable: true, 
-			width: '120px',
+			width: '18%',
 			render: (value: string, row: any) => (
 				<span className={`status-badge ${row.rawStatus?.toLowerCase() || ''}`}>
 					{value}
@@ -101,13 +101,16 @@ const OrdersDesktop = () => {
 	};
 
   return (
-		<div style={{ 
+		<div
+      className="orders-desktop-page"
+      style={{ 
 			padding: '2rem', 
 			backgroundColor: 'rgb(17, 24, 39)',
 			fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
 			color: 'var(--mainBlack)',
 			marginTop: '4rem'
-		}}>
+		}}
+    >
 			{error && (
 				<div style={{ 
 					background: 'rgba(239, 68, 68, 0.1)', 
@@ -120,31 +123,34 @@ const OrdersDesktop = () => {
 					{error}
 				</div>
 			)}
-			<Table
-				title={showOnlyPending ? 'Pedidos sin validar' : 'Gestión de Pedidos'}
-				subtitle={
+      <div className="orders-table">
+        <Table
+				  title={showOnlyPending ? 'Pedidos sin validar' : 'Gestión de Pedidos'}
+				  subtitle={
           showOnlyPending
             ? `Pedidos con estado pendiente de validación (${total})`
             : `Administra todos los pedidos del sistema (${total})`
-        }
-				columns={columns}
-				data={tableData}
-				onAddNew={handleAddNew}
-				onRowClick={handleRowClick}
-				loading={loading}
-				searchPlaceholder="Buscar por cliente, ID o teléfono..."
+          }
+				  columns={columns}
+				  data={tableData}
+				  onAddNew={handleAddNew}
+				  onRowClick={handleRowClick}
+				  loading={loading}
+				  searchPlaceholder="Buscar por cliente, ID o teléfono..."
         searchValue={searchTerm}
         onSearchChange={(value) => {
           setPage(1);
           setSearchTerm(value);
         }}
-				addButtonText="Nuevo Pedido"
-				emptyMessage={showOnlyPending ? 'No hay pedidos sin validar' : 'No hay pedidos disponibles'}
+				  addButtonText="Nuevo Pedido"
+				  emptyMessage={showOnlyPending ? 'No hay pedidos sin validar' : 'No hay pedidos disponibles'}
         stickyHeader={true}
-			/>
+			  />
+      </div>
 
-      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', color: 'rgb(233, 232, 232)' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginTop: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', color: 'rgb(233, 232, 232)', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.875rem', opacity: 0.8 }}>Total: {total}</span>
           <span style={{ fontSize: '0.875rem', opacity: 0.8 }}>Filas:</span>
           <select
             value={limit}
