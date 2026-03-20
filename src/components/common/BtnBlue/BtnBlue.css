@@ -5,13 +5,29 @@
   padding: var(--mainPadding);
 }
 
-/* Estilo para botón "Volver" cuando no hay BottomNav */
 .btn-back {
   position: fixed;
-  bottom: 80px; /* Posicionado arriba del BottomNav o mensaje de caducidad */
+  bottom: 75px;
   left: 0;
   right: 0;
   z-index: 999;
+  padding: 0.75rem 1rem; /* Vertical = 1.5rem (ver spacer en BtnBlue.tsx) */
+  background-color: rgba(247, 250, 252, 0.92);
+  backdrop-filter: blur(8px);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.btn-back-spacer {
+  display: none;
+  pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+  .btn-back-spacer {
+    display: block;
+    width: 100%;
+  }
 }
 
 .btn-blue {

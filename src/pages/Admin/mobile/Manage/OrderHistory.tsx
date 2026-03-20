@@ -8,39 +8,67 @@ import InfoRow from "../../../../components/common/InfoRow/InfoRow";
 import { LuClipboardList } from 'react-icons/lu';
 import SearchBar from '../../../../components/common/SearchBar/SearchBar';
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
+import SegmentedTabs, { SegmentedTab } from '../../../../components/mobile/SegmentedTabs/SegmentedTabs';
 
 const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'validated' | 'cancelled' | 'pending' | 'all'>('validated');
 
-  // Cargar todos los pedidos al montar
+  const tabs: SegmentedTab[] = [
+    { key: 'validated', label: 'Validado' },
+    { key: 'cancelled', label: 'Cancelado' },
+    { key: 'pending', label: 'Pendiente' },
+    { key: 'all', label: 'Todos' },
+  ];
+
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const getStatusParam = (): OrderStatus | undefined => {
+    switch (statusFilter) {
+      case 'pending':
+        return OrderStatus.PENDING;
+      case 'validated':
+        return OrderStatus.VALIDATED;
+      case 'cancelled':
+        return OrderStatus.CANCELLED;
+      default:
+        return undefined;
+    }
+  };
+
+  // Debounce search -> server-side
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  // Fetch paginado server-side
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
         setError(null);
-        const ordersData = await ordersService.findAll();
-        
-        // Filtrar órdenes vacías (sin items) que son solo para generar links
-        // Estas órdenes se crean solo como contenedor para el link y no deben mostrarse
-        // hasta que el cliente las complete con items
-        const ordersWithItems = ordersData.filter(order => 
-          order.orderItems && order.orderItems.length > 0
-        );
-        
-        // Ordenar por fecha de creación (más recientes primero)
-        const sortedOrders = ordersWithItems.sort((a, b) => {
-          const dateA = new Date(a.createdAt).getTime();
-          const dateB = new Date(b.createdAt).getTime();
-          return dateB - dateA;
+
+        const result = await ordersService.findPaged({
+          page,
+          limit,
+          status: getStatusParam(),
+          q: debouncedSearch.trim() ? debouncedSearch.trim() : undefined,
         });
-        
-        setOrders(sortedOrders);
-        setFilteredOrders(sortedOrders);
+
+        setTotalPages(result.totalPages || 1);
+        setTotalCount(result.total || 0);
+
+        if (page === 1) setOrders(result.data);
+        else setOrders(prev => [...prev, ...result.data]);
       } catch (err: any) {
         console.error('Error al cargar pedidos:', err);
         setError(err.message || 'Error al cargar los pedidos');
@@ -50,28 +78,18 @@ const OrderHistory = () => {
     };
 
     fetchOrders();
-  }, []);
-
-  // Filtrar pedidos
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredOrders(orders);
-      return;
-    }
-
-    const searchLower = searchTerm.toLowerCase();
-    const filtered = orders.filter(order => 
-      order.id.toString().includes(searchLower) ||
-      order.client?.name.toLowerCase().includes(searchLower) ||
-      (order.client as any)?.email?.toLowerCase().includes(searchLower) ||
-      (order.client as any)?.phone?.includes(searchLower)
-    );
-    
-    setFilteredOrders(filtered);
-  }, [searchTerm, orders]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, debouncedSearch, statusFilter]);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+    setPage(1);
+  };
+
+  const handleStatusChange = (value: typeof statusFilter) => {
+    setStatusFilter(value);
+    setPage(1);
+    setOrders([]);
   };
 
   // Formatear fecha
@@ -113,9 +131,22 @@ const OrderHistory = () => {
         <h2>Historial de pedidos</h2>
       </SectionTitle>
 
+      {/* Status Filter */}
+      <div style={{ padding: '0 1rem', marginTop: '-0.25rem', marginBottom: '0.75rem' }}>
+        <div style={{ fontSize: '0.875rem', opacity: 0.85, color: 'rgb(233, 232, 232)', marginBottom: '0.5rem', fontWeight: 600 }}>
+          Estado
+        </div>
+        <SegmentedTabs
+          tabs={tabs}
+          activeKey={statusFilter}
+          onChange={(key) => handleStatusChange(key as typeof statusFilter)}
+          stretch={true}
+        />
+      </div>
+
       {/* Search Bar */}
-      <SearchBar 
-        placeholder="Buscar por cliente o nro de pedido" 
+      <SearchBar
+        placeholder="Buscar por cliente o nro de pedido"
         value={searchTerm}
         onChange={handleSearch}
       />
@@ -142,21 +173,21 @@ const OrderHistory = () => {
       )}
 
       {/* Empty state - con búsqueda */}
-      {!loading && filteredOrders.length === 0 && searchTerm && (
+      {!loading && orders.length === 0 && searchTerm && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
           No se encontraron pedidos con "{searchTerm}"
         </div>
       )}
 
       {/* Empty state - sin pedidos */}
-      {!loading && filteredOrders.length === 0 && !searchTerm && orders.length === 0 && (
+      {!loading && orders.length === 0 && !searchTerm && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
-          No hay pedidos disponibles
+          No hay pedidos disponibles para el filtro seleccionado
         </div>
       )}
 
       {/* Order History Header */}
-      {!loading && filteredOrders.length > 0 && (
+      {!loading && orders.length > 0 && (
         <InfoRow className="row-header mobile-compact"
           columns={[
             <span key={'order'}>Pedido</span>,
@@ -166,30 +197,47 @@ const OrderHistory = () => {
       )}
 
       {/* Orders List */}
-      {filteredOrders.map((order) => {
-        const statusInfo = formatStatus(order.status);
-        return (
-          <InfoRow
-            key={order.id}
-            className="mobile-compact"
-            columns={[
-              <div key={'order'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
-                <span style={{ fontWeight: 600 }}>{formatOrderNumber(order.id)}</span>
-                <span style={{ fontSize: '0.85rem' }}>{formatDate(order.createdAt)}</span>
-              </div>,
-              <div key={'client'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
-                <span>{order.client?.name || 'Sin cliente'}</span>
-                <span style={{ color: statusInfo.color, fontWeight: 700, fontSize: '0.85rem' }}>
-                  {statusInfo.text}
-                </span>
-              </div>,
-            ]}
-            actionLabel="Ver más"
-            actionIcon={<LuClipboardList />}
-            onActionClick={() => navigate(`/HistoryOrderDetails/${order.id}`)}
-          />
-        );
-      })}
+      {/* Espacio reservado para el botón "Volver" arriba del BottomNav */}
+      <div style={{ paddingBottom: '120px' }}>
+        {orders.map((order) => {
+          const statusInfo = formatStatus(order.status);
+          return (
+            <InfoRow
+              key={order.id}
+              className="mobile-compact"
+              columns={[
+                <div key={'order'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                  <span style={{ fontWeight: 600 }}>{formatOrderNumber(order.id)}</span>
+                  <span style={{ fontSize: '0.85rem' }}>{formatDate(order.createdAt)}</span>
+                </div>,
+                <div key={'client'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                  <span>{order.client?.name || 'Sin cliente'}</span>
+                  <span style={{ color: statusInfo.color, fontWeight: 700, fontSize: '0.85rem' }}>
+                    {statusInfo.text}
+                  </span>
+                </div>,
+              ]}
+              actionLabel="Ver más"
+              actionIcon={<LuClipboardList />}
+              onActionClick={() => navigate(`/HistoryOrderDetails/${order.id}`)}
+            />
+          );
+        })}
+
+        {/* Cargar más (dentro del contenedor de padding para que no tape el BottomNav) */}
+        {!loading && orders.length > 0 && page < totalPages && (
+          <div style={{ padding: '1.25rem 1rem' }}>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              onClick={() => setPage((p) => p + 1)}
+              isBackButton={false}
+            >
+              <span>Cargar más</span>
+            </BtnBlue>
+          </div>
+        )}
+      </div>
 
       {/* Back Button - Vuelve a la página anterior (Orders, Manage o Reports) */}
       <BtnBlue 

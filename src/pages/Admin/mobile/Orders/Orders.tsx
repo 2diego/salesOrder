@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "../../../../components/common/Header/Header";
 import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue"
@@ -12,28 +12,39 @@ import { ordersService, Order, OrderStatus } from "../../../../services/ordersSe
 const Orders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar pedidos sin validar (PENDING) al montar
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Debounce search -> server-side
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  // Fetch paginado server-side para pedidos pendientes
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
         setError(null);
-        const ordersData = await ordersService.findAll({ status: OrderStatus.PENDING });
-        
-        // Filtrar órdenes vacías (sin items) que son solo para generar links
-        // Estas órdenes se crean solo como contenedor para el link y no deben mostrarse
-        // hasta que el cliente las complete con items
-        const ordersWithItems = ordersData.filter(order => 
-          order.orderItems && order.orderItems.length > 0
-        );
-        
-        setOrders(ordersWithItems);
-        setFilteredOrders(ordersWithItems);
+
+        const result = await ordersService.findPaged({
+          page,
+          limit,
+          status: OrderStatus.PENDING,
+          q: debouncedSearch.trim() ? debouncedSearch.trim() : undefined,
+        });
+
+        setTotalPages(result.totalPages || 1);
+
+        if (page === 1) setOrders(result.data);
+        else setOrders((prev) => [...prev, ...result.data]);
       } catch (err: any) {
         console.error('Error al cargar pedidos:', err);
         setError(err.message || 'Error al cargar los pedidos');
@@ -43,28 +54,12 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, []);
-
-  // Filtrar pedidos
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredOrders(orders);
-      return;
-    }
-
-    const searchLower = searchTerm.toLowerCase();
-    const filtered = orders.filter(order => 
-      order.id.toString().includes(searchLower) ||
-      order.client?.name.toLowerCase().includes(searchLower) ||
-      (order.client as any)?.email?.toLowerCase().includes(searchLower) ||
-      (order.client as any)?.phone?.includes(searchLower)
-    );
-    
-    setFilteredOrders(filtered);
-  }, [searchTerm, orders]);
+  }, [page, limit, debouncedSearch]);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+    setPage(1);
+    setOrders([]);
   };
 
   // Formatear fecha
@@ -120,21 +115,23 @@ const Orders = () => {
       )}
 
       {/* Empty state - con búsqueda */}
-      {!loading && filteredOrders.length === 0 && searchTerm && (
+      {!loading && orders.length === 0 && searchTerm && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
           No se encontraron pedidos con "{searchTerm}"
         </div>
       )}
 
       {/* Empty state - sin pedidos */}
-      {!loading && filteredOrders.length === 0 && !searchTerm && orders.length === 0 && (
+      {!loading && orders.length === 0 && !searchTerm && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mainGray)' }}>
           No hay pedidos sin validar
         </div>
       )}
 
       {/* Orders List */}
-      {filteredOrders.map((order) => (
+      {/* Espacio reservado para el botón "Volver" arriba del BottomNav */}
+      <div style={{ paddingBottom: '120px' }}>
+      {orders.map((order) => (
         <InfoRow
           key={order.id}
           columns={[
@@ -146,6 +143,21 @@ const Orders = () => {
           onActionClick={() => navigate(`/ValidateOrder/${order.id}`)}
         />
       ))}
+
+      {/* Cargar más (dentro del contenedor de padding para que no tape el BottomNav) */}
+      {!loading && orders.length > 0 && page < totalPages && (
+        <div style={{ padding: '0 1rem', marginTop: '1rem' }}>
+          <BtnBlue
+            width="100%"
+            height="3rem"
+            isBackButton={false}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            <span>Cargar más</span>
+          </BtnBlue>
+        </div>
+      )}
+      </div>
 
 
       {/* Bottom Actions Block */}

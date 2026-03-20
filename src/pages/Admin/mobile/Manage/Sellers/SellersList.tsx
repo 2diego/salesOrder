@@ -11,9 +11,11 @@ import { Seller, sellersService } from "../../../../../services/sellersService";
 import { useNavigate } from "react-router-dom";
 
 const SellersList = () => {
+  const PAGE_SIZE = 10;
 
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [filteredSellers, setFilteredSellers] = useState<Seller[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +31,7 @@ const SellersList = () => {
       const sellersData = await sellersService.findAll();
       setSellers(sellersData);
       setFilteredSellers(sellersData);
+      setVisibleCount(PAGE_SIZE);
     } catch (err: any) {
       console.error('Error al cargar vendedores:', err);
       setError(err.message);
@@ -41,6 +44,7 @@ const SellersList = () => {
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredSellers(sellers);
+      setVisibleCount(PAGE_SIZE);
       return;
     }
 
@@ -53,6 +57,7 @@ const SellersList = () => {
     );
 
     setFilteredSellers(filtered);
+    setVisibleCount(PAGE_SIZE);
   }, [searchTerm, sellers]);
   
   const handleSearch = (value: string) => {
@@ -125,19 +130,40 @@ const SellersList = () => {
       )}
       
       { /* Sellers list */ }
-      {filteredSellers.map((seller) => (
-        <InfoRow
-          key={seller.id}
-          columns={[
-            <span key={'name'}>{seller.name}</span>,
-            <span key={'phone'}>{seller.phone}</span>,
-          ]}
-          actionLabel="Editar"
-          actionIcon={<LuClipboardList />}
-          onActionClick={() => navigate(`/Manage/EditSeller/${seller.id}`)}
-          onRowClick={() => navigate(`/Manage/EditSeller/${seller.id}`)}
-        />
-      ))}
+      {/* Espacio reservado para el botón "Volver" arriba del BottomNav */}
+      <div style={{ paddingBottom: '120px' }}>
+        {filteredSellers.slice(0, visibleCount).map((seller) => (
+          <InfoRow
+            key={seller.id}
+            columns={[
+              <span key={'name'}>{seller.name}</span>,
+              <span key={'phone'}>{seller.phone}</span>,
+            ]}
+            actionLabel="Editar"
+            actionIcon={<LuClipboardList />}
+            onActionClick={() => navigate(`/Manage/EditSeller/${seller.id}`)}
+            onRowClick={() => navigate(`/Manage/EditSeller/${seller.id}`)}
+          />
+        ))}
+        
+        {/* Cargar más (dentro del contenedor de padding para que no tape el BottomNav) */}
+        {!loading && filteredSellers.length > visibleCount && (
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              isBackButton={false}
+              onClick={() =>
+                setVisibleCount((c) =>
+                  Math.min(filteredSellers.length, c + PAGE_SIZE)
+                )
+              }
+            >
+              <span>Cargar más</span>
+            </BtnBlue>
+          </div>
+        )}
+      </div>
 
       { /* Empty state */ }
       {!loading && filteredSellers.length === 0 && !searchTerm && sellers.length === 0 && (

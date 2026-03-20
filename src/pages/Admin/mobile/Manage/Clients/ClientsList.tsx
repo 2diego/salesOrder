@@ -11,8 +11,10 @@ import { clientsService, Client } from "../../../../../services/clientsService";
 import { useNavigate } from 'react-router-dom';
 
 const ClientsList = () => {
+  const PAGE_SIZE = 10;
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +29,7 @@ const ClientsList = () => {
         const clientsData = await clientsService.findAll();
         setClients(clientsData);
         setFilteredClients(clientsData);
+        setVisibleCount(PAGE_SIZE);
       } catch (err: any) {
         console.error('Error al cargar clientes:', err);
         setError(err.message);
@@ -42,6 +45,7 @@ const ClientsList = () => {
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredClients(clients);
+      setVisibleCount(PAGE_SIZE);
       return;
     }
 
@@ -49,13 +53,14 @@ const ClientsList = () => {
     const filtered = clients.filter(client => 
       client.name.toLowerCase().includes(searchLower) ||
       client.id.toString().padStart(6, '0').includes(searchLower) ||
-      client.email.toLowerCase().includes(searchLower) ||
-      client.phone.includes(searchLower) ||
-      client.city.toLowerCase().includes(searchLower) ||
-      client.address.toLowerCase().includes(searchLower)
+      (client.email ?? '').toLowerCase().includes(searchLower) ||
+      (client.phone ?? '').includes(searchLower) ||
+      (client.city ?? '').toLowerCase().includes(searchLower) ||
+      (client.address ?? '').toLowerCase().includes(searchLower)
     );
     
     setFilteredClients(filtered);
+    setVisibleCount(PAGE_SIZE);
   }, [searchTerm, clients]);
 
   const handleSearch = (value: string) => {
@@ -136,28 +141,49 @@ const ClientsList = () => {
       )}
 
       {/* Clients list */}
-      {filteredClients.map((client) => (
-        <InfoRow
-          key={client.id}
-          className="mobile-compact"
-          columns={[
-            <div key={'client'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
-              <span style={{ fontWeight: 600 }}>{client.name}</span>
-              <span style={{ fontSize: '0.85rem' }}>
-                {client.id.toString().padStart(6, '0')}
-              </span>
-            </div>,
-            <div key={'location'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
-              <span>{client.city}</span>
-              <span style={{ fontSize: '0.85rem' }}>{client.address}</span>
-            </div>,
-          ]}
-          actionLabel="Editar"
-          actionIcon={<LuClipboardList />}
-          onActionClick={() => navigate(`/Manage/EditClient/${client.id}`)}
-          onRowClick={() => navigate(`/Manage/EditClient/${client.id}`)}
-        />
-      ))} 
+      {/* Espacio reservado para el botón "Volver" arriba del BottomNav */}
+      <div style={{ paddingBottom: '120px' }}>
+        {filteredClients.slice(0, visibleCount).map((client) => (
+          <InfoRow
+            key={client.id}
+            className="mobile-compact"
+            columns={[
+              <div key={'client'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                <span style={{ fontWeight: 600 }}>{client.name}</span>
+                <span style={{ fontSize: '0.85rem' }}>
+                  {client.id.toString().padStart(6, '0')}
+                </span>
+              </div>,
+              <div key={'location'} style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                <span>{client.city ?? '—'}</span>
+                <span style={{ fontSize: '0.85rem' }}>{client.address ?? '—'}</span>
+              </div>,
+            ]}
+            actionLabel="Editar"
+            actionIcon={<LuClipboardList />}
+            onActionClick={() => navigate(`/Manage/EditClient/${client.id}`)}
+            onRowClick={() => navigate(`/Manage/EditClient/${client.id}`)}
+          />
+        ))}
+        
+        {/* Cargar más (dentro del contenedor de padding para que no tape el BottomNav) */}
+        {!loading && filteredClients.length > visibleCount && (
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+            <BtnBlue
+              width="100%"
+              height="3rem"
+              isBackButton={false}
+              onClick={() =>
+                setVisibleCount((c) =>
+                  Math.min(filteredClients.length, c + PAGE_SIZE)
+                )
+              }
+            >
+              <span>Cargar más</span>
+            </BtnBlue>
+          </div>
+        )}
+      </div>
 
       {/* Back Button */}
       <Link to="/Manage/AdminClients" style={{ textDecoration: 'none', color: 'inherit' }}>
