@@ -82,6 +82,10 @@ const ValidateOrderDesktop = () => {
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [selectedProductQuantity, setSelectedProductQuantity] = useState(1);
 
+  // Permite editar cantidad usando teclado numérico.
+  // Guardamos el "draft" como string para soportar estados intermedios (ej. borrar todo).
+  const [quantityDraftByProductId, setQuantityDraftByProductId] = useState<Record<string, string>>({});
+
   useEffect(() => {
     const loadOrderData = async () => {
       if (!id) {
@@ -179,6 +183,76 @@ const ValidateOrderDesktop = () => {
     } catch (err: any) {
       setError(err.message || 'Error al actualizar la cantidad');
     }
+  };
+
+  const setQuantityForProduct = async (productId: string, newQuantity: number) => {
+    if (!order) return;
+    const item = orderItems.find(i => i.productId.toString() === productId);
+    if (!item?.id) {
+      setError(item ? 'El item no tiene un ID válido' : 'Item no encontrado en la orden');
+      return;
+    }
+
+    const target = Math.max(0, Math.floor(newQuantity));
+    if (target === item.quantity) return;
+
+    try {
+      if (target === 0) {
+        await ordersItemsService.remove(item.id);
+      } else {
+        await ordersItemsService.update(item.id, { quantity: target });
+      }
+
+      // Refrescar UI con el estado real del backend
+      const updatedOrder = await ordersService.findOne(order.id);
+      setOrder(updatedOrder);
+      const items = await ordersItemsService.findAll({ orderId: order.id });
+      setOrderItems(items);
+      setProducts(
+        items.map(i => ({
+          id: i.productId.toString(),
+          name: i.product?.name || 'Producto',
+          detail: i.product?.description || i.product?.sku || '',
+          quantity: i.quantity,
+          price: i.product?.price,
+        }))
+      );
+    } catch (err: any) {
+      setError(err.message || 'Error al actualizar la cantidad');
+    }
+  };
+
+  const applyQuantityDraft = (productId: string) => {
+    const raw = quantityDraftByProductId[productId];
+    const item = orderItems.find(i => i.productId.toString() === productId);
+
+    // Si no tenemos draft o está vacío/invalidamos, volvemos al valor real.
+    if (!item || raw === undefined || raw === '') {
+      setQuantityDraftByProductId(prev => {
+        const copy = { ...prev };
+        delete copy[productId];
+        return copy;
+      });
+      return;
+    }
+
+    const parsed = parseInt(raw, 10);
+    if (Number.isNaN(parsed)) {
+      setQuantityDraftByProductId(prev => {
+        const copy = { ...prev };
+        copy[productId] = String(item.quantity);
+        return copy;
+      });
+      return;
+    }
+
+    setQuantityForProduct(productId, parsed).finally(() => {
+      setQuantityDraftByProductId(prev => {
+        const copy = { ...prev };
+        delete copy[productId];
+        return copy;
+      });
+    });
   };
 
   const handleAddProduct = async () => {
@@ -349,7 +423,7 @@ const ValidateOrderDesktop = () => {
             <thead>
               <tr>
                 <th>Producto</th>
-                <th style={{ width: '100px' }}>Cantidad</th>
+                <th style={{ width: '100px', textAlign: 'center' }}>Cantidad</th>
                 <th style={{ width: '100px', textAlign: 'right' }}>Precio</th>
               </tr>
             </thead>
@@ -362,9 +436,53 @@ const ValidateOrderDesktop = () => {
                   </td>
                   <td>
                     <div className="desktop-qty-controls">
-                      <button className="desktop-qty-btn" onClick={() => updateQuantity(product.id, -1)}>-</button>
-                      <span className="desktop-qty-value">{product.quantity}</span>
-                      <button className="desktop-qty-btn" onClick={() => updateQuantity(product.id, 1)}>+</button>
+                      <button
+                        className="desktop-qty-btn"
+                        onClick={() => {
+                          setQuantityDraftByProductId(prev => {
+                            const copy = { ...prev };
+                            delete copy[product.id];
+                            return copy;
+                          });
+                          updateQuantity(product.id, -1);
+                        }}
+                      >
+                        -
+                      </button>
+
+                      <input
+                        className="desktop-qty-input"
+                        type="number"
+                        min={0}
+                        step={1}
+                        inputMode="numeric"
+                        value={quantityDraftByProductId[product.id] ?? String(product.quantity)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setQuantityDraftByProductId(prev => ({ ...prev, [product.id]: value }));
+                        }}
+                        onBlur={() => applyQuantityDraft(product.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            (e.currentTarget as HTMLInputElement).blur();
+                          }
+                        }}
+                      />
+
+                      <button
+                        className="desktop-qty-btn"
+                        onClick={() => {
+                          setQuantityDraftByProductId(prev => {
+                            const copy = { ...prev };
+                            delete copy[product.id];
+                            return copy;
+                          });
+                          updateQuantity(product.id, 1);
+                        }}
+                      >
+                        +
+                      </button>
                     </div>
                   </td>
                   <td style={{ textAlign: 'right' }}>{product.price != null ? `$${product.price}` : '-'}</td>
@@ -422,7 +540,7 @@ const ValidateOrderDesktop = () => {
                   const currentQuantity = existingProduct ? existingProduct.quantity : 0;
                   return (
                     <option key={product.id} value={product.id.toString()}>
-                      {product.name} - ${product.price} {existingProduct ? `(Actual: ${currentQuantity})` : ''}
+                      {product.name} {existingProduct ? `(Actual: ${currentQuantity})` : ''}
                     </option>
                   );
                 })}
