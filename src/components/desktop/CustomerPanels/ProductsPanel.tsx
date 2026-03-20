@@ -42,6 +42,7 @@ const ProductsPanel = ({
         products={products}
         onQuantityChange={onQuantityChange}
         showQuantityControls={!orderSent}
+        showQuantityInput={!orderSent}
         showExpandArrow={false}
         className="products-list-full"
       />

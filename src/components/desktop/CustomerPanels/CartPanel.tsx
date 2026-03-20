@@ -31,6 +31,7 @@ const CartPanel = ({
           products={products}
           onQuantityChange={onQuantityChange}
           showQuantityControls={!orderSent}
+          showQuantityInput={!orderSent}
           showExpandArrow={false}
           className="products-list-full"
         />

@@ -344,6 +344,7 @@ const NewOrder = () => {
           products={filteredProducts}
           onQuantityChange={orderSent ? undefined : updateQuantity}
           showQuantityControls={!orderSent}
+          showQuantityInput={!orderSent}
           showExpandArrow={false}
           className="products-list-full"
         />
@@ -365,9 +366,22 @@ const NewOrder = () => {
               to={`/Cart${token ? `?token=${token}` : ''}`} 
               style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
               onClick={() => {
-                // Guardar productos seleccionados en localStorage para Cart
-                const selectedProducts = filteredProducts.filter(p => p.quantity > 0)
-                localStorage.setItem(`cart-${token}`, JSON.stringify(selectedProducts))
+                // Importante: no usar `filteredProducts` (depende de la categoría activa).
+                // Guardamos TODO lo seleccionado en base a `productQuantities` para que no desaparezcan productos al cambiar categoría.
+                const selectedProducts = allProducts
+                  .filter(p => p.isActive)
+                  .map(p => ({
+                    id: p.id.toString(),
+                    name: p.name,
+                    detail: p.description || '',
+                    quantity: productQuantities[p.id.toString()] || 0,
+                    price: p.price,
+                  }))
+                  .filter(p => p.quantity > 0);
+
+                if (token) {
+                  localStorage.setItem(`cart-${token}`, JSON.stringify(selectedProducts));
+                }
               }}
             >
               <BtnBlue width="100%" height="3rem">
