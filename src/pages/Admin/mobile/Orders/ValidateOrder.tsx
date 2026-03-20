@@ -513,7 +513,7 @@ const ValidateOrder = () => {
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Agregar observaciones sobre el pedido..."
               style={{
-                width: '100%',
+                width: '90%',
                 minHeight: '150px',
                 padding: '1rem',
                 borderRadius: '8px',
@@ -620,7 +620,7 @@ const ValidateOrder = () => {
                     const currentQuantity = existingProduct ? existingProduct.quantity : 0;
                     return (
                       <option key={product.id} value={product.id.toString()}>
-                        {product.name} - ${product.price} {existingProduct ? `(Actual: ${currentQuantity})` : ''}
+                        {product.name} {existingProduct ? `(Actual: ${currentQuantity})` : ''}
                       </option>
                     );
                   })
