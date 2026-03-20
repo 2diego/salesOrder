@@ -29,6 +29,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
   const [success, setSuccess] = useState(false);
   const [createdLink, setCreatedLink] = useState<OrderLink | null>(null);
   const [linkUrl, setLinkUrl] = useState<string>('');
+  const [copyAlert, setCopyAlert] = useState<string | null>(null);
   const [sellerId, setSellerId] = useState<number | null>(null);
   
   // Estados para el selector de clientes
@@ -65,6 +66,13 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
     };
     fetchData();
   }, []);
+
+  // Ocultar alerta de copiado automáticamente
+  useEffect(() => {
+    if (!copyAlert) return;
+    const t = setTimeout(() => setCopyAlert(null), 2200);
+    return () => clearTimeout(t);
+  }, [copyAlert]);
 
   // Filtrar clientes cuando cambia el termino de busqueda
   useEffect(() => {
@@ -225,7 +233,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(linkUrl);
-      alert('¡Link copiado al portapapeles!');
+      setCopyAlert('¡Link copiado al portapapeles!');
     } catch (err) {
       console.error('Error al copiar:', err);
       // Fallback para navegadores que no soportan clipboard API
@@ -235,7 +243,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      alert('¡Link copiado al portapapeles!');
+      setCopyAlert('¡Link copiado al portapapeles!');
     }
   };
 
@@ -289,6 +297,14 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
       
       {/* Form Fields */}
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
+        {copyAlert && (
+          <div className={`alert alert-success ${desktop ? 'desktop-alert' : ''}`} style={{ margin: '0 0 1rem 0' }}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8.3 14.1L4.6 10.4L5.7 9.3L8.3 11.9L14.3 5.9L15.4 7L8.3 14.1Z" fill="currentColor"/>
+            </svg>
+            <span>{copyAlert}</span>
+          </div>
+        )}
         {/* Client Selector */}
         <h4 className="field-label">Buscar Cliente {selectedClient ? '(✓ Seleccionado)' : ' *'}</h4>
         {!selectedClient && (
@@ -502,31 +518,42 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
 
         {/* Success Message and Link */}
         {success && createdLink && linkUrl && (
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            border: '1px solid rgba(34, 197, 94, 0.3)',
-            color: '#22c55e'
-          }}>
-            <div style={{ marginBottom: '1rem', fontWeight: 600 }}>
-              ✅ Link creado exitosamente
+          <div
+            style={{
+              marginTop: '1rem',
+              padding: '1rem',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(34, 197, 94, 0.10)',
+              border: '1px solid rgba(34, 197, 94, 0.35)',
+              color: '#22c55e',
+              boxSizing: 'border-box',
+              overflowX: 'hidden',
+            }}
+          >
+            <div style={{ marginBottom: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1rem' }}>✅</span>
+              <span>Link creado exitosamente</span>
             </div>
-            
-            <div style={{ 
-              marginBottom: '1rem',
-              padding: '0.75rem',
-              backgroundColor: 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '6px',
-              wordBreak: 'break-all',
-              fontSize: '0.875rem',
-              fontFamily: 'monospace'
-            }}>
+
+            <div
+              style={{
+                marginBottom: '1rem',
+                padding: '0.8rem',
+                backgroundColor: 'rgba(0, 0, 0, 0.18)',
+                borderRadius: '8px',
+                overflowX: 'hidden',
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+                fontSize: '0.875rem',
+                fontFamily: 'monospace',
+                color: 'rgba(233, 232, 232, 0.95)',
+                border: '1px solid rgba(100, 100, 100, 0.25)',
+              }}
+            >
               {linkUrl}
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: desktop ? 'row' : 'column' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: desktop ? 'row' : 'column', flexWrap: 'nowrap' }}>
               <BtnBlue 
                 width="100%" 
                 height="2.5rem" 
@@ -559,7 +586,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
             <div style={{ 
               marginTop: '1rem', 
               fontSize: '0.75rem', 
-              color: 'rgba(0, 0, 0, 0.7)',
+              color: 'rgba(255, 255, 255, 0.7)',
               fontStyle: 'italic'
             }}>
               ⏰ Este link caduca en 24 horas

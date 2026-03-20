@@ -23,6 +23,7 @@
   min-height: 450px;
   max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
   animation: popupSlideIn 0.3s ease-out;
 }
 
@@ -96,7 +97,7 @@
 
 /* Mobile Styles */
 .form-container {
-  padding: 0 1rem;
+  padding: 0 1rem 1rem;
 }
 
 .field-label {
