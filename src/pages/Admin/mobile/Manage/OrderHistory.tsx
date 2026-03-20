@@ -87,6 +87,13 @@ const OrderHistory = () => {
   };
 
   const handleStatusChange = (value: typeof statusFilter) => {
+    if (value === statusFilter) {
+      // Si toca la misma tab activa, no vaciar listado.
+      // Solo reiniciar a página 1 si estaba paginado.
+      if (page !== 1) setPage(1);
+      return;
+    }
+
     setStatusFilter(value);
     setPage(1);
     setOrders([]);
@@ -131,11 +138,15 @@ const OrderHistory = () => {
         <h2>Historial de pedidos</h2>
       </SectionTitle>
 
+        {/* Search Bar */}
+        <SearchBar
+          placeholder="Buscar por cliente o nro de pedido"
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+
       {/* Status Filter */}
       <div style={{ padding: '0 1rem', marginTop: '-0.25rem', marginBottom: '0.75rem' }}>
-        <div style={{ fontSize: '0.875rem', opacity: 0.85, color: 'rgb(233, 232, 232)', marginBottom: '0.5rem', fontWeight: 600 }}>
-          Estado
-        </div>
         <SegmentedTabs
           tabs={tabs}
           activeKey={statusFilter}
@@ -143,13 +154,6 @@ const OrderHistory = () => {
           stretch={true}
         />
       </div>
-
-      {/* Search Bar */}
-      <SearchBar
-        placeholder="Buscar por cliente o nro de pedido"
-        value={searchTerm}
-        onChange={handleSearch}
-      />
 
       {/* Error Message */}
       {error && (
@@ -219,10 +223,27 @@ const OrderHistory = () => {
               ]}
               actionLabel="Ver más"
               actionIcon={<LuClipboardList />}
-              onActionClick={() => navigate(`/HistoryOrderDetails/${order.id}`)}
+              onActionClick={() =>
+                order.status === OrderStatus.PENDING
+                  ? navigate(`/ValidateOrder/${order.id}`)
+                  : navigate(`/HistoryOrderDetails/${order.id}`)
+              }
             />
           );
         })}
+
+        {!loading && !error && (
+          <div
+            style={{
+              padding: '0.5rem 1rem 0.25rem',
+              color: '#4D7099',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+            }}
+          >
+            Total pedidos: {totalCount}
+          </div>
+        )}
 
         {/* Cargar más (dentro del contenedor de padding para que no tape el BottomNav) */}
         {!loading && orders.length > 0 && page < totalPages && (

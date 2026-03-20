@@ -163,6 +163,18 @@ body, html {
   scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
 }
 
+/* Esconder spinners para el input de cantidad en el ValidateOrder */
+.validate-order-qty-input::-webkit-outer-spin-button,
+.validate-order-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.validate-order-qty-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
 /* Alert Styles */
 .alert {
   padding: 1rem 1.5rem;

@@ -464,6 +464,7 @@ const ValidateOrder = () => {
         products={products}
         onQuantityChange={updateQuantity}
         showQuantityControls={true}
+        showQuantityInput={true}
         showExpandArrow={false}
       />
 
@@ -633,6 +634,7 @@ const ValidateOrder = () => {
                 Cantidad
               </label>
               <input
+                className="validate-order-qty-input"
                 type="number"
                 min="1"
                 value={selectedProductQuantity}
@@ -643,7 +645,9 @@ const ValidateOrder = () => {
                   borderRadius: '8px',
                   border: '1px solid #E8EDF2',
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  appearance: 'textfield',
+                  MozAppearance: 'textfield'
                 }}
               />
             </div>
