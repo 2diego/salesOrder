@@ -238,7 +238,7 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
         <h4 className="field-label">Correo</h4>
         <FormField 
           label="correo" 
-          value={clientData.email} 
+          value={clientData.email || 'N/A'} 
           placeholder="Ej: juanperez@example.com"
           editable={true}
           onChange={handleInputChange('email')}
@@ -261,28 +261,6 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
           editable={true}
           onChange={handleInputChange('address')}
         />
-
-        <h4 className="field-label">Ciudad</h4>
-        <div className="form-field">
-          <div className="field-input">
-            <input
-              type="text"
-              value={clientData.city}
-              onChange={handleInputChange('city')}
-              placeholder="Ej: Benito Juárez"
-              list={cityDatalistId}
-              autoComplete="off"
-            />
-            <datalist id={cityDatalistId}>
-              {citySuggestions.map(city => (
-                <option key={city} value={city} />
-              ))}
-            </datalist>
-          </div>
-        </div>
-        <div style={{ marginTop: '0.25rem', color: 'var(--mainGray)', fontSize: '0.85rem', paddingLeft: '1rem' }}>
-          Escribí el nombre completo, sin abreviaturas.
-        </div>
 
         <h4 className="field-label">Provincia</h4>
         <div className="form-field">
@@ -308,6 +286,24 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
           </div>
         </div>
 
+        <h4 className="field-label">Ciudad<span style={{ fontSize: '0.75rem'}}> (Sin abreviaturas)</span></h4>
+        <div className="form-field">
+          <div className="field-input">
+            <input
+              type="text"
+              value={clientData.city}
+              onChange={handleInputChange('city')}
+              placeholder="Ej: Benito Juárez"
+              list={cityDatalistId}
+              autoComplete="off"
+            />
+            <datalist id={cityDatalistId}>
+              {citySuggestions.map(city => (
+                <option key={city} value={city} />
+              ))}
+            </datalist>
+          </div>
+        </div>
         
         <BtnBlue 
           width="100%" 

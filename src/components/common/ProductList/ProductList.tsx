@@ -123,9 +123,6 @@ const ProductList = ({
             {!showQuantityControls && product.quantity && product.quantity > 0 && (
               <div className="product-quantity-info">
                 <span className="quantity-text">{product.quantity}</span>
-                {product.price && (
-                  <span className="price-text">${product.price}</span>
-                )}
               </div>
             )}
           </div>
