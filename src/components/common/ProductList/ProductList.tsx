@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, type SyntheticEvent } from 'react'
 import './ProductList.css'
+import { getDefaultProductImageUrl, resolveProductListImageSrc } from '../../../config/productImages'
+import { ProductImagePreview } from '../ProductImagePreview/ProductImagePreview'
 
 interface Product {
   id: string;
@@ -7,6 +9,8 @@ interface Product {
   detail?: string;
   quantity?: number;
   price?: number;
+  /** Si viene del API/admin; si no, se usa solo el placeholder. */
+  imageUrl?: string;
 }
 
 interface ProductListProps {
@@ -15,6 +19,10 @@ interface ProductListProps {
   showQuantityControls?: boolean;
   showQuantityInput?: boolean;
   showExpandArrow?: boolean;
+  /** Miniatura desde `product.imageUrl` o URL por defecto (env / fallback). */
+  showProductImage?: boolean;
+  /** Lightbox al tocar la miniatura (misma URL, más grande). */
+  enableImagePreview?: boolean;
   className?: string;
 }
 
@@ -24,9 +32,19 @@ const ProductList = ({
   showQuantityControls = true,
   showQuantityInput = false,
   showExpandArrow = true,
+  showProductImage = true,
+  enableImagePreview = true,
   className = ""
 }: ProductListProps) => {
   const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({});
+  const [imagePreview, setImagePreview] = useState<{ src: string; alt: string } | null>(null);
+
+  const handleProductImageError = (e: SyntheticEvent<HTMLImageElement>) => {
+    const el = e.currentTarget;
+    if (el.dataset.fallback === '1') return;
+    el.dataset.fallback = '1';
+    el.src = getDefaultProductImageUrl();
+  };
 
   const updateQuantity = (productId: string, change: number) => {
     if (onQuantityChange) {
@@ -38,8 +56,50 @@ const ProductList = ({
     <div className={`product-list-container ${className}`}>
       {/* Products List */}
       <div className="products-list">
-        {products.map((product) => (
+        {products.map((product) => {
+          const thumbSrc = resolveProductListImageSrc(product.imageUrl);
+          return (
           <div key={product.id} className="product-item">
+            {showProductImage && (
+              enableImagePreview ? (
+                <button
+                  type="button"
+                  className="product-thumb product-thumb--interactive"
+                  aria-label={`Ver imagen ampliada: ${product.name}`}
+                  onClick={(e) => {
+                    const img = e.currentTarget.querySelector('img');
+                    const src =
+                      img instanceof HTMLImageElement
+                        ? img.currentSrc || img.src || thumbSrc
+                        : thumbSrc;
+                    setImagePreview({
+                      src,
+                      alt: `Producto ${product.name}`,
+                    });
+                  }}
+                >
+                  <img
+                    src={thumbSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="product-thumb__img"
+                    onError={handleProductImageError}
+                  />
+                </button>
+              ) : (
+                <div className="product-thumb" aria-hidden="true">
+                  <img
+                    src={thumbSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="product-thumb__img"
+                    onError={handleProductImageError}
+                  />
+                </div>
+              )
+            )}
             <div className="product-info">
               <div className="product-name">
                 <span>{product.name}</span>
@@ -126,8 +186,18 @@ const ProductList = ({
               </div>
             )}
           </div>
-        ))}
+        );
+        })}
       </div>
+
+      {enableImagePreview && showProductImage && imagePreview && (
+        <ProductImagePreview
+          isOpen
+          imageSrc={imagePreview.src}
+          alt={imagePreview.alt}
+          onClose={() => setImagePreview(null)}
+        />
+      )}
 
       {/* Flecha de expandir - Solo se muestra si está habilitada */}
       {showExpandArrow && (

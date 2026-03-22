@@ -4,4 +4,6 @@ export interface ProductItem {
   detail?: string;
   quantity: number;
   price?: number;
+  /** URL de miniatura; si falta, ProductList usa el default de configuración. */
+  imageUrl?: string;
 }

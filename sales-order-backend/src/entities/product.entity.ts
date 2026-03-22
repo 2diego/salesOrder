@@ -22,6 +22,10 @@ export class Product {
   @Column({ unique: true, nullable: true })
   sku: string;
 
+  /** URL HTTPS de la miniatura (CDN, bucket, ImgBB direct link, etc.). */
+  @Column({ name: 'image_url', type: 'text', nullable: true })
+  imageUrl: string | null;
+
   @Column({ type: 'int', default: 0 })
   stock: number;
 

@@ -13,14 +13,8 @@ import { clientsService } from '../../../services/clientsService'
 import { productsService, Product } from '../../../services/productsService'
 import { categoriesService } from '../../../services/categoriesService'
 import { ordersItemsService } from '../../../services/ordersItemsService'
-
-interface ProductItem {
-  id: string
-  name: string
-  detail?: string
-  quantity: number
-  price?: number
-}
+import type { ProductItem } from '../../../components/desktop/CustomerPanels/types'
+import { mapApiProductToItem } from '../../../utils/mapProductItem'
 
 const NewOrder = () => {
   const [searchParams] = useSearchParams()
@@ -136,13 +130,9 @@ const NewOrder = () => {
         // 6. Mapear productos a formato ProductItem con cantidades guardadas
         const mappedProducts: ProductItem[] = productsData
           .filter(product => product.isActive)
-          .map(product => ({
-            id: product.id.toString(),
-            name: product.name,
-            detail: product.description || '',
-            quantity: initialQuantities[product.id.toString()] || 0,
-            price: product.price
-          }))
+          .map(product =>
+            mapApiProductToItem(product, initialQuantities[product.id.toString()] || 0),
+          )
         
         setFilteredProducts(mappedProducts)
         setProductQuantities(initialQuantities)
@@ -208,13 +198,9 @@ const NewOrder = () => {
     }
     
     // Mapear productos a formato ProductItem, preservando cantidades
-    const mappedProducts: ProductItem[] = productsToShow.map(product => ({
-      id: product.id.toString(),
-      name: product.name,
-      detail: product.description || '',
-      quantity: productQuantities[product.id.toString()] || 0,
-      price: product.price
-    }))
+    const mappedProducts: ProductItem[] = productsToShow.map((product) =>
+      mapApiProductToItem(product, productQuantities[product.id.toString()] || 0),
+    )
     
     setFilteredProducts(mappedProducts)
   }, [activeCategory, allProducts, productQuantities])
@@ -236,13 +222,9 @@ const NewOrder = () => {
         // Obtener todos los productos con sus cantidades actualizadas
         const productsWithQuantities = allProducts
           .filter(product => product.isActive)
-          .map(product => ({
-            id: product.id.toString(),
-            name: product.name,
-            detail: product.description || '',
-            quantity: updatedQuantities[product.id.toString()] || 0,
-            price: product.price
-          }))
+          .map(product =>
+            mapApiProductToItem(product, updatedQuantities[product.id.toString()] || 0),
+          )
           .filter(p => p.quantity > 0)
         
         localStorage.setItem(`cart-${token}`, JSON.stringify(productsWithQuantities))

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, IsPositive } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, IsPositive, MaxLength, IsUrl, ValidateIf } from 'class-validator';
 
 export class CreateProductDTO {
   @IsString({ message: 'El nombre debe ser texto' })
@@ -20,6 +20,13 @@ export class CreateProductDTO {
   @IsString({ message: 'El SKU debe ser texto' })
   @IsOptional()
   sku?: string;
+
+  /** Enlace directo a imagen (https://...), no página de galería. */
+  @IsOptional()
+  @ValidateIf((_, v) => v != null && String(v).trim() !== '')
+  @IsUrl({ require_protocol: true }, { message: 'La URL de imagen debe ser válida (https://...)' })
+  @MaxLength(2048)
+  imageUrl?: string | null;
 
   @IsNumber({}, { message: 'El stock debe ser un número' })
   @Min(0, { message: 'El stock no puede ser negativo' })

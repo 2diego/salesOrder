@@ -6,6 +6,8 @@ export interface CreateProductDTO {
   price: number;
   categoryId: number;
   sku?: string;
+  /** URL HTTPS directa a la imagen (no página tipo ibb.co/...). */
+  imageUrl?: string | null;
   stock: number;
   isActive?: boolean;
 }
@@ -16,6 +18,7 @@ export interface UpdateProductDTO {
   price?: number;
   categoryId?: number;
   sku?: string;
+  imageUrl?: string | null;
   stock?: number;
   isActive?: boolean;
 }
@@ -27,6 +30,8 @@ export interface Product {
   price: number;
   categoryId: number;
   sku: string;
+  /** Null si no hay imagen asignada en BD. */
+  imageUrl?: string | null;
   stock: number;
   isActive: boolean;
   createdAt: string;

@@ -146,6 +146,8 @@ export class OrdersItemsService {
         name: orderItem.product.name,
         price: orderItem.product.price,
         description: orderItem.product.description,
+        sku: orderItem.product.sku,
+        imageUrl: orderItem.product.imageUrl,
       } : undefined,
       order: orderItem.order ? {
         id: orderItem.order.id,

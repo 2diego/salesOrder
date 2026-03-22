@@ -29,6 +29,7 @@ export interface OrderItem {
     price: number;
     sku?: string;
     description?: string;
+    imageUrl?: string | null;
   };
 }
 

@@ -6,14 +6,8 @@ import { ordersValidationsService } from "../../../../services/ordersValidations
 import { productsService, Product } from "../../../../services/productsService";
 import { clientsService } from "../../../../services/clientsService";
 import './ValidateOrderDesktop.css';
-
-interface ProductItem {
-  id: string;
-  name: string;
-  detail?: string;
-  quantity: number;
-  price?: number;
-}
+import type { ProductItem } from "../../../../components/desktop/CustomerPanels/types";
+import { mapOrderItemToProductItem } from "../../../../utils/mapProductItem";
 
 const modalOverlayStyle: React.CSSProperties = {
   position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -135,13 +129,7 @@ const ValidateOrderDesktop = () => {
         const items = await ordersItemsService.findAll({ orderId: orderData.id });
         setOrderItems(items);
 
-        const mappedProducts: ProductItem[] = items.map(item => ({
-          id: item.productId.toString(),
-          name: item.product?.name || 'Producto',
-          detail: item.product?.description || item.product?.sku || '',
-          quantity: item.quantity,
-          price: item.product?.price
-        }));
+        const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
         setProducts(mappedProducts);
 
         const allProducts = await productsService.findAll();
@@ -208,15 +196,7 @@ const ValidateOrderDesktop = () => {
       setOrder(updatedOrder);
       const items = await ordersItemsService.findAll({ orderId: order.id });
       setOrderItems(items);
-      setProducts(
-        items.map(i => ({
-          id: i.productId.toString(),
-          name: i.product?.name || 'Producto',
-          detail: i.product?.description || i.product?.sku || '',
-          quantity: i.quantity,
-          price: i.product?.price,
-        }))
-      );
+      setProducts(items.map((i) => mapOrderItemToProductItem(i)));
     } catch (err: any) {
       setError(err.message || 'Error al actualizar la cantidad');
     }
@@ -277,13 +257,7 @@ const ValidateOrderDesktop = () => {
       const items = await ordersItemsService.findAll({ orderId: order.id });
       setOrder(updatedOrder);
       setOrderItems(items);
-      setProducts(items.map(item => ({
-        id: item.productId.toString(),
-        name: item.product?.name || 'Producto',
-        detail: item.product?.description || item.product?.sku || '',
-        quantity: item.quantity,
-        price: item.product?.price
-      })));
+      setProducts(items.map((item) => mapOrderItemToProductItem(item)));
       setSelectedProductId('');
       setSelectedProductQuantity(1);
       setShowAddProductModal(false);

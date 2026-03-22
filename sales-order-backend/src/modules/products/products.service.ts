@@ -47,9 +47,14 @@ export class ProductsService {
       }
     }
 
+    const { imageUrl, ...rest } = createProductDto;
+    const normalizedImage =
+      imageUrl != null && String(imageUrl).trim() !== '' ? String(imageUrl).trim() : null;
+
     const product = this.productRepository.create({
-      ...createProductDto,
-      category
+      ...rest,
+      imageUrl: normalizedImage,
+      category,
     });
 
     return this.productRepository.save(product);
@@ -112,8 +117,15 @@ export class ProductsService {
       }
     }
 
-    await this.productRepository.update(id, updateProductDto);
-    
+    const patch: Record<string, unknown> = { ...updateProductDto };
+    if ('imageUrl' in patch) {
+      const v = patch.imageUrl;
+      patch.imageUrl =
+        v != null && String(v).trim() !== '' ? String(v).trim() : null;
+    }
+
+    await this.productRepository.update(id, patch as Partial<Product>);
+
     return this.findOne(id);
   }
 

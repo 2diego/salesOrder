@@ -9,6 +9,8 @@ export class OrderItemResponseDto {
     name: string;
     price: number;
     description?: string;
+    sku?: string;
+    imageUrl?: string | null;
   };
   order?: {
     id: number;

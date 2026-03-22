@@ -14,6 +14,7 @@ import {
   OrderHistoryPanel,
   type ProductItem,
 } from '../../../components/desktop/CustomerPanels';
+import { mapApiProductToItem, mapOrderItemToProductItem } from '../../../utils/mapProductItem';
 import './CustomerDesktop.css';
 
 const CustomerDesktop = () => {
@@ -123,13 +124,9 @@ const CustomerDesktop = () => {
 
         const mappedProducts: ProductItem[] = productsData
           .filter((product) => product.isActive)
-          .map((product) => ({
-            id: product.id.toString(),
-            name: product.name,
-            detail: product.description || '',
-            quantity: initialQuantities[product.id.toString()] || 0,
-            price: product.price,
-          }));
+          .map((product) =>
+            mapApiProductToItem(product, initialQuantities[product.id.toString()] || 0),
+          );
 
         setFilteredProducts(mappedProducts);
         setProductQuantities(initialQuantities);
@@ -204,13 +201,9 @@ const CustomerDesktop = () => {
       );
     }
 
-    const mappedProducts: ProductItem[] = productsToShow.map((product) => ({
-      id: product.id.toString(),
-      name: product.name,
-      detail: product.description || '',
-      quantity: productQuantities[product.id.toString()] || 0,
-      price: product.price,
-    }));
+    const mappedProducts: ProductItem[] = productsToShow.map((product) =>
+      mapApiProductToItem(product, productQuantities[product.id.toString()] || 0),
+    );
 
     setFilteredProducts(mappedProducts);
   }, [activeCategory, allProducts, productQuantities]);
@@ -233,13 +226,9 @@ const CustomerDesktop = () => {
       if (token && !orderSent) {
         const productsWithQuantities = allProducts
           .filter((product) => product.isActive)
-          .map((product) => ({
-            id: product.id.toString(),
-            name: product.name,
-            detail: product.description || '',
-            quantity: updatedQuantities[product.id.toString()] || 0,
-            price: product.price,
-          }))
+          .map((product) =>
+            mapApiProductToItem(product, updatedQuantities[product.id.toString()] || 0),
+          )
           .filter((p) => p.quantity > 0);
 
         localStorage.setItem(`cart-${token}`, JSON.stringify(productsWithQuantities));
@@ -252,13 +241,9 @@ const CustomerDesktop = () => {
   const cartProducts = useMemo<ProductItem[]>(() => {
     return allProducts
       .filter((product) => product.isActive)
-      .map((product) => ({
-        id: product.id.toString(),
-        name: product.name,
-        detail: product.description || '',
-        quantity: productQuantities[product.id.toString()] || 0,
-        price: product.price,
-      }))
+      .map((product) =>
+        mapApiProductToItem(product, productQuantities[product.id.toString()] || 0),
+      )
       .filter((p) => p.quantity > 0);
   }, [allProducts, productQuantities]);
 
@@ -303,13 +288,7 @@ const CustomerDesktop = () => {
 
     try {
       const items = await ordersItemsService.findAll({ orderId: order.id });
-      const mappedProducts: ProductItem[] = items.map((item) => ({
-        id: item.productId.toString(),
-        name: item.product?.name || 'Producto',
-        detail: item.product?.description || item.product?.sku || '',
-        quantity: item.quantity,
-        price: item.product?.price,
-      }));
+      const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
       setHistoryProducts(mappedProducts);
     } catch (err) {
       console.error('Error loading history order details:', err);

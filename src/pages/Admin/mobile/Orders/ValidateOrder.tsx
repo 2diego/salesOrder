@@ -10,14 +10,8 @@ import { ordersItemsService, OrderItem } from "../../../../services/ordersItemsS
 import { ordersValidationsService } from "../../../../services/ordersValidationsService";
 import { productsService, Product } from "../../../../services/productsService";
 import { clientsService } from "../../../../services/clientsService";
-
-interface ProductItem {
-  id: string;
-  name: string;
-  detail?: string;
-  quantity: number;
-  price?: number;
-}
+import type { ProductItem } from "../../../../components/desktop/CustomerPanels/types";
+import { mapOrderItemToProductItem } from "../../../../utils/mapProductItem";
 
 const ValidateOrder = () => {
   const { id } = useParams<{ id: string }>();
@@ -108,13 +102,7 @@ const ValidateOrder = () => {
         setOrderItems(items);
 
         // 3. Mapear items del pedido a formato ProductItem
-        const mappedProducts: ProductItem[] = items.map(item => ({
-          id: item.productId.toString(),
-          name: item.product?.name || 'Producto',
-          detail: item.product?.description || item.product?.sku || '',
-          quantity: item.quantity,
-          price: item.product?.price
-        }));
+        const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
         setProducts(mappedProducts);
 
         // 4. Cargar productos disponibles para agregar
@@ -258,13 +246,7 @@ const ValidateOrder = () => {
       setOrder(updatedOrder);
       setOrderItems(items);
       
-      const mappedProducts: ProductItem[] = items.map(item => ({
-        id: item.productId.toString(),
-        name: item.product?.name || 'Producto',
-        detail: item.product?.description || item.product?.sku || '',
-        quantity: item.quantity,
-        price: item.product?.price
-      }));
+      const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
       setProducts(mappedProducts);
 
       // Reiniciar formulario

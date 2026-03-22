@@ -8,14 +8,8 @@ import { ordersLinksService } from '../../../services/ordersLinksService'
 import { clientsService } from '../../../services/clientsService'
 import { ordersService, Order } from '../../../services/ordersService'
 import { ordersItemsService } from '../../../services/ordersItemsService'
-
-interface ProductItem {
-  id: string
-  name: string
-  detail?: string
-  quantity: number
-  price?: number
-}
+import type { ProductItem } from '../../../components/desktop/CustomerPanels/types'
+import { mapOrderItemToProductItem } from '../../../utils/mapProductItem'
 
 const Cart = () => {
   const [searchParams] = useSearchParams()
@@ -86,13 +80,7 @@ const Cart = () => {
           // Convertir items existentes a formato ProductItem
           selectedProducts = existingItems
             .filter(item => item.quantity > 0)
-            .map(item => ({
-              id: item.productId.toString(),
-              name: item.product?.name || 'Producto',
-              detail: item.product?.sku || '',
-              quantity: item.quantity,
-              price: item.product?.price
-            }))
+            .map(item => mapOrderItemToProductItem(item))
         } else {
           // Si no hay items existentes, intentar cargar desde localStorage
           const savedProducts = localStorage.getItem(`cart-${token}`)

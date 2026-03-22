@@ -22,7 +22,8 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
     categoryId: 0,
     description: '',
     price: 0,
-    stock: 0
+    stock: 0,
+    imageUrl: '',
   });
 
   const [priceString, setPriceString] = useState('');
@@ -328,6 +329,15 @@ const AddProducts: React.FC<AddProductsProps> = ({ desktop = false, onClose, onP
           placeholder="Ej: Producto de prueba"
           editable={true}
           onChange={handleInputChange('description')}
+        />
+
+        <h4 className="field-label">URL de imagen (opcional)</h4>
+        <FormField
+          label="imageUrl"
+          value={productData.imageUrl || ''}
+          placeholder="https://i.ibb.co/..."
+          editable={true}
+          onChange={handleInputChange('imageUrl')}
         />
 
         <h4 className="field-label">Precio</h4>

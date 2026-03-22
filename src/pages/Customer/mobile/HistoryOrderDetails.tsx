@@ -6,14 +6,8 @@ import BtnBlue from "../../../components/common/BtnBlue/BtnBlue";
 import ProductList from "../../../components/common/ProductList/ProductList";
 import { ordersService } from '../../../services/ordersService';
 import { ordersItemsService } from '../../../services/ordersItemsService';
-
-interface ProductItem {
-  id: string;
-  name: string;
-  detail?: string;
-  quantity: number;
-  price?: number;
-}
+import type { ProductItem } from '../../../components/desktop/CustomerPanels/types';
+import { mapOrderItemToProductItem } from '../../../utils/mapProductItem';
 
 const HistoryOrderDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,13 +57,7 @@ const HistoryOrderDetails = () => {
         const items = await ordersItemsService.findAll({ orderId: orderData.id });
 
         // 3. Mapear items a formato ProductItem
-        const mappedProducts: ProductItem[] = items.map(item => ({
-          id: item.productId.toString(),
-          name: item.product?.name || 'Producto',
-          detail: item.product?.description || item.product?.sku || '',
-          quantity: item.quantity,
-          price: item.product?.price
-        }));
+        const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
 
         setProducts(mappedProducts);
 

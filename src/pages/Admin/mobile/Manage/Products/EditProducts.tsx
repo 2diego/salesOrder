@@ -27,7 +27,8 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
     description: product?.description || '',
     categoryId: product?.categoryId || 0,
     priceString: product?.price ? product.price.toString() : '',
-    stockString: product?.stock ? product.stock.toString() : ''
+    stockString: product?.stock ? product.stock.toString() : '',
+    imageUrlString: product?.imageUrl?.trim() || '',
   });
   // Cargar cuando se usa vía ruta
   useEffect(() => {
@@ -41,7 +42,8 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
             description: data.description || '',
             categoryId: data.categoryId || 0,
             priceString: data.price ? data.price.toString() : '',
-            stockString: data.stock ? data.stock.toString() : ''
+            stockString: data.stock ? data.stock.toString() : '',
+            imageUrlString: data.imageUrl?.trim() || '',
           });
         } catch (e: any) {
           setError(e.message || 'No se pudo cargar el producto');
@@ -86,11 +88,14 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
     // const stockNum = formData.stockString === '' ? 0 : parseInt(formData.stockString) || 0; // Stock no usado por el momento
     const base = currentProduct || product;
     if (!base) return false;
+    const imageChanged =
+      formData.imageUrlString.trim() !== (base.imageUrl?.trim() || '');
     return (
       formData.name !== base.name ||
       formData.description !== (base.description || '') ||
       formData.categoryId !== base.categoryId ||
-      priceNum !== base.price
+      priceNum !== base.price ||
+      imageChanged
       // || stockNum !== base.stock
     );
   }, [formData, currentProduct, product]);
@@ -105,6 +110,9 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
     if (formData.description !== (base.description || '')) diff.description = formData.description || undefined;
     if (formData.categoryId !== base.categoryId) diff.categoryId = formData.categoryId;
     if (priceNum !== base.price) diff.price = priceNum;
+    const nextImg = formData.imageUrlString.trim();
+    const prevImg = base.imageUrl?.trim() || '';
+    if (nextImg !== prevImg) diff.imageUrl = nextImg || null;
     // if (stockNum !== base.stock) diff.stock = stockNum;
     return diff;
   };
@@ -248,6 +256,15 @@ const EditProducts: React.FC<EditProductsProps> = ({ desktop = false, onClose, p
 
         <h4 className="field-label">Descripción</h4>
         <FormField label="descripcion" value={formData.description} placeholder="Descripción" editable={true} onChange={handleInputChange('description')} />
+
+        <h4 className="field-label">URL de imagen (opcional)</h4>
+        <FormField
+          label="imageUrl"
+          value={formData.imageUrlString}
+          placeholder="https://i.ibb.co/..."
+          editable={true}
+          onChange={handleInputChange('imageUrlString')}
+        />
 
         <h4 className="field-label">Precio</h4>
         <FormField label="precio" value={formData.priceString} placeholder="Ej: 100" editable={true} onChange={handleInputChange('priceString')} />
