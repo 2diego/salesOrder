@@ -536,19 +536,35 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
             </div>
 
             <div
-              style={{
-                marginBottom: '1rem',
-                padding: '0.8rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.18)',
-                borderRadius: '8px',
-                overflowX: 'hidden',
-                overflowWrap: 'anywhere',
-                wordBreak: 'break-word',
-                fontSize: '0.875rem',
-                fontFamily: 'monospace',
-                color: 'rgba(233, 232, 232, 0.95)',
-                border: '1px solid rgba(100, 100, 100, 0.25)',
-              }}
+              style={
+                desktop
+                  ? {
+                      marginBottom: '1rem',
+                      padding: '0.8rem',
+                      backgroundColor: 'rgba(0, 0, 0, 0.18)',
+                      borderRadius: '8px',
+                      overflowX: 'hidden',
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                      fontSize: '0.875rem',
+                      fontFamily: 'monospace',
+                      color: 'rgba(233, 232, 232, 0.95)',
+                      border: '1px solid rgba(100, 100, 100, 0.25)',
+                    }
+                  : {
+                      marginBottom: '1rem',
+                      padding: '0.8rem',
+                      backgroundColor: '#f3f4f6',
+                      borderRadius: '8px',
+                      overflowX: 'hidden',
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                      fontSize: '0.875rem',
+                      fontFamily: 'monospace',
+                      color: '#0D141C',
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                    }
+              }
             >
               {linkUrl}
             </div>
@@ -583,12 +599,14 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
               )}
             </div>
 
-            <div style={{ 
-              marginTop: '1rem', 
-              fontSize: '0.75rem', 
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontStyle: 'italic'
-            }}>
+            <div
+              style={{
+                marginTop: '1rem',
+                fontSize: '0.75rem',
+                color: desktop ? 'rgba(255, 255, 255, 0.7)' : '#1a1a1a',
+                fontStyle: 'italic',
+              }}
+            >
               ⏰ Este link caduca en 24 horas
             </div>
           </div>
