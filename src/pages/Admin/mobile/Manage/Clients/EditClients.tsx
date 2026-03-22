@@ -7,6 +7,7 @@ import FormField from "../../../../../components/common/FormField/FormField";
 import { useEffect, useMemo, useState } from "react";
 import './AddClients.css';
 import { clientsService, Client, UpdateClientDTO } from "../../../../../services/clientsService";
+import { CLIENT_VALIDATION_MESSAGES } from "../../../../../constants/clientValidationMessages";
 
 const ARG_PROVINCES = [
   'Buenos Aires',
@@ -35,6 +36,8 @@ const ARG_PROVINCES = [
   'Tucumán',
 ] as const;
 
+const NEW_CITY_OPTION = '__NEW_CITY__';
+
 interface EditClientsProps {
   desktop?: boolean;
   onClose?: () => void;
@@ -62,6 +65,8 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+  const [isAddingNewCity, setIsAddingNewCity] = useState(false);
 
   // Cargar cliente vía ruta
   useEffect(() => {
@@ -98,24 +103,75 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
     const value = e.target.value;
     setFormData(prev => ({ ...prev, state: value, city: '' }));
     setCitySuggestions([]);
+    setIsAddingNewCity(false);
     if (error) setError(null);
   };
 
   const selectedProvince = formData.state;
-  const cityDatalistId = useMemo(() => `cities-edit-${selectedProvince || 'none'}`, [selectedProvince]);
+
+  const selectStyle: React.CSSProperties = {
+    width: '100%',
+    height: '100%',
+    background: 'transparent',
+    border: 'none',
+    fontSize: '1rem',
+    fontFamily: 'Inter, sans-serif',
+    outline: 'none',
+  };
 
   useEffect(() => {
     const loadCities = async () => {
-      if (!selectedProvince) return;
+      if (!selectedProvince) {
+        setCitySuggestions([]);
+        return;
+      }
+      setCitiesLoading(true);
       try {
         const cities = await clientsService.findCitiesByProvince(selectedProvince);
         setCitySuggestions(cities);
       } catch {
         setCitySuggestions([]);
+      } finally {
+        setCitiesLoading(false);
       }
     };
     loadCities();
   }, [selectedProvince]);
+
+  /** Si la ciudad guardada no está en la lista del backend, mostrar modo "nueva ciudad" */
+  useEffect(() => {
+    if (!selectedProvince || citiesLoading) return;
+    const c = formData.city.trim();
+    // Ciudad vacía: puede ser modo "nueva ciudad" (usuario aún no escribió); no resetear aquí
+    if (!c) return;
+    if (citySuggestions.length === 0) {
+      setIsAddingNewCity(true);
+      return;
+    }
+    if (!citySuggestions.includes(c)) {
+      setIsAddingNewCity(true);
+    } else {
+      setIsAddingNewCity(false);
+    }
+  }, [citySuggestions, selectedProvince, formData.city, citiesLoading]);
+
+  const handleCitySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === NEW_CITY_OPTION) {
+      setIsAddingNewCity(true);
+      setFormData(prev => ({ ...prev, city: '' }));
+    } else {
+      setIsAddingNewCity(false);
+      setFormData(prev => ({ ...prev, city: value }));
+    }
+    if (error) setError(null);
+  };
+
+  const citySelectValue = useMemo(() => {
+    if (!selectedProvince) return '';
+    if (isAddingNewCity) return NEW_CITY_OPTION;
+    return formData.city;
+  }, [selectedProvince, isAddingNewCity, formData.city]);
 
   const hasChanges = useMemo(() => {
     if (!currentClient) return false;
@@ -157,17 +213,17 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
         return false;
       }
     }
+    if (!formData.state.trim()) {
+      setError(CLIENT_VALIDATION_MESSAGES.PROVINCE_REQUIRED);
+      return false;
+    }
     if (!formData.city.trim()) {
-      setError('La ciudad es obligatoria');
+      setError(CLIENT_VALIDATION_MESSAGES.CITY_REQUIRED);
       return false;
     }
     const cityRaw = formData.city.trim();
     if (cityRaw.includes('.') || /\b(bs|baires|caba)\b/i.test(cityRaw)) {
-      setError('La ciudad debe escribirse sin abreviaturas');
-      return false;
-    }
-    if (!formData.state.trim()) {
-      setError('La provincia es obligatoria');
+      setError(CLIENT_VALIDATION_MESSAGES.CITY_NO_ABBREVIATIONS);
       return false;
     }
     return true;
@@ -295,43 +351,13 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
         <h4 className="field-label">Dirección</h4>
         <FormField label="direccion" value={formData.address} placeholder="Dirección" editable={true} onChange={handleInputChange('address')} />
 
-        <h4 className="field-label">Ciudad</h4>
-        <div className="form-field">
-          <div className="field-input">
-            <input
-              type="text"
-              value={formData.city}
-              onChange={handleInputChange('city')}
-              placeholder="Ej: Benito Juárez"
-              list={cityDatalistId}
-              autoComplete="off"
-            />
-            <datalist id={cityDatalistId}>
-              {citySuggestions.map(city => (
-                <option key={city} value={city} />
-              ))}
-            </datalist>
-          </div>
-        </div>
-        <div style={{ marginTop: '0.25rem', color: 'var(--mainGray)', fontSize: '0.85rem', paddingLeft: '1rem' }}>
-          Escribí el nombre completo, sin abreviaturas.
-        </div>
-
         <h4 className="field-label">Provincia</h4>
         <div className="form-field">
           <div className="field-input">
             <select
               value={formData.state}
               onChange={handleProvinceChange}
-              style={{
-                width: '100%',
-                height: '100%',
-                background: 'transparent',
-                border: 'none',
-                fontSize: '1rem',
-                fontFamily: 'Inter, sans-serif',
-                outline: 'none'
-              }}
+              style={selectStyle}
             >
               <option value="">Seleccione una provincia</option>
               {ARG_PROVINCES.map(p => (
@@ -340,6 +366,54 @@ const EditClients: React.FC<EditClientsProps> = ({ desktop = false, onClose, cli
             </select>
           </div>
         </div>
+
+        <h4 className="field-label">Ciudad<span style={{ fontSize: '0.75rem', color: 'rgb(102, 102, 102)' }}> - Sin abreviaturas</span></h4>
+        <div className="form-field">
+          <div className="field-input">
+            <select
+              value={citySelectValue}
+              onChange={handleCitySelectChange}
+              disabled={!selectedProvince || citiesLoading}
+              style={{
+                ...selectStyle,
+                opacity: !selectedProvince || citiesLoading ? 0.6 : 1,
+              }}
+            >
+              <option value="">
+                {!selectedProvince
+                  ? 'Seleccione primero una provincia'
+                  : citiesLoading
+                    ? 'Cargando ciudades...'
+                    : 'Seleccione una ciudad'}
+              </option>
+              {citySuggestions.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+              <option value={NEW_CITY_OPTION}>+ Agregar nueva ciudad…</option>
+            </select>
+          </div>
+        </div>
+        {selectedProvince && isAddingNewCity && (
+          <>
+            <h4 className="field-label" style={{ marginTop: '0.5rem' }}>
+              Nombre de la ciudad
+            </h4>
+            <FormField
+              label="ciudad_nueva"
+              value={formData.city}
+              placeholder="Nombre completo, sin abreviaturas (ej: Benito Juárez)"
+              editable={true}
+              onChange={handleInputChange('city')}
+            />
+          </>
+        )}
+        {!isAddingNewCity && (
+          <div style={{ marginTop: '0.25rem', color: 'var(--mainGray)', fontSize: '0.85rem', paddingLeft: '1rem' }}>
+            Elegí una ciudad de la lista o usá &quot;Agregar nueva ciudad&quot;.
+          </div>
+        )}
 
         <BtnBlue width="100%" height="3rem" onClick={(loading || deleting) ? undefined : handleSubmit} disabled={loading || deleting}>
           <span>{loading ? 'Guardando...' : hasChanges ? 'Guardar cambios' : 'Sin cambios'}</span>

@@ -5,6 +5,7 @@ import { Client } from 'src/entities/client.entity';
 import { Order, OrderStatus } from 'src/entities/order.entity';
 import { CreateClientDTO, ARG_PROVINCES } from './dto/create-client-dto';
 import { UpdateClientDTO } from './dto/update-client-dto';
+import { CLIENT_VALIDATION_MESSAGES } from './client-validation.messages';
 
 @Injectable()
 export class ClientsService {
@@ -28,10 +29,14 @@ export class ClientsService {
       .join(' ');
   }
 
+  /** Mismas reglas que el front (AddClients / EditClients): sin puntos ni abreviaturas típicas */
   private assertCityNoAbbreviations(city: string) {
     const raw = city.trim();
     if (raw.includes('.')) {
-      throw new BadRequestException('La ciudad debe escribirse sin abreviaturas');
+      throw new BadRequestException(CLIENT_VALIDATION_MESSAGES.CITY_NO_ABBREVIATIONS);
+    }
+    if (/\b(bs|baires|caba)\b/i.test(raw)) {
+      throw new BadRequestException(CLIENT_VALIDATION_MESSAGES.CITY_NO_ABBREVIATIONS);
     }
   }
 
@@ -40,11 +45,16 @@ export class ClientsService {
     return this.normalizeTitle(city);
   }
 
+  /** Para listar ciudades existentes: solo título, sin assert (evita romper GET si hubiera datos legacy) */
+  private normalizeCityLabel(city: string): string {
+    return this.normalizeTitle(city);
+  }
+
   private normalizeProvince(state: string): string {
     const normalized = this.normalizeTitle(state);
     // Si llega un valor fuera de catálogo, preferimos fallar con mensaje claro
     if (!ARG_PROVINCES.includes(normalized as any)) {
-      throw new BadRequestException('La provincia debe seleccionarse de la lista');
+      throw new BadRequestException(CLIENT_VALIDATION_MESSAGES.PROVINCE_FROM_LIST);
     }
     return normalized;
   }
@@ -174,7 +184,7 @@ export class ClientsService {
     const normalized = rows
       .map(r => r.city)
       .filter(Boolean)
-      .map(c => this.normalizeCity(c));
+      .map(c => this.normalizeCityLabel(c));
 
     return Array.from(new Set(normalized)).sort((a, b) => a.localeCompare(b, 'es-AR'));
   }

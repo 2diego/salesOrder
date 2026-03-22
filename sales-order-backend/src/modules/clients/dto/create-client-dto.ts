@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsString, IsNotEmpty, IsEmail, IsOptional, ValidateIf, IsIn } from 'class-validator';
+import { CLIENT_VALIDATION_MESSAGES } from '../client-validation.messages';
 
 export const ARG_PROVINCES = [
   'Buenos Aires',
@@ -48,15 +49,15 @@ export class CreateClientDTO {
   @IsNotEmpty({ message: 'La dirección es obligatoria' })
   address: string;
 
-  @IsString({ message: 'La ciudad debe ser texto' })
-  @IsNotEmpty({ message: 'La ciudad es obligatoria' })
+  @IsString({ message: CLIENT_VALIDATION_MESSAGES.CITY_MUST_BE_TEXT })
+  @IsNotEmpty({ message: CLIENT_VALIDATION_MESSAGES.CITY_REQUIRED })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : value))
   city: string;
 
-  @IsString({ message: 'El estado/provincia debe ser texto' })
-  @IsNotEmpty({ message: 'El estado/provincia es obligatorio' })
+  @IsString({ message: CLIENT_VALIDATION_MESSAGES.PROVINCE_MUST_BE_TEXT })
+  @IsNotEmpty({ message: CLIENT_VALIDATION_MESSAGES.PROVINCE_REQUIRED })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : value))
-  @IsIn(ARG_PROVINCES, { message: 'La provincia debe seleccionarse de la lista' })
+  @IsIn(ARG_PROVINCES, { message: CLIENT_VALIDATION_MESSAGES.PROVINCE_FROM_LIST })
   state: string;
 
   @IsString()

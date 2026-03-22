@@ -1,7 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 import { Order } from './order.entity';
 
+/** Mejora consultas por provincia / sugerencias de ciudades (filtro is_active + state + city) */
 @Entity('clients')
+@Index('idx_clients_active_state_city', ['isActive', 'state', 'city'])
 export class Client {
   @PrimaryGeneratedColumn()
   id: number;

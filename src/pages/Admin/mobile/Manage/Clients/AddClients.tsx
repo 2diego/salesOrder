@@ -7,6 +7,7 @@ import FormField from "../../../../../components/common/FormField/FormField";
 import { useEffect, useMemo, useState } from "react";
 import './AddClients.css';
 import { clientsService, CreateClientDTO } from "../../../../../services/clientsService";
+import { CLIENT_VALIDATION_MESSAGES } from "../../../../../constants/clientValidationMessages";
 
 const ARG_PROVINCES = [
   'Buenos Aires',
@@ -35,6 +36,9 @@ const ARG_PROVINCES = [
   'Tucumán',
 ] as const;
 
+/** Valor interno del &lt;select&gt; de ciudad para "Agregar nueva ciudad" */
+const NEW_CITY_OPTION = '__NEW_CITY__';
+
 interface AddClientsProps {
   desktop?: boolean;
   onClose?: () => void;
@@ -52,6 +56,9 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
     state: ''
   });
   const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+  /** true = el usuario eligió escribir una ciudad que aún no está en la lista */
+  const [isAddingNewCity, setIsAddingNewCity] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -73,24 +80,59 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
       city: '' // reset para evitar inconsistencias
     }));
     setCitySuggestions([]);
+    setIsAddingNewCity(false);
     if (error) setError(null);
   };
 
   const selectedProvince = clientData.state;
-  const cityDatalistId = useMemo(() => `cities-${selectedProvince || 'none'}`, [selectedProvince]);
 
   useEffect(() => {
     const loadCities = async () => {
-      if (!selectedProvince) return;
+      if (!selectedProvince) {
+        setCitySuggestions([]);
+        return;
+      }
+      setCitiesLoading(true);
       try {
         const cities = await clientsService.findCitiesByProvince(selectedProvince);
         setCitySuggestions(cities);
       } catch {
         setCitySuggestions([]);
+      } finally {
+        setCitiesLoading(false);
       }
     };
     loadCities();
   }, [selectedProvince]);
+
+  const selectStyle: React.CSSProperties = {
+    width: '100%',
+    height: '100%',
+    background: 'transparent',
+    border: 'none',
+    fontSize: '1rem',
+    fontFamily: 'Inter, sans-serif',
+    outline: 'none',
+  };
+
+  const handleCitySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === NEW_CITY_OPTION) {
+      setIsAddingNewCity(true);
+      setClientData(prev => ({ ...prev, city: '' }));
+    } else {
+      setIsAddingNewCity(false);
+      setClientData(prev => ({ ...prev, city: value }));
+    }
+    if (error) setError(null);
+  };
+
+  /** Valor controlado del &lt;select&gt; de ciudad */
+  const citySelectValue = useMemo(() => {
+    if (!selectedProvince) return '';
+    if (isAddingNewCity) return NEW_CITY_OPTION;
+    return clientData.city;
+  }, [selectedProvince, isAddingNewCity, clientData.city]);
 
   const validateForm = (): boolean => {
     if (!clientData.name.trim()) {
@@ -114,18 +156,18 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
       setError('La dirección es obligatoria');
       return false;
     }
+    if (!clientData.state.trim()) {
+      setError(CLIENT_VALIDATION_MESSAGES.PROVINCE_REQUIRED);
+      return false;
+    }
     if (!clientData.city.trim()) {
-      setError('La ciudad es obligatoria');
+      setError(CLIENT_VALIDATION_MESSAGES.CITY_REQUIRED);
       return false;
     }
     // Ciudad sin abreviaturas
     const cityRaw = clientData.city.trim();
     if (cityRaw.includes('.') || /\b(bs|baires|caba)\b/i.test(cityRaw)) {
-      setError('La ciudad debe escribirse sin abreviaturas');
-      return false;
-    }
-    if (!clientData.state.trim()) {
-      setError('La provincia es obligatoria');
+      setError(CLIENT_VALIDATION_MESSAGES.CITY_NO_ABBREVIATIONS);
       return false;
     }
     return true;
@@ -257,7 +299,7 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
         <FormField 
           label="direccion" 
           value={clientData.address} 
-          placeholder="Ej: Calle Falsa 123"
+          placeholder="Ej: Calle 123"
           editable={true}
           onChange={handleInputChange('address')}
         />
@@ -268,15 +310,7 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
             <select
               value={clientData.state}
               onChange={handleProvinceChange}
-              style={{
-                width: '100%',
-                height: '100%',
-                background: 'transparent',
-                border: 'none',
-                fontSize: '1rem',
-                fontFamily: 'Inter, sans-serif',
-                outline: 'none'
-              }}
+              style={selectStyle}
             >
               <option value="">Seleccione una provincia</option>
               {ARG_PROVINCES.map(p => (
@@ -286,24 +320,50 @@ const AddClients: React.FC<AddClientsProps> = ({ desktop = false, onClose, onCli
           </div>
         </div>
 
-        <h4 className="field-label">Ciudad<span style={{ fontSize: '0.75rem'}}> (Sin abreviaturas)</span></h4>
+        <h4 className="field-label">Ciudad</h4>
         <div className="form-field">
           <div className="field-input">
-            <input
-              type="text"
-              value={clientData.city}
-              onChange={handleInputChange('city')}
-              placeholder="Ej: Benito Juárez"
-              list={cityDatalistId}
-              autoComplete="off"
-            />
-            <datalist id={cityDatalistId}>
-              {citySuggestions.map(city => (
-                <option key={city} value={city} />
+            <select
+              value={citySelectValue}
+              onChange={handleCitySelectChange}
+              disabled={!selectedProvince || citiesLoading}
+              style={{
+                ...selectStyle,
+                opacity: !selectedProvince || citiesLoading ? 0.6 : 1,
+              }}
+            >
+              <option value="">
+                {!selectedProvince
+                  ? 'Seleccione primero una provincia'
+                  : citiesLoading
+                    ? 'Cargando ciudades...'
+                    : 'Seleccione una ciudad'}
+              </option>
+              {citySuggestions.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
               ))}
-            </datalist>
+              <option value={NEW_CITY_OPTION}>
+                + Agregar nueva ciudad…
+              </option>
+            </select>
           </div>
         </div>
+        {selectedProvince && isAddingNewCity && (
+          <>
+            <h4 className="field-label" style={{ marginTop: '0.5rem' }}>
+              Nombre de la ciudad
+            </h4>
+            <FormField
+              label="ciudad_nueva"
+              value={clientData.city}
+              placeholder="Completo, sin abreviaturas"
+              editable={true}
+              onChange={handleInputChange('city')}
+            />
+          </>
+        )}
         
         <BtnBlue 
           width="100%" 
