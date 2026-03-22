@@ -27,11 +27,6 @@ const formatDate = (dateString?: string): string => {
   });
 };
 
-const formatMoney = (value?: number): string => {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '-';
-  return `$${value.toFixed(2)}`;
-};
-
 const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ orderId, onClose }) => {
   const [order, setOrder] = useState<Order | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
@@ -58,13 +53,6 @@ const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ ord
 
     loadOrderDetails();
   }, [orderId]);
-
-  const computedTotal = useMemo(() => {
-    return items.reduce((acc, item) => {
-      const price = item.product?.price || 0;
-      return acc + price * item.quantity;
-    }, 0);
-  }, [items]);
 
   const statusClass = `status-badge ${order?.status?.toLowerCase() || ''}`;
 
@@ -138,35 +126,22 @@ const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ ord
                     <tr>
                       <th>Producto</th>
                       <th>Cant.</th>
-                      <th>Precio</th>
-                      <th>Subtotal</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((item) => {
-                      const price = item.product?.price || 0;
-                      const subtotal = price * item.quantity;
-                      return (
-                        <tr key={item.id}>
-                          <td>{item.product?.name || `Producto #${item.productId}`}</td>
-                          <td>{item.quantity}</td>
-                          <td>{formatMoney(price)}</td>
-                          <td>{formatMoney(subtotal)}</td>
-                        </tr>
-                      );
-                    })}
+                    {items.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.product?.name || `Producto #${item.productId}`}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))}
                     {items.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="order-details-empty">Este pedido no tiene productos.</td>
+                        <td colSpan={2} className="order-details-empty">Este pedido no tiene productos.</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
-              </div>
-
-              <div className="order-details-total">
-                <span>Total:</span>
-                <strong>{formatMoney(order.totalAmount || computedTotal)}</strong>
               </div>
 
               {order.notes && (

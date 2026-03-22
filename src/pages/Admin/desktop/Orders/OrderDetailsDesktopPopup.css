@@ -148,26 +148,15 @@
 }
 
 .order-details-table th:nth-child(2),
-.order-details-table th:nth-child(3),
-.order-details-table th:nth-child(4),
-.order-details-table td:nth-child(2),
-.order-details-table td:nth-child(3),
-.order-details-table td:nth-child(4) {
+.order-details-table td:nth-child(2) {
   white-space: nowrap;
+  text-align: center;
+  width: 4.5rem;
 }
 
 .order-details-empty {
   text-align: center !important;
   color: rgba(233, 232, 232, 0.7);
-}
-
-.order-details-total {
-  margin-top: 0.9rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--mainWhite);
 }
 
 .order-details-notes {
@@ -224,7 +213,6 @@
   .order-details-meta p,
   .order-details-client h5,
   .order-details-client p,
-  .order-details-total,
   .order-details-notes h5,
   .order-details-notes p,
   .order-details-table {

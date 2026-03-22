@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type SyntheticEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
 import { ordersItemsService, OrderItem } from "../../../../services/ordersItemsService";
@@ -8,6 +8,8 @@ import { clientsService } from "../../../../services/clientsService";
 import './ValidateOrderDesktop.css';
 import type { ProductItem } from "../../../../components/desktop/CustomerPanels/types";
 import { mapOrderItemToProductItem } from "../../../../utils/mapProductItem";
+import { getDefaultProductImageUrl, resolveProductListImageSrc } from "../../../../config/productImages";
+import { ProductImagePreview } from "../../../../components/common/ProductImagePreview/ProductImagePreview";
 
 const modalOverlayStyle: React.CSSProperties = {
   position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -79,6 +81,14 @@ const ValidateOrderDesktop = () => {
   // Permite editar cantidad usando teclado numérico.
   // Guardamos el "draft" como string para soportar estados intermedios (ej. borrar todo).
   const [quantityDraftByProductId, setQuantityDraftByProductId] = useState<Record<string, string>>({});
+  const [imagePreview, setImagePreview] = useState<{ src: string; alt: string } | null>(null);
+
+  const handleProductThumbError = (e: SyntheticEvent<HTMLImageElement>) => {
+    const el = e.currentTarget;
+    if (el.dataset.fallback === '1') return;
+    el.dataset.fallback = '1';
+    el.src = getDefaultProductImageUrl();
+  };
 
   useEffect(() => {
     const loadOrderData = async () => {
@@ -392,18 +402,43 @@ const ValidateOrderDesktop = () => {
         )}
 
         <div className="desktop-products-section">
-          <h3 className="desktop-products-title">Productos</h3>
           <table className="desktop-products-table">
             <thead>
               <tr>
+                <th className="desktop-products-table__th-thumb" aria-label="Imagen" />
                 <th>Producto</th>
                 <th style={{ width: '100px', textAlign: 'center' }}>Cantidad</th>
-                <th style={{ width: '100px', textAlign: 'right' }}>Precio</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
+              {products.map((product) => {
+                const thumbSrc = resolveProductListImageSrc(product.imageUrl);
+                return (
                 <tr key={product.id}>
+                  <td className="desktop-product-thumb-cell">
+                    <button
+                      type="button"
+                      className="desktop-product-thumb-btn"
+                      aria-label={`Ver imagen ampliada: ${product.name}`}
+                      onClick={(e) => {
+                        const img = e.currentTarget.querySelector('img');
+                        const src =
+                          img instanceof HTMLImageElement
+                            ? img.currentSrc || img.src || thumbSrc
+                            : thumbSrc;
+                        setImagePreview({ src, alt: `Producto ${product.name}` });
+                      }}
+                    >
+                      <img
+                        src={thumbSrc}
+                        alt=""
+                        className="desktop-product-thumb__img"
+                        loading="lazy"
+                        decoding="async"
+                        onError={handleProductThumbError}
+                      />
+                    </button>
+                  </td>
                   <td>
                     <div>{product.name}</div>
                     {product.detail && <div style={{ fontSize: '0.75rem', color: 'rgba(233,232,232,0.6)' }}>{product.detail}</div>}
@@ -459,13 +494,9 @@ const ValidateOrderDesktop = () => {
                       </button>
                     </div>
                   </td>
-                  <td style={{ textAlign: 'right' }}>{product.price != null ? `$${product.price}` : '-'}</td>
                 </tr>
-              ))}
-              <tr className="desktop-total-row">
-                <td colSpan={2}>Total</td>
-                <td style={{ textAlign: 'right' }}>${(Number(order?.totalAmount) || 0).toFixed(2)}</td>
-              </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -560,6 +591,15 @@ const ValidateOrderDesktop = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {imagePreview && (
+        <ProductImagePreview
+          isOpen
+          imageSrc={imagePreview.src}
+          alt={imagePreview.alt}
+          onClose={() => setImagePreview(null)}
+        />
       )}
     </div>
   );
