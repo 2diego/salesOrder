@@ -23,3 +23,22 @@ export function mapOrderItemToProductItem(item: OrderItem): ProductItem {
     imageUrl: item.product?.imageUrl ?? undefined,
   };
 }
+
+/**
+ * Completa `imageUrl` (y detalle vacío) desde el catálogo cuando el ítem vino de
+ * localStorage antiguo o sin `imageUrl`.
+ */
+export function mergeProductItemsWithCatalog(
+  items: ProductItem[],
+  catalog: Product[],
+): ProductItem[] {
+  const byId = new Map(catalog.map((p) => [String(p.id), p]));
+  return items.map((item) => {
+    const api = byId.get(item.id);
+    return {
+      ...item,
+      imageUrl: item.imageUrl ?? api?.imageUrl ?? undefined,
+      detail: item.detail?.trim() ? item.detail : api?.description || item.detail,
+    };
+  });
+}

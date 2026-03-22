@@ -8,8 +8,9 @@ import { ordersLinksService } from '../../../services/ordersLinksService'
 import { clientsService } from '../../../services/clientsService'
 import { ordersService, Order } from '../../../services/ordersService'
 import { ordersItemsService } from '../../../services/ordersItemsService'
+import { productsService } from '../../../services/productsService'
 import type { ProductItem } from '../../../components/desktop/CustomerPanels/types'
-import { mapOrderItemToProductItem } from '../../../utils/mapProductItem'
+import { mapOrderItemToProductItem, mergeProductItemsWithCatalog } from '../../../utils/mapProductItem'
 
 const Cart = () => {
   const [searchParams] = useSearchParams()
@@ -72,6 +73,9 @@ const Cart = () => {
 
         // 3. Cargar items de la orden existentes si hay alguno
         const existingItems = await ordersItemsService.findAll({ orderId: orderIdValue })
+
+        // Catálogo para completar imageUrl (localStorage suele no traerla)
+        const catalog = await productsService.findAll()
         
         // 4. Cargar productos seleccionados - priorizar items existentes sobre localStorage
         let selectedProducts: ProductItem[] = []
@@ -88,6 +92,8 @@ const Cart = () => {
             selectedProducts = JSON.parse(savedProducts)
           }
         }
+
+        selectedProducts = mergeProductItemsWithCatalog(selectedProducts, catalog)
 
         setProducts(selectedProducts)
         
