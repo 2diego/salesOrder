@@ -697,7 +697,7 @@ const ValidateOrder = () => {
             <p style={{ marginBottom: '1.5rem', color: '#4D7099', fontSize: '0.875rem' }}>
               ¿Está seguro que desea validar este pedido? Esta acción confirmará el pedido y no se podrá modificar posteriormente.
             </p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <BtnBlue 
                 width="100%" 
                 height="3rem"
