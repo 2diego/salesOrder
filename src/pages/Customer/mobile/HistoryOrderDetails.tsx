@@ -4,7 +4,7 @@ import Header from "../../../components/common/Header/Header";
 import SectionTitle from "../../../components/common/SectionTitle/SectionTitle";
 import BtnBlue from "../../../components/common/BtnBlue/BtnBlue";
 import ProductList from "../../../components/common/ProductList/ProductList";
-import { ordersService } from '../../../services/ordersService';
+import { ordersService, OrderStatus } from '../../../services/ordersService';
 import { ordersItemsService } from '../../../services/ordersItemsService';
 import type { ProductItem } from '../../../components/desktop/CustomerPanels/types';
 import { mapOrderItemToProductItem } from '../../../utils/mapProductItem';
@@ -21,6 +21,8 @@ const HistoryOrderDetails = () => {
   const [orderDate, setOrderDate] = useState('');
   const [clientName, setClientName] = useState('');
   const [products, setProducts] = useState<ProductItem[]>([]);
+  const [orderStatus, setOrderStatus] = useState<OrderStatus | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   // Determinar si viene de CustomerOrderHistory (tiene token) o de OrderHistory (solo lectura)
   const isCustomerView = !!token;
@@ -43,6 +45,7 @@ const HistoryOrderDetails = () => {
         
         // Formatear número de pedido
         setOrderNumber(`Pedido Nº ${orderData.id.toString().padStart(6, '0')}`);
+        setOrderStatus(orderData.status);
         
         // Formatear fecha
         if (orderData.createdAt) {
@@ -81,6 +84,20 @@ const HistoryOrderDetails = () => {
 
     // Navegar a NewOrder con el token
     navigate(`/NewOrder?token=${token}`);
+  };
+
+  const handleMarkAsProcessed = async () => {
+    if (!id) return;
+    try {
+      setProcessing(true);
+      setError(null);
+      const updated = await ordersService.updateStatus(parseInt(id), OrderStatus.PROCESSED);
+      setOrderStatus(updated.status);
+    } catch (err: any) {
+      setError(err.message || 'No se pudo marcar el pedido como cargado');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   if (loading) {
@@ -134,6 +151,12 @@ const HistoryOrderDetails = () => {
 
       {/* Bottom Actions */}
       <div className="bottom-actions">
+        {!isCustomerView && orderStatus === OrderStatus.VALIDATED && (
+          <BtnBlue width="100%" height="3rem" onClick={handleMarkAsProcessed} disabled={processing}>
+            <span>{processing ? 'Marcando...' : 'Marcar como cargado'}</span>
+          </BtnBlue>
+        )}
+
         {/* Repeat Order Button - Solo mostrar si viene de CustomerOrderHistory */}
         {isCustomerView && (
           <BtnBlue width="100%" height="3rem" onClick={handleRepeatOrder}>

@@ -36,6 +36,11 @@ export class OrdersValidationsService {
       throw new BadRequestException('No se puede validar un pedido cancelado');
     }
 
+    // Verificar que la orden no esté cargada
+    if (order.status === OrderStatus.PROCESSED) {
+      throw new BadRequestException('No se puede validar un pedido cargado');
+    }
+
     // Crear la validación
     const orderValidation = this.orderValidationRepository.create(createOrderValidationDto);
     const savedValidation = await this.orderValidationRepository.save(orderValidation);

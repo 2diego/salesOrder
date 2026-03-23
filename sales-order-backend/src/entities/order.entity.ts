@@ -8,6 +8,7 @@ import { OrderValidation } from './order-validation.entity';
 export enum OrderStatus {
   PENDING = 'pending',
   VALIDATED = 'validated',
+  PROCESSED = 'processed',
   CANCELLED = 'cancelled',
 }
 

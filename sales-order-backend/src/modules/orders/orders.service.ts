@@ -190,8 +190,8 @@ export class OrdersService {
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<OrderResponseDto> {
     const order = await this.findOne(id);
     
-    if (order.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('No se puede actualizar un pedido validado');
+    if (order.status === OrderStatus.VALIDATED || order.status === OrderStatus.PROCESSED) {
+      throw new BadRequestException('No se puede actualizar un pedido validado o cargado');
     }
 
     await this.orderRepository.update(id, updateOrderDto);
@@ -201,8 +201,8 @@ export class OrdersService {
   async remove(id: number): Promise<void> {
     const order = await this.findOne(id);
     
-    if (order.status === OrderStatus.VALIDATED) {
-      throw new BadRequestException('No se puede eliminar un pedido validado');
+    if (order.status === OrderStatus.VALIDATED || order.status === OrderStatus.PROCESSED) {
+      throw new BadRequestException('No se puede eliminar un pedido validado o cargado');
     }
 
     await this.orderRepository.delete(id);
@@ -227,6 +227,17 @@ export class OrdersService {
   }
 
   async updateStatus(id: number, status: OrderStatus): Promise<OrderResponseDto> {
+    const order = await this.findOne(id);
+
+    // Regla de negocio: solo un pedido validado puede cerrarse como cargado.
+    if (status === OrderStatus.PROCESSED && order.status !== OrderStatus.VALIDATED) {
+      throw new BadRequestException('Solo los pedidos validados pueden marcarse como cargados');
+    }
+
+    if (order.status === OrderStatus.PROCESSED && status !== OrderStatus.PROCESSED) {
+      throw new BadRequestException('Un pedido cargado no puede cambiar de estado');
+    }
+
     await this.orderRepository.update(id, { status });
     return this.findOne(id);
   }

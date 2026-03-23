@@ -3,12 +3,33 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import Table, { TableColumn } from "../../../../components/desktop/Table/Table";
 import { ordersService, Order, OrderStatus } from "../../../../services/ordersService";
 import OrderDetailsDesktopPopup from './OrderDetailsDesktopPopup';
+import OrderStatusTabs, { OrderDesktopFilter } from './OrderStatusTabs';
 
 const OrdersDesktop = () => {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const statusFilter = searchParams.get('status');
-	const showOnlyPending = statusFilter === 'pending';
+  const mapQueryStatusToFilter = (queryStatus: string | null): OrderDesktopFilter =>
+    queryStatus === 'pending'
+      ? 'pending'
+      : queryStatus === 'validated'
+      ? 'validated'
+      : queryStatus === 'processed'
+      ? 'processed'
+      : queryStatus === 'cancelled'
+      ? 'cancelled'
+      : 'all';
+
+  const initialDesktopFilter: OrderDesktopFilter =
+    statusFilter === 'pending'
+      ? 'pending'
+      : statusFilter === 'validated'
+      ? 'validated'
+      : statusFilter === 'processed'
+      ? 'processed'
+      : statusFilter === 'cancelled'
+      ? 'cancelled'
+      : 'all';
 
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -20,11 +41,24 @@ const OrdersDesktop = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [total, setTotal] = useState(0);
   const [selectedReadOnlyOrderId, setSelectedReadOnlyOrderId] = useState<number | null>(null);
+  const [desktopStatusFilter, setDesktopStatusFilter] = useState<OrderDesktopFilter>(initialDesktopFilter);
+
+  const handleDesktopFilterChange = (nextFilter: OrderDesktopFilter) => {
+    setPage(1);
+    setDesktopStatusFilter(nextFilter);
+    navigate(nextFilter === 'all' ? '/Orders' : `/Orders?status=${nextFilter}`);
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
     return () => clearTimeout(t);
   }, [searchTerm]);
+
+  useEffect(() => {
+    const nextFilter = mapQueryStatusToFilter(statusFilter);
+    setDesktopStatusFilter(nextFilter);
+    setPage(1);
+  }, [statusFilter]);
 
 	useEffect(() => {
 		const fetchOrders = async () => {
@@ -34,7 +68,16 @@ const OrdersDesktop = () => {
 				const result = await ordersService.findPaged({
           page,
           limit,
-          status: showOnlyPending ? OrderStatus.PENDING : undefined,
+          status:
+            desktopStatusFilter === 'pending'
+              ? OrderStatus.PENDING
+              : desktopStatusFilter === 'validated'
+              ? OrderStatus.VALIDATED
+              : desktopStatusFilter === 'processed'
+              ? OrderStatus.PROCESSED
+              : desktopStatusFilter === 'cancelled'
+              ? OrderStatus.CANCELLED
+              : undefined,
           q: debouncedSearch.trim() ? debouncedSearch.trim() : undefined
         });
 				const ordersData = result.data;
@@ -51,13 +94,14 @@ const OrdersDesktop = () => {
 		};
 
 		fetchOrders();
-	}, [showOnlyPending, page, limit, debouncedSearch]);
+	}, [desktopStatusFilter, page, limit, debouncedSearch]);
 
 	// Formatear el estado a español
 	const formatStatus = (status: OrderStatus): string => {
 		const statusMap: Record<OrderStatus, string> = {
 			[OrderStatus.PENDING]: 'Pendiente',
 			[OrderStatus.VALIDATED]: 'Validado',
+			[OrderStatus.PROCESSED]: 'Cargado',
 			[OrderStatus.CANCELLED]: 'Cancelado',
 		};
 		return statusMap[status] || status;
@@ -92,10 +136,6 @@ const OrdersDesktop = () => {
 		}
 	];
 
-	const handleAddNew = () => {
-		console.log('Crear nuevo pedido');
-	};
-
 	const handleRowClick = (row: any) => {
 		if (row.rawStatus === OrderStatus.PENDING) {
 			navigate(`/ValidateOrder/${row.order.id}`);
@@ -129,15 +169,14 @@ const OrdersDesktop = () => {
 			)}
       <div className="orders-table">
         <Table
-				  title={showOnlyPending ? 'Pedidos sin validar' : 'Gestión de Pedidos'}
+				  title={desktopStatusFilter === 'pending' ? 'Pedidos sin validar' : 'Gestión de Pedidos'}
 				  subtitle={
-          showOnlyPending
+          desktopStatusFilter === 'pending'
             ? `Pedidos con estado pendiente de validación (${total})`
             : `Administra todos los pedidos del sistema (${total})`
           }
 				  columns={columns}
 				  data={tableData}
-				  onAddNew={handleAddNew}
 				  onRowClick={handleRowClick}
 				  loading={loading}
 				  searchPlaceholder="Buscar por cliente, ID o teléfono..."
@@ -146,8 +185,13 @@ const OrdersDesktop = () => {
           setPage(1);
           setSearchTerm(value);
         }}
-				  addButtonText="Nuevo Pedido"
-				  emptyMessage={showOnlyPending ? 'No hay pedidos sin validar' : 'No hay pedidos disponibles'}
+          headerActions={
+            <OrderStatusTabs
+              activeFilter={desktopStatusFilter}
+              onChange={handleDesktopFilterChange}
+            />
+          }
+				  emptyMessage={desktopStatusFilter === 'pending' ? 'No hay pedidos sin validar' : 'No hay pedidos disponibles'}
         stickyHeader={true}
 			  />
       </div>
@@ -220,6 +264,9 @@ const OrdersDesktop = () => {
         <OrderDetailsDesktopPopup
           orderId={selectedReadOnlyOrderId}
           onClose={() => setSelectedReadOnlyOrderId(null)}
+          onStatusUpdated={(orderId, newStatus) => {
+            setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));
+          }}
         />
       )}
 		</div>

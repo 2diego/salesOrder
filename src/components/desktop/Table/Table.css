@@ -211,7 +211,7 @@
   
   .table-controls {
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 1.25rem;
   }
 }
 
@@ -249,6 +249,12 @@
   background-color: rgba(239, 68, 68, 0.1);
   color: rgb(239, 68, 68);
   border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.processed {
+  background-color: rgba(109, 74, 255, 0.15);
+  color: rgb(167, 139, 250);
+  border: 1px solid rgba(139, 92, 246, 0.35);
 }
 
 /* Scroll específico para la tabla de productos en escritorio */

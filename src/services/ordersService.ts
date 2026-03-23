@@ -3,6 +3,7 @@ import { getApiUrl } from '../config/api.config';
 export enum OrderStatus {
   PENDING = 'pending',
   VALIDATED = 'validated',
+  PROCESSED = 'processed',
   CANCELLED = 'cancelled',
 }
 

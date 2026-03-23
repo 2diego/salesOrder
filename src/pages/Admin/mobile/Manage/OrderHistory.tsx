@@ -17,10 +17,11 @@ const OrderHistory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'validated' | 'cancelled' | 'pending' | 'all'>('validated');
+  const [statusFilter, setStatusFilter] = useState<'validated' | 'processed' | 'cancelled' | 'pending' | 'all'>('validated');
 
   const tabs: SegmentedTab[] = [
     { key: 'validated', label: 'Validado' },
+    { key: 'processed', label: 'Cargado' },
     { key: 'cancelled', label: 'Cancelado' },
     { key: 'pending', label: 'Pendiente' },
     { key: 'all', label: 'Todos' },
@@ -37,6 +38,8 @@ const OrderHistory = () => {
         return OrderStatus.PENDING;
       case 'validated':
         return OrderStatus.VALIDATED;
+      case 'processed':
+        return OrderStatus.PROCESSED;
       case 'cancelled':
         return OrderStatus.CANCELLED;
       default:
@@ -118,6 +121,7 @@ const OrderHistory = () => {
     const statusMap: Record<OrderStatus, { text: string; color: string }> = {
       [OrderStatus.PENDING]: { text: 'Pendiente', color: '#c99715ff' },
       [OrderStatus.VALIDATED]: { text: 'Validado', color: '#3c9234ff' },
+      [OrderStatus.PROCESSED]: { text: 'Cargado', color: '#6d4aff' },
       [OrderStatus.CANCELLED]: { text: 'Cancelado', color: '#8d2121ff' },
     };
     return statusMap[status] || { text: status, color: '#4D7099' };
@@ -146,7 +150,7 @@ const OrderHistory = () => {
         />
 
       {/* Status Filter */}
-      <div style={{ padding: '0 1rem', marginTop: '-0.25rem', marginBottom: '0.75rem' }}>
+      <div style={{ marginTop: '-0.25rem', marginBottom: '0.75rem' }}>
         <SegmentedTabs
           tabs={tabs}
           activeKey={statusFilter}

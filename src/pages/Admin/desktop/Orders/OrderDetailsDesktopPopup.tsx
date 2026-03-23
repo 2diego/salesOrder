@@ -7,12 +7,14 @@ import './OrderDetailsDesktopPopup.css';
 interface OrderDetailsDesktopPopupProps {
   orderId: number;
   onClose: () => void;
+  onStatusUpdated?: (orderId: number, status: OrderStatus) => void;
 }
 
 const formatStatus = (status: OrderStatus): string => {
   const statusMap: Record<OrderStatus, string> = {
     [OrderStatus.PENDING]: 'Pendiente',
     [OrderStatus.VALIDATED]: 'Validado',
+    [OrderStatus.PROCESSED]: 'Cargado',
     [OrderStatus.CANCELLED]: 'Cancelado',
   };
   return statusMap[status] || status;
@@ -27,11 +29,12 @@ const formatDate = (dateString?: string): string => {
   });
 };
 
-const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ orderId, onClose }) => {
+const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ orderId, onClose, onStatusUpdated }) => {
   const [order, setOrder] = useState<Order | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     const loadOrderDetails = async () => {
@@ -71,12 +74,33 @@ const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ ord
     order?.createdBy?.name || (order?.createdBy as any)?.username || `ID ${order?.createdById ?? '-'}`;
 
   const validationLabel =
-    order?.status === OrderStatus.VALIDATED ? 'Validado' : order?.status === OrderStatus.CANCELLED ? 'Cancelado' : 'Estado';
+    order?.status === OrderStatus.VALIDATED
+      ? 'Validado'
+      : order?.status === OrderStatus.CANCELLED
+      ? 'Cancelado'
+      : order?.status === OrderStatus.PROCESSED
+      ? 'Cargado'
+      : 'Estado';
 
   const validationByName =
     latestValidation?.validatedBy?.name ||
     latestValidation?.validatedBy?.username ||
     (latestValidation?.validatedById ? `ID ${latestValidation.validatedById}` : 'Sin validación');
+
+  const handleMarkAsProcessed = async () => {
+    if (!order) return;
+    try {
+      setProcessing(true);
+      setError(null);
+      const updated = await ordersService.updateStatus(order.id, OrderStatus.PROCESSED);
+      setOrder(updated);
+      onStatusUpdated?.(updated.id, updated.status);
+    } catch (err: any) {
+      setError(err?.message || 'No se pudo marcar el pedido como cargado');
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className="desktop-popup-overlay" onClick={onClose}>
@@ -152,6 +176,17 @@ const OrderDetailsDesktopPopup: React.FC<OrderDetailsDesktopPopupProps> = ({ ord
               )}
 
               <div className="order-details-actions">
+                {order.status === OrderStatus.VALIDATED && (
+                  <BtnBlue
+                    width="100%"
+                    height="2.75rem"
+                    onClick={handleMarkAsProcessed}
+                    disabled={processing}
+                    background="linear-gradient(195deg, rgba(102, 87, 230, 0.85), rgba(67, 56, 202, 0.75))"
+                  >
+                    <span>{processing ? 'Marcando...' : 'Marcar como cargado'}</span>
+                  </BtnBlue>
+                )}
                 <BtnBlue
                   width="100%"
                   height="2.75rem"

@@ -25,6 +25,7 @@ export interface TableProps {
   stickyHeader?: boolean;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
+  headerActions?: React.ReactNode;
 }
 
 const Table: React.FC<TableProps> = ({
@@ -40,7 +41,8 @@ const Table: React.FC<TableProps> = ({
   addButtonText = "Agregar nuevo",
   stickyHeader = false,
   searchValue,
-  onSearchChange
+  onSearchChange,
+  headerActions
 }) => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [internalSearchTerm, setInternalSearchTerm] = useState('');
@@ -111,13 +113,18 @@ const Table: React.FC<TableProps> = ({
               }}
             />
 
-            {/* Add Button */}
-            <BtnBlue width="auto" height="2.75rem" borderRadius="0.5rem" isBackButton={false} background='linear-gradient(195deg, rgba(43, 118, 184, 0.699), rgba(15, 55, 107, 0.459))' onClick={onAddNew}>
-              <svg className="add-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              {addButtonText}
-            </BtnBlue>
+            {headerActions ? (
+              headerActions
+            ) : (
+              onAddNew && (
+                <BtnBlue width="auto" height="2.75rem" borderRadius="0.5rem" isBackButton={false} background='linear-gradient(195deg, rgba(43, 118, 184, 0.699), rgba(15, 55, 107, 0.459))' onClick={onAddNew}>
+                  <svg className="add-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  {addButtonText}
+                </BtnBlue>
+              )
+            )}
           </div>
 
         </div>
