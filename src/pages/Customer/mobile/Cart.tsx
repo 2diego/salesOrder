@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import Header from "../../../components/common/Header/Header"
 import SectionTitle from "../../../components/common/SectionTitle/SectionTitle"
@@ -6,11 +6,11 @@ import ProductList from "../../../components/common/ProductList/ProductList"
 import BtnBlue from "../../../components/common/BtnBlue/BtnBlue"
 import { ordersLinksService } from '../../../services/ordersLinksService'
 import { clientsService } from '../../../services/clientsService'
-import { ordersService, Order } from '../../../services/ordersService'
 import { ordersItemsService } from '../../../services/ordersItemsService'
 import { productsService } from '../../../services/productsService'
 import type { ProductItem } from '../../../components/desktop/CustomerPanels/types'
 import { mapOrderItemToProductItem, mergeProductItemsWithCatalog } from '../../../utils/mapProductItem'
+import { getDefaultProductImageUrl, resolveProductListImageSrc } from '../../../config/productImages'
 
 const Cart = () => {
   const [searchParams] = useSearchParams()
@@ -31,7 +31,12 @@ const Cart = () => {
 
   // Productos
   const [products, setProducts] = useState<ProductItem[]>([])
-  const [productQuantities, setProductQuantities] = useState<Record<string, number>>({})
+  const [showSendConfirm, setShowSendConfirm] = useState(false)
+
+  const productsToSend = useMemo(
+    () => products.filter((p) => p.quantity > 0),
+    [products],
+  )
 
   useEffect(() => {
     const loadData = async () => {
@@ -97,13 +102,6 @@ const Cart = () => {
 
         setProducts(selectedProducts)
         
-        // Inicializar mapa de cantidades
-        const initialQuantities: Record<string, number> = {}
-        selectedProducts.forEach(product => {
-          initialQuantities[product.id] = product.quantity
-        })
-        setProductQuantities(initialQuantities)
-
       } catch (err: any) {
         console.error('Error loading data:', err)
         setError(err.message || 'Error al cargar los datos')
@@ -148,15 +146,6 @@ const Cart = () => {
   }, [expiresAt])
 
   const updateQuantity = (productId: string, change: number) => {
-    setProductQuantities(prevQuantities => {
-      const currentQuantity = prevQuantities[productId] || 0
-      const newQuantity = Math.max(0, currentQuantity + change)
-      return {
-        ...prevQuantities,
-        [productId]: newQuantity
-      }
-    })
-    
     setProducts(prevProducts =>
       prevProducts.map(product =>
         product.id === productId
@@ -172,8 +161,6 @@ const Cart = () => {
       return
     }
 
-    const productsToSend = products.filter(p => p.quantity > 0)
-    
     if (productsToSend.length === 0) {
       setError('Debe seleccionar al menos un producto para enviar el pedido')
       return
@@ -280,8 +267,8 @@ const Cart = () => {
         <BtnBlue 
           width="100%" 
           height="3rem"
-          onClick={handleSendOrder}
-          disabled={sending || products.filter(p => p.quantity > 0).length === 0}
+          onClick={() => setShowSendConfirm(true)}
+          disabled={sending || productsToSend.length === 0}
         >
           <span>{sending ? 'Enviando...' : 'Enviar pedido'}</span>
         </BtnBlue>
@@ -303,6 +290,93 @@ const Cart = () => {
           <span>{timeRemaining || 'Este enlace caduca en 24 horas'}</span>
         </div>
       </div>
+
+      {showSendConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+          }}
+          onClick={() => setShowSendConfirm(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '420px',
+              background: '#F7FAFC',
+              borderRadius: '12px',
+              border: '1px solid #d1d5db',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: '1rem 1rem 0.5rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', color: '#0D141C' }}>Confirmar envío de pedido</h3>
+              <p style={{ margin: '0.5rem 0 0', color: '#4D7099', fontSize: '0.9rem' }}>
+                Mi pedido:
+              </p>
+            </div>
+
+            <div style={{ padding: '0.25rem 1rem 1rem', maxHeight: '45vh', overflowY: 'auto' }}>
+              {productsToSend.map((p) => (
+                <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.55rem', borderBottom: '1px solid #e0e0e0' }}>
+                  <div style={{ display: 'flex', gap: '0.6rem', minWidth: 0 }}>
+                    <img
+                      src={resolveProductListImageSrc(p.imageUrl)}
+                      alt=""
+                      style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0, background: '#e8edf2' }}
+                      onError={(e) => {
+                        const el = e.currentTarget
+                        if (el.dataset.fallback === '1') return
+                        el.dataset.fallback = '1'
+                        el.src = getDefaultProductImageUrl()
+                      }}
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                      {p.detail && (
+                        <div style={{ fontSize: '0.8rem', color: '#4D7099', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {p.detail}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <strong>x{p.quantity}</strong>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ padding: '0 1rem 1rem' }}>
+              <BtnBlue
+                width="100%"
+                height="2.75rem"
+                onClick={() => {
+                  setShowSendConfirm(false)
+                  handleSendOrder()
+                }}
+                disabled={sending || productsToSend.length === 0}
+              >
+                <span>{sending ? 'Enviando...' : 'Confirmar envío'}</span>
+              </BtnBlue>
+              <BtnBlue
+                width="100%"
+                height="2.75rem"
+                onClick={() => setShowSendConfirm(false)}
+                background="rgba(107, 114, 128, 0.9)"
+              >
+                <span>Cancelar</span>
+              </BtnBlue>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
