@@ -1,0 +1,139 @@
+/* Desktop Popup Styles */
+.desktop-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1201;
+  backdrop-filter: blur(4px);
+}
+
+.desktop-popup {
+  background-color: rgb(17, 24, 39);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  box-shadow: rgba(0, 0, 0, 0.3) 0rem 1.25rem 1.6875rem 0rem;
+  width: 90%;
+  max-width: 500px;
+  min-height: 450px;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.desktop-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.desktop-popup-header h3 {
+  color: var(--mainWhite);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  color: var(--mainGray);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--mainWhite);
+  transform: scale(1.1);
+}
+
+/* Desktop Form Styles */
+.desktop-form {
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.desktop-form .field-label {
+  color: var(--mainWhite);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-left: 0;
+}
+
+.desktop-form .button-container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Mobile Styles */
+.form-container {
+  padding: 0 1rem 1rem;
+}
+
+.field-label {
+  color: var(--mainBlack);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+}
+
+.button-container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+/* Client Selector Styles */
+.client-selector-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.desktop-form .client-selector-dropdown {
+  background-color: rgb(31, 41, 55);
+  border-color: rgba(100, 100, 100, 0.3);
+}

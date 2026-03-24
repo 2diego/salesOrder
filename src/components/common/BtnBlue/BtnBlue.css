@@ -1,0 +1,69 @@
+.btn-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--mainPadding);
+}
+
+.btn-back {
+  position: fixed;
+  bottom: 75px;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  padding: 0.75rem 1rem; /* Vertical = 1.5rem (ver spacer en BtnBlue.tsx) */
+  background-color: rgba(247, 250, 252, 0.92);
+  backdrop-filter: blur(8px);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.btn-back-spacer {
+  display: none;
+  pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+  .btn-back-spacer {
+    display: block;
+    width: 100%;
+  }
+}
+
+.btn-blue {
+  width: 100%;
+  max-width: 480px;
+  height: 40px;
+  background-color: var(--mainBlue);
+  padding: var(--mainPadding);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--mainWhite);
+}
+
+.btn-blue:hover {
+  background-color: var(--mainBlueHover);
+  border-color: rgba(100, 100, 100, 0.50);
+  box-shadow: rgba(0, 0, 0, 0.349) 0rem 0.25rem 0.375rem -0.0625rem, rgba(0, 0, 0, 0.06) 0rem 0.125rem 0.25rem -0.0625rem;
+}
+
+.btn-blue span {
+  color: var(--mainWhite);
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 21px;
+}
+
+@media (min-width: 1023px) {
+  .btn-container {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}

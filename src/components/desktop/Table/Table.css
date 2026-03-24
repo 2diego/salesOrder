@@ -1,0 +1,352 @@
+/* Table Container */
+.table-container {
+  background-color: rgb(31, 41, 55);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 100, 100, 0.50);
+  box-shadow: rgba(0, 0, 0, 0.05) 0rem 1.25rem 1.6875rem 0rem;
+  overflow: hidden;
+}
+
+/* Table Header */
+.table-header {
+  padding: 2rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.20);
+}
+
+/* .table-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+} */
+
+.table-title-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.table-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(233, 232, 232);
+  line-height: 1.2;
+}
+
+.table-subtitle {
+  font-size: 0.875rem;
+  color: var(--lightBlue, #60a5fa);
+  font-weight: 400;
+}
+
+.table-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+/* Add Button */
+.add-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border-radius: 0;
+}
+
+.table-content {
+  min-width: 100%;
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table-head {
+  background-color: rgb(55, 65, 81);
+}
+
+.table-header-cell {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: rgb(233, 232, 232);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.30);
+  position: relative;
+}
+
+.table-header-cell.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.table-header-cell.sortable:hover {
+  background-color: rgb(75, 85, 99);
+}
+
+.sort-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-left: 0.5rem;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.table-header-cell.sortable:hover .sort-icon {
+  opacity: 0.8;
+}
+
+/* Table Body */
+.table-body {
+  background-color: rgb(31, 41, 55);
+}
+
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row.even {
+  background-color: rgb(31, 41, 55);
+}
+
+.table-row.odd {
+  background-color: rgb(55, 65, 81);
+}
+
+.table-row.clickable {
+  cursor: pointer;
+}
+
+.table-row.clickable:hover {
+  background-color: rgba(96, 165, 250, 0.1) !important;
+}
+
+.table-cell {
+  padding: 1rem;
+  color: rgb(233, 232, 232);
+  border-bottom: 1px solid rgba(100, 100, 100, 0.20);
+  vertical-align: middle;
+}
+
+/* Loading State */
+.loading-cell {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: rgb(156, 163, 175);
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgba(156, 163, 175, 0.3);
+  border-top: 2px solid var(--lightBlue, #60a5fa);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-cell {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: rgb(156, 163, 175);
+}
+
+.empty-icon {
+  width: 3rem;
+  height: 3rem;
+  opacity: 0.5;
+}
+
+/* Responsive Design */
+
+/* Para laptops pequeñas y pantallas medianas (1024px - 1280px) */
+@media (max-width: 1280px) {
+  .table-controls {
+    gap: 0.75rem;
+  }
+}
+
+/* Para tablets y laptops muy pequeñas */
+@media (max-width: 1024px) {
+  .table-header-content {
+    gap: 1rem;
+  }
+  
+  .table-controls {
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+}
+
+/* Status Badge Styles (for common use cases) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.completed {
+  background-color: rgba(145, 145, 145, 0.1);
+  color: rgb(145, 145, 145);
+  border: 1px solid rgba(145, 145, 145, 0.3);
+}
+
+.status-badge.validated {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.pending {
+  background-color: rgba(251, 191, 36, 0.1);
+  color: rgb(251, 191, 36);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.status-badge.cancelled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: rgb(239, 68, 68);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.processed {
+  background-color: rgba(109, 74, 255, 0.15);
+  color: rgb(167, 139, 250);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+/* Scroll específico para la tabla de productos en escritorio */
+.products-desktop-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 5rem); /* ajusta 5rem según header/márgenes reales */
+  box-sizing: border-box;
+}
+
+.clients-desktop-page,
+.sellers-desktop-page,
+.orders-desktop-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 5rem); /* ajusta 5rem según header/márgenes reales */
+  box-sizing: border-box;
+}
+
+.products-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* permite que el hijo con overflow funcione correctamente */
+}
+
+.clients-table,
+.sellers-table,
+.orders-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.products-table .table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.clients-table .table-container,
+.sellers-table .table-container,
+.orders-table .table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.products-table .table-wrapper {
+  flex: 1;
+}
+
+.orders-table .table-wrapper {
+  flex: 1;
+}
+
+/* Layout para tabla con header fijo (usado en productos) */
+.table-wrapper-sticky {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header-fixed {
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.table-body-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.table-wrapper-sticky .data-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Mejor uso de espacio y evitar que el body se haga más ancho que el contenedor */
+.products-table .table-cell {
+  word-break: break-word;
+  white-space: normal;
+}
+
+.orders-table .table-cell {
+  word-break: break-word;
+  white-space: normal;
+}
+
+.orders-table .status-badge {
+  white-space: nowrap;
+}

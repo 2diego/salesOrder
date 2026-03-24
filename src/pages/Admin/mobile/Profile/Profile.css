@@ -1,0 +1,63 @@
+/* Desktop Section Headers */
+.desktop-section-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.desktop-section-header h3 {
+  color: var(--mainWhite);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Desktop Form Styles */
+.desktop-form {
+  padding: 0;
+}
+
+.desktop-form .field-label {
+  color: var(--mainWhite);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-left: 0;
+}
+
+.desktop-form .button-container {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Mobile Styles */
+.form-container {
+  padding: 0 1rem;
+}
+
+.field-label {
+  color: var(--mainBlack);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+}
+
+.button-container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+/* Mobile Container Styles */
+.edit-profile-container,
+.edit-password-container {
+  width: 100%;
+}

@@ -1,0 +1,127 @@
+/* Category Filter Component Styles */
+.category-filter-container {
+  padding: 0 1rem 1rem;
+}
+
+.category-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.category-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  position: relative;
+  flex: 1;
+}
+
+.category-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.category-arrow {
+  width: 25px;
+  height: 32px;
+  background-color: #E8EDF2;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.category-arrow:hover {
+  background-color: #D1D5DB;
+}
+
+.category-arrow.left span {
+  transform: rotate(90deg);
+}
+
+.category-arrow.right span {
+  transform: rotate(-90deg);
+}
+
+.category-arrow span {
+  color: #0D141C;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+}
+
+.category-button {
+  background-color: #E8EDF2;
+  border-radius: 12px;
+  padding: 5.5px 1rem;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 21px;
+  color: #0D141C;
+  white-space: nowrap;
+}
+
+.category-button:hover {
+  background-color: #D1D5DB;
+}
+
+.category-button.active {
+  background-color: #0F5EB2;
+  color: #F7FAFC;
+}
+
+.category-button.active:hover {
+  background-color: #0D4A8F;
+}
+
+.category-button span {
+  color: inherit;
+}
+
+/* Legacy filter-button para compatibilidad */
+.filter-button {
+  border-radius: 12px;
+  border: none;
+  background-color: var(--mainGray);
+  padding: 4px 16px;
+  font-weight: 500;
+  font-size: 14px;
+  font-family: inherit;
+  box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .category-container {
+    gap: 0.5rem;
+  }
+  
+  .category-button {
+    padding: 5.5px 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .category-arrow {
+    width: 22px;
+    height: 28px;
+  }
+}

@@ -1,0 +1,79 @@
+/* Mobile */
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 24px;
+  padding: 8px;
+  background: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.search-bar {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 4px 8px;
+}
+
+/* Desktop */
+
+.search-bar-container-desktop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+}
+
+.search-bar-desktop {
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  background-color: rgb(55, 65, 81);
+  border: 1px solid rgba(100, 100, 100, 0.30);
+  border-radius: 0.5rem;
+  color: rgb(233, 232, 232);
+  font-size: 0.875rem;
+  min-width: 400px;
+  transition: all 0.2s ease;
+}
+
+.search-bar-desktop:focus {
+  outline: none;
+  border-color: var(--lightBlue, #60a5fa);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.search-bar-desktop::placeholder {
+  color: rgb(156, 163, 175);
+}
+
+.search-icon-desktop {
+  position: absolute;
+  left: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  color: rgb(156, 163, 175);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive adjustments */
+
+/* Para laptops pequeñas y pantallas medianas (1024px - 1280px) */
+@media (max-width: 1280px) {
+  .search-input {
+    min-width: 200px;
+  }
+}
+
+/* Para tablets y laptops muy pequeñas */
+@media (max-width: 1024px) {
+  .search-wrapper {
+    flex: 1 1 auto;
+    min-width: 180px;
+  }
+  
+  .search-input {
+    min-width: 180px;
+  }
+}
