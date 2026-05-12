@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, HttpCode, HttpStatus, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  Patch,
+} from '@nestjs/common';
+import { Public } from '../../auth/public.decorator';
 import { ProductsService } from './products.service';
 import { CreateProductDTO } from './dto/create-product-dto';
 import { UpdateProductDTO } from './dto/update-product-dto';
@@ -14,22 +26,25 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
+  @Public()
   @Get()
   findAll(): Promise<Product[]> {
     return this.productsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    return this.productsService.findOne(id);
-  }
-
+  @Public()
   @Get('category/:categoryId')
   findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number): Promise<Product[]> {
     return this.productsService.findByCategory(categoryId);
   }
 
-  @Patch(':id') //Usar patch o put?
+  @Public()
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+    return this.productsService.findOne(id);
+  }
+
+  @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDTO,

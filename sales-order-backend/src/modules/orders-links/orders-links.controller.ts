@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { Public } from '../../auth/public.decorator';
 import { OrdersLinksService } from './orders-links.service';
 import { CreateOrderLinkDto } from './dto/create-order-link-dto';
 import { UpdateOrderLinkDto } from './dto/update-order-link-dto';
@@ -19,22 +30,33 @@ export class OrdersLinksController {
     @Query('createdById') createdById?: string,
     @Query('isActive') isActive?: string,
   ): Promise<OrderLinkResponseDto[]> {
-    const filters: any = {};
-    if (orderId) filters.orderId = parseInt(orderId);
-    if (createdById) filters.createdById = parseInt(createdById);
+    const filters: {
+      orderId?: number;
+      createdById?: number;
+      isActive?: boolean;
+    } = {};
+    if (orderId) filters.orderId = parseInt(orderId, 10);
+    if (createdById) filters.createdById = parseInt(createdById, 10);
     if (isActive !== undefined) filters.isActive = isActive === 'true';
 
     return this.ordersLinksService.findAll(filters);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<OrderLinkResponseDto> {
-    return this.ordersLinksService.findOne(id);
-  }
-
+  @Public()
   @Get('token/:token')
   findByToken(@Param('token') token: string): Promise<OrderLinkResponseDto> {
     return this.ordersLinksService.findByToken(token);
+  }
+
+  @Public()
+  @Get('validate/:token')
+  validateToken(@Param('token') token: string): Promise<{ valid: boolean }> {
+    return this.ordersLinksService.validateToken(token).then((valid) => ({ valid }));
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<OrderLinkResponseDto> {
+    return this.ordersLinksService.findOne(id);
   }
 
   @Patch(':id')
@@ -53,10 +75,5 @@ export class OrdersLinksController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.ordersLinksService.remove(id);
-  }
-
-  @Get('validate/:token')
-  validateToken(@Param('token') token: string): Promise<{ valid: boolean }> {
-    return this.ordersLinksService.validateToken(token).then(valid => ({ valid }));
   }
 }
