@@ -1,21 +1,33 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Configurar ValidationPipe global
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // Solo permite propiedades definidas en DTOs
-    forbidNonWhitelisted: true, // Rechaza propiedades no definidas
-    transform: true, // Transforma tipos automáticamente
-  }));
 
-  // Configurar CORS
-  app.enableCors();
+  app.use(helmet());
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Aplicación ejecutándose en: http://localhost:${process.env.PORT ?? 3000}`);
+  const corsOrigins = process.env.CORS_ORIGINS?.split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  app.enableCors(
+    corsOrigins?.length
+      ? { origin: corsOrigins, credentials: true }
+      : { origin: true },
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  console.log(`Aplicación ejecutándose en: http://localhost:${port}`);
 }
 bootstrap();
