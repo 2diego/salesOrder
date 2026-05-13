@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 import { OrderStatus } from './ordersService';
 
 export interface CreateOrderValidationDTO {
@@ -31,7 +31,7 @@ export const ordersValidationsService = {
   
   async create(validationData: CreateOrderValidationDTO): Promise<OrderValidation> {
     try {
-      const response = await fetch(getApiUrl('/order-validations'), {
+      const response = await apiFetch('/order-validations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,9 +75,8 @@ export const ordersValidationsService = {
       if (filters?.orderId) params.append('orderId', filters.orderId.toString());
       if (filters?.validatedById) params.append('validatedById', filters.validatedById.toString());
 
-      const url = `${getApiUrl('/order-validations')}${params.toString() ? `?${params.toString()}` : ''}`;
-      
-      const response = await fetch(url, {
+      const qs = params.toString();
+      const response = await apiFetch(`/order-validations${qs ? `?${qs}` : ''}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +101,7 @@ export const ordersValidationsService = {
 
   async findOne(id: number): Promise<OrderValidation> {
     try {
-      const response = await fetch(getApiUrl(`/order-validations/${id}`), {
+      const response = await apiFetch(`/order-validations/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +131,7 @@ export const ordersValidationsService = {
 
   async findByOrderId(orderId: number): Promise<OrderValidation[]> {
     try {
-      const response = await fetch(getApiUrl(`/order-validations/order/${orderId}`), {
+      const response = await apiFetch(`/order-validations/order/${orderId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -157,7 +156,7 @@ export const ordersValidationsService = {
 
   async validateOrder(orderId: number, validatedById: number, status: OrderStatus, notes?: string): Promise<OrderValidation> {
     try {
-      const response = await fetch(getApiUrl(`/order-validations/validate`), {
+      const response = await apiFetch(`/order-validations/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 export interface CreateSellerDTO {
   username: string;
@@ -42,7 +42,7 @@ export const sellersService = {
         isActive: sellerData.isActive !== undefined ? sellerData.isActive : true
       };
 
-      const response = await fetch(getApiUrl('/users'), {
+      const response = await apiFetch('/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ export const sellersService = {
 
   async findAll(): Promise<Seller[]> {
     try {
-      const response = await fetch(getApiUrl('/users'), {
+      const response = await apiFetch('/users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export const sellersService = {
 
   async findOne(id: number): Promise<Seller> {
     try {
-      const response = await fetch(getApiUrl(`/users/${id}`), {
+      const response = await apiFetch(`/users/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ export const sellersService = {
 
   async update(id: number, updateData: UpdateSellerDTO): Promise<Seller> {
     try {
-      const response = await fetch(getApiUrl(`/users/${id}`), {
+      const response = await apiFetch(`/users/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +172,7 @@ export const sellersService = {
 
   async remove(id: number): Promise<{ message: string }> {
     try {
-      const response = await fetch(getApiUrl(`/users/${id}`), {
+      const response = await apiFetch(`/users/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

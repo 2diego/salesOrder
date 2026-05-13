@@ -5,8 +5,7 @@ import SectionTitle from "../../../components/common/SectionTitle/SectionTitle"
 import ProductList from "../../../components/common/ProductList/ProductList"
 import BtnBlue from "../../../components/common/BtnBlue/BtnBlue"
 import { ordersLinksService } from '../../../services/ordersLinksService'
-import { clientsService } from '../../../services/clientsService'
-import { ordersItemsService } from '../../../services/ordersItemsService'
+import { customerPortalService } from '../../../services/customerPortalService'
 import { productsService } from '../../../services/productsService'
 import type { ProductItem } from '../../../components/desktop/CustomerPanels/types'
 import { mapOrderItemToProductItem, mergeProductItemsWithCatalog } from '../../../utils/mapProductItem'
@@ -73,11 +72,11 @@ const Cart = () => {
         }
 
         // 2. Obtener todos los datos del cliente
-        const client = await clientsService.findOne(clientId)
+        const client = await customerPortalService.findClient(clientId, token)
         setClientName(client.name)
 
         // 3. Cargar items de la orden existentes si hay alguno
-        const existingItems = await ordersItemsService.findAll({ orderId: orderIdValue })
+        const existingItems = await customerPortalService.findOrderItems(orderIdValue, token)
 
         // Catálogo para completar imageUrl (localStorage suele no traerla)
         const catalog = await productsService.findAll()
@@ -102,9 +101,8 @@ const Cart = () => {
 
         setProducts(selectedProducts)
         
-      } catch (err: any) {
-        console.error('Error loading data:', err)
-        setError(err.message || 'Error al cargar los datos')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al cargar los datos')
       } finally {
         setLoading(false)
       }
@@ -172,11 +170,14 @@ const Cart = () => {
 
       // Crear items de la orden para cada producto con cantidad > 0
       for (const product of productsToSend) {
-        await ordersItemsService.create({
-          orderId: orderId,
-          productId: parseInt(product.id),
-          quantity: product.quantity
-        })
+        await customerPortalService.createOrderItem(
+          {
+            orderId,
+            productId: parseInt(product.id, 10),
+            quantity: product.quantity,
+          },
+          token,
+        )
       }
 
       // Limpiar localStorage
@@ -185,9 +186,8 @@ const Cart = () => {
       // Navegar a CustomerOrderHistory para mostrar el pedido enviado
       navigate(`/CustomerOrderHistory?token=${token}`)
       
-    } catch (err: any) {
-      console.error('Error sending order:', err)
-      setError(err.message || 'Error al enviar el pedido')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al enviar el pedido')
       setSending(false)
     }
   }

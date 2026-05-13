@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 export interface CreateOrderItemDTO {
   orderId: number;
@@ -37,7 +37,7 @@ export const ordersItemsService = {
   
   async create(itemData: CreateOrderItemDTO): Promise<OrderItem> {
     try {
-      const response = await fetch(getApiUrl('/order-items'), {
+      const response = await apiFetch('/order-items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,9 +77,8 @@ export const ordersItemsService = {
       if (filters?.orderId) params.append('orderId', filters.orderId.toString());
       if (filters?.productId) params.append('productId', filters.productId.toString());
 
-      const url = `${getApiUrl('/order-items')}${params.toString() ? `?${params.toString()}` : ''}`;
-      
-      const response = await fetch(url, {
+      const qs = params.toString();
+      const response = await apiFetch(`/order-items${qs ? `?${qs}` : ''}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +103,7 @@ export const ordersItemsService = {
 
   async findOne(id: number): Promise<OrderItem> {
     try {
-      const response = await fetch(getApiUrl(`/order-items/${id}`), {
+      const response = await apiFetch(`/order-items/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +133,7 @@ export const ordersItemsService = {
 
   async update(id: number, updateData: UpdateOrderItemDTO): Promise<OrderItem> {
     try {
-      const response = await fetch(getApiUrl(`/order-items/${id}`), {
+      const response = await apiFetch(`/order-items/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +168,7 @@ export const ordersItemsService = {
 
   async remove(id: number): Promise<void> {
     try {
-      const response = await fetch(getApiUrl(`/order-items/${id}`), {
+      const response = await apiFetch(`/order-items/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -200,7 +199,7 @@ export const ordersItemsService = {
 
   async findByOrderId(orderId: number): Promise<OrderItem[]> {
     try {
-      const response = await fetch(getApiUrl(`/order-items/order/${orderId}`), {
+      const response = await apiFetch(`/order-items/order/${orderId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

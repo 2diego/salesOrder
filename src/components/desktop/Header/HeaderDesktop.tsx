@@ -4,6 +4,7 @@ import BtnBlue from '../../common/BtnBlue/BtnBlue';
 import HeaderNotification from '../HeaderNotification/HeaderNotification';
 import CreateLink from '../../../pages/Admin/mobile/Orders/CreateLink';
 import { ordersService, OrderStatus } from '../../../services/ordersService';
+import { logout as authLogout } from '../../../services/authService';
 import './HeaderDesktop.css';
 
 const HeaderDesktop = () => {
@@ -47,9 +48,9 @@ const HeaderDesktop = () => {
   };
 
   const handleLogout = () => {
-    // Implementar logica de logout
-    console.log('Logout clicked');
+    authLogout();
     setShowUserMenu(false);
+    navigate('/login');
   };
 
   const handleProfile = () => {

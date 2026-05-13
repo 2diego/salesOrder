@@ -1,7 +1,9 @@
-import { StrictMode } from 'react'
+import { StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import Login from './pages/Login';
+import { getStoredToken } from './services/http';
 import Orders from './pages/Admin/mobile/Orders/Orders';
 import Reports from './pages/Admin/mobile/Reports/Reports';
 import Manage from './pages/Admin/mobile/Manage/Manage';
@@ -51,10 +53,25 @@ const HistoryOrderDetailsRoute = () => {
   return isDesktop ? <CustomerDesktop /> : <HistoryOrderDetails />;
 };
 
+function RequireAuth({ children }: { children: ReactNode }) {
+  if (!getStoredToken()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+}
+
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     path: "/",
-    element: <AdminLayout />,  
+    element: (
+      <RequireAuth>
+        <AdminLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: "/",
