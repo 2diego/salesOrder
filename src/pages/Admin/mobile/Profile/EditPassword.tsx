@@ -4,6 +4,7 @@ import SectionTitle from "../../../../components/common/SectionTitle/SectionTitl
 import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue";
 import FormField from "../../../../components/common/FormField/FormField";
 import { useState } from "react";
+import { changeOwnPassword } from "../../../../services/usersPasswordService";
 import './Profile.css';
 
 interface EditPasswordProps {
@@ -16,6 +17,8 @@ const EditPassword: React.FC<EditPasswordProps> = ({ desktop = false }) => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordData(prev => ({
@@ -24,8 +27,26 @@ const EditPassword: React.FC<EditPasswordProps> = ({ desktop = false }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log('Updating password:', passwordData);
+  const handleSubmit = async () => {
+    setFeedback(null);
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setFeedback('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setFeedback('La nueva contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    setSaving(true);
+    try {
+      await changeOwnPassword(passwordData.currentPassword, passwordData.newPassword);
+      setFeedback('Contraseña actualizada correctamente');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (e) {
+      setFeedback(e instanceof Error ? e.message : 'No se pudo actualizar');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const content = (
@@ -82,9 +103,14 @@ const EditPassword: React.FC<EditPasswordProps> = ({ desktop = false }) => {
           onChange={handleInputChange('confirmPassword')}
         />
 
+        {feedback && (
+          <p style={{ marginBottom: 12, color: feedback.includes('correctamente') ? '#2e7d32' : '#c62828' }}>
+            {feedback}
+          </p>
+        )}
         <div className="button-container">
-          <BtnBlue width="100%" height="3rem" onClick={handleSubmit}>
-            <span>Cambiar contraseña</span>
+          <BtnBlue width="100%" height="3rem" onClick={() => void handleSubmit()} disabled={saving}>
+            <span>{saving ? 'Guardando…' : 'Cambiar contraseña'}</span>
           </BtnBlue>
         </div>
 

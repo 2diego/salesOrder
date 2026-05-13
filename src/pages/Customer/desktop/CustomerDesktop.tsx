@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '../../../components/common/Header/Header';
 import { ordersLinksService } from '../../../services/ordersLinksService';
-import { clientsService } from '../../../services/clientsService';
+import { customerPortalService } from '../../../services/customerPortalService';
 import { productsService, Product } from '../../../services/productsService';
 import { categoriesService } from '../../../services/categoriesService';
-import { ordersItemsService } from '../../../services/ordersItemsService';
-import { ordersService, Order } from '../../../services/ordersService';
+import type { Order } from '../../../services/ordersService';
+import type { OrderItem } from '../../../services/ordersItemsService';
 import {
   ClientDataPanel,
   ProductsPanel,
@@ -83,7 +83,7 @@ const CustomerDesktop = () => {
           setExpiresAt(orderLink.expiresAt);
         }
 
-        const client = await clientsService.findOne(clientId);
+        const client = await customerPortalService.findClient(clientId, token);
         setClientName(client.name);
         setClientAddress(client.address || '');
 
@@ -94,7 +94,7 @@ const CustomerDesktop = () => {
         const activeCategories = categoriesData.filter((cat) => cat.isActive);
         setCategories(['Todos', ...activeCategories.map((cat) => cat.name)]);
 
-        const existingItems = await ordersItemsService.findAll({ orderId: orderIdValue });
+        const existingItems = await customerPortalService.findOrderItems(orderIdValue, token);
         const savedProducts = localStorage.getItem(`cart-${token}`);
 
         if (existingItems.length > 0) {
@@ -117,8 +117,8 @@ const CustomerDesktop = () => {
                 initialQuantities[product.id] = product.quantity;
               }
             });
-          } catch (e) {
-            console.error('Error parsing saved products:', e);
+          } catch {
+            /* localStorage inválido */
           }
         }
 
@@ -131,16 +131,15 @@ const CustomerDesktop = () => {
         setFilteredProducts(mappedProducts);
         setProductQuantities(initialQuantities);
 
-        const clientOrders = await ordersService.findAll({ clientId });
+        const clientOrders = await customerPortalService.findOrdersByClient(clientId, token);
         const sortedOrders = clientOrders.sort((a, b) => {
           const dateA = new Date(a.createdAt).getTime();
           const dateB = new Date(b.createdAt).getTime();
           return dateB - dateA;
         });
         setOrders(sortedOrders);
-      } catch (err: any) {
-        console.error('Error loading data:', err);
-        setError(err.message || 'Error al cargar los datos');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al cargar los datos');
       } finally {
         setLoading(false);
       }
@@ -265,18 +264,20 @@ const CustomerDesktop = () => {
       setError(null);
 
       for (const product of productsToSend) {
-        await ordersItemsService.create({
-          orderId,
-          productId: parseInt(product.id),
-          quantity: product.quantity,
-        });
+        await customerPortalService.createOrderItem(
+          {
+            orderId,
+            productId: parseInt(product.id, 10),
+            quantity: product.quantity,
+          },
+          token,
+        );
       }
 
       localStorage.removeItem(`cart-${token}`);
       setOrderSent(true);
-    } catch (err: any) {
-      console.error('Error sending order:', err);
-      setError(err.message || 'Error al enviar el pedido');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al enviar el pedido');
       setSending(false);
     }
   };
@@ -287,11 +288,14 @@ const CustomerDesktop = () => {
     setHistoryProducts([]);
 
     try {
-      const items = await ordersItemsService.findAll({ orderId: order.id });
-      const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
+      if (!token) return;
+      const items = await customerPortalService.findOrderItems(order.id, token);
+      const mappedProducts: ProductItem[] = items.map((item) =>
+        mapOrderItemToProductItem(item as OrderItem),
+      );
       setHistoryProducts(mappedProducts);
-    } catch (err) {
-      console.error('Error loading history order details:', err);
+    } catch {
+      /* ignorar */
     } finally {
       setLoadingHistoryDetail(false);
     }

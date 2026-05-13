@@ -6,6 +6,8 @@ import BtnBlue from "../../../components/common/BtnBlue/BtnBlue";
 import ProductList from "../../../components/common/ProductList/ProductList";
 import { ordersService, OrderStatus } from '../../../services/ordersService';
 import { ordersItemsService } from '../../../services/ordersItemsService';
+import type { OrderItem } from '../../../services/ordersItemsService';
+import { customerPortalService } from '../../../services/customerPortalService';
 import type { ProductItem } from '../../../components/desktop/CustomerPanels/types';
 import { mapOrderItemToProductItem } from '../../../utils/mapProductItem';
 
@@ -41,7 +43,9 @@ const HistoryOrderDetails = () => {
         setError(null);
 
         // 1. Cargar datos de la orden
-        const orderData = await ordersService.findOne(parseInt(id));
+        const orderData = token
+          ? await customerPortalService.findOrder(parseInt(id, 10), token)
+          : await ordersService.findOne(parseInt(id, 10));
         
         // Formatear número de pedido
         setOrderNumber(`Pedido Nº ${orderData.id.toString().padStart(6, '0')}`);
@@ -57,23 +61,26 @@ const HistoryOrderDetails = () => {
         setClientName(orderData.client?.name || 'Sin cliente');
 
         // 2. Cargar items de la orden
-        const items = await ordersItemsService.findAll({ orderId: orderData.id });
+        const items = token
+          ? await customerPortalService.findOrderItems(orderData.id, token)
+          : await ordersItemsService.findAll({ orderId: orderData.id });
 
-        // 3. Mapear items a formato ProductItem
-        const mappedProducts: ProductItem[] = items.map((item) => mapOrderItemToProductItem(item));
+        // 3. Mapear items a ProductItem
+          const mappedProducts: ProductItem[] = items.map((item) =>
+          mapOrderItemToProductItem(item as OrderItem),
+        );
 
         setProducts(mappedProducts);
 
-      } catch (err: any) {
-        console.error('Error loading order data:', err);
-        setError(err.message || 'Error al cargar los datos del pedido');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al cargar los datos del pedido');
       } finally {
         setLoading(false);
       }
     };
 
     loadOrderData();
-  }, [id]);
+  }, [id, token]);
 
   const handleRepeatOrder = () => {
     if (!token) return;
@@ -91,10 +98,12 @@ const HistoryOrderDetails = () => {
     try {
       setProcessing(true);
       setError(null);
-      const updated = await ordersService.updateStatus(parseInt(id), OrderStatus.PROCESSED);
+      const updated = token
+        ? await customerPortalService.updateOrderStatus(parseInt(id, 10), OrderStatus.PROCESSED, token)
+        : await ordersService.updateStatus(parseInt(id, 10), OrderStatus.PROCESSED);
       setOrderStatus(updated.status);
-    } catch (err: any) {
-      setError(err.message || 'No se pudo marcar el pedido como cargado');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'No se pudo marcar el pedido como cargado');
     } finally {
       setProcessing(false);
     }

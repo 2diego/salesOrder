@@ -9,10 +9,9 @@ import ProductList from '../../../components/common/ProductList/ProductList'
 import SectionTitle from '../../../components/common/SectionTitle/SectionTitle'
 import { Link } from 'react-router-dom'
 import { ordersLinksService } from '../../../services/ordersLinksService'
-import { clientsService } from '../../../services/clientsService'
+import { customerPortalService } from '../../../services/customerPortalService'
 import { productsService, Product } from '../../../services/productsService'
 import { categoriesService } from '../../../services/categoriesService'
-import { ordersItemsService } from '../../../services/ordersItemsService'
 import type { ProductItem } from '../../../components/desktop/CustomerPanels/types'
 import { mapApiProductToItem } from '../../../utils/mapProductItem'
 
@@ -77,7 +76,7 @@ const NewOrder = () => {
         }
 
         // 2. Get data del cliente (direccion)
-        const client = await clientsService.findOne(clientId)
+        const client = await customerPortalService.findClient(clientId, token)
         setClientName(client.name)
         setClientAddress(client.address || '')
 
@@ -92,7 +91,7 @@ const NewOrder = () => {
         setCategories(categoryNames)
 
         // 5. Cargar items de la orden existentes o estado guardado
-        const existingItems = await ordersItemsService.findAll({ orderId: orderId })
+        const existingItems = await customerPortalService.findOrderItems(orderId, token)
         const savedProducts = localStorage.getItem(`cart-${token}`)
         
         // Si ya hay items existentes en el backend, el pedido ya fue enviado

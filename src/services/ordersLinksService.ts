@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 export interface CreateOrderLinkDTO {
   orderId: number;
@@ -36,71 +36,57 @@ export interface OrderLink {
   };
 }
 
+async function handle<T>(response: Response, fallback: string): Promise<T> {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error((errorData as { message?: string }).message ?? fallback);
+  }
+  return response.json() as Promise<T>;
+}
+
 export const ordersLinksService = {
   async create(linkData: CreateOrderLinkDTO): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl('/order-links'), {
+      const response = await apiFetch('/order-links', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(linkData),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 404) {
-          throw new Error(errorData.message || 'Orden o usuario no encontrado');
-        }
-        
-        if (response.status === 409) {
-          throw new Error(errorData.message || 'Ya existe un enlace activo para esta orden');
-        }
-
-        if (response.status === 400) {
-          throw new Error(errorData.message || 'Datos inválidos. Por favor verifica los campos');
-        }
-
-        throw new Error(errorData.message || 'Error al crear el enlace');
+        const msg = (errorData as { message?: string }).message;
+        if (response.status === 404) throw new Error(msg || 'Orden o usuario no encontrado');
+        if (response.status === 409)
+          throw new Error(msg || 'Ya existe un enlace activo para esta orden');
+        if (response.status === 400)
+          throw new Error(msg || 'Datos inválidos. Por favor verifica los campos');
+        throw new Error(msg || 'Error al crear el enlace');
       }
 
-      const newLink: OrderLink = await response.json();
-      return newLink;
-
+      return response.json() as Promise<OrderLink>;
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
       }
-      
       throw error;
     }
   },
 
-  async findAll(filters?: { orderId?: number; createdById?: number; isActive?: boolean }): Promise<OrderLink[]> {
+  async findAll(filters?: {
+    orderId?: number;
+    createdById?: number;
+    isActive?: boolean;
+  }): Promise<OrderLink[]> {
     try {
       const params = new URLSearchParams();
       if (filters?.orderId) params.append('orderId', filters.orderId.toString());
       if (filters?.createdById) params.append('createdById', filters.createdById.toString());
       if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
 
-      const url = `${getApiUrl('/order-links')}${params.toString() ? `?${params.toString()}` : ''}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const qs = params.toString();
+      const response = await apiFetch(`/order-links${qs ? `?${qs}` : ''}`, { method: 'GET' });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al obtener los enlaces');
-      }
-
-      const links: OrderLink[] = await response.json();
-      return links;
-
+      return handle<OrderLink[]>(response, 'Error al obtener los enlaces');
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
@@ -111,26 +97,13 @@ export const ordersLinksService = {
 
   async findOne(id: number): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/order-links/${id}`), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const response = await apiFetch(`/order-links/${id}`, { method: 'GET' });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 404) {
-          throw new Error('Enlace no encontrado');
-        }
-
-        throw new Error(errorData.message || 'Error al obtener el enlace');
+        if (response.status === 404) throw new Error('Enlace no encontrado');
+        throw new Error((errorData as { message?: string }).message || 'Error al obtener el enlace');
       }
-
-      const link: OrderLink = await response.json();
-      return link;
-
+      return response.json() as Promise<OrderLink>;
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
@@ -141,26 +114,14 @@ export const ordersLinksService = {
 
   async findByToken(token: string): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/order-links/token/${token}`), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const encoded = encodeURIComponent(token);
+      const response = await apiFetch(`/order-links/token/${encoded}`, { method: 'GET' });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 404) {
-          throw new Error('Enlace no encontrado o ha expirado');
-        }
-
-        throw new Error(errorData.message || 'Error al validar el enlace');
+        if (response.status === 404) throw new Error('Enlace no encontrado o ha expirado');
+        throw new Error((errorData as { message?: string }).message || 'Error al validar el enlace');
       }
-
-      const link: OrderLink = await response.json();
-      return link;
-
+      return response.json() as Promise<OrderLink>;
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
@@ -171,27 +132,16 @@ export const ordersLinksService = {
 
   async update(id: number, updateData: UpdateOrderLinkDTO): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/order-links/${id}`), {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await apiFetch(`/order-links/${id}`, {
+        method: 'PATCH',
         body: JSON.stringify(updateData),
       });
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 404) {
-          throw new Error('Enlace no encontrado');
-        }
-
-        throw new Error(errorData.message || 'Error al actualizar el enlace');
+        if (response.status === 404) throw new Error('Enlace no encontrado');
+        throw new Error((errorData as { message?: string }).message || 'Error al actualizar el enlace');
       }
-
-      const updatedLink: OrderLink = await response.json();
-      return updatedLink;
-
+      return response.json() as Promise<OrderLink>;
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
@@ -202,26 +152,15 @@ export const ordersLinksService = {
 
   async deactivate(id: number): Promise<OrderLink> {
     try {
-      const response = await fetch(getApiUrl(`/order-links/${id}/deactivate`), {
+      const response = await apiFetch(`/order-links/${id}/deactivate`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 404) {
-          throw new Error('Enlace no encontrado');
-        }
-
-        throw new Error(errorData.message || 'Error al desactivar el enlace');
+        if (response.status === 404) throw new Error('Enlace no encontrado');
+        throw new Error((errorData as { message?: string }).message || 'Error al desactivar el enlace');
       }
-
-      const deactivatedLink: OrderLink = await response.json();
-      return deactivatedLink;
-
+      return response.json() as Promise<OrderLink>;
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
@@ -232,23 +171,12 @@ export const ordersLinksService = {
 
   async remove(id: number): Promise<void> {
     try {
-      const response = await fetch(getApiUrl(`/order-links/${id}`), {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const response = await apiFetch(`/order-links/${id}`, { method: 'DELETE' });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 404) {
-          throw new Error('Enlace no encontrado');
-        }
-
-        throw new Error(errorData.message || 'Error al eliminar el enlace');
+        if (response.status === 404) throw new Error('Enlace no encontrado');
+        throw new Error((errorData as { message?: string }).message || 'Error al eliminar el enlace');
       }
-
     } catch (error) {
       if (error instanceof TypeError) {
         throw new Error('No se pudo conectar con el servidor.');
@@ -259,23 +187,13 @@ export const ordersLinksService = {
 
   async validateToken(token: string): Promise<boolean> {
     try {
-      const response = await fetch(getApiUrl(`/orders-links/token/${token}/validate`), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        return false;
-      }
-
+      const encoded = encodeURIComponent(token);
+      const response = await apiFetch(`/order-links/validate/${encoded}`, { method: 'GET' });
+      if (!response.ok) return false;
       const result: { valid: boolean } = await response.json();
       return result.valid;
-
-    } catch (error) {
+    } catch {
       return false;
     }
-  }
+  },
 };
-

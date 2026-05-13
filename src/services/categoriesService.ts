@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 export interface Category {
   id: number;
@@ -17,7 +17,7 @@ export interface CreateCategoryDTO {
 export const categoriesService = {
   async create(categoryData: CreateCategoryDTO): Promise<Category> {
     try {
-      const response = await fetch(getApiUrl('/categories'), {
+      const response = await apiFetch('/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const categoriesService = {
 
   async findAll(): Promise<Category[]> {
     try {
-      const response = await fetch(getApiUrl('/categories'), {
+      const response = await apiFetch('/categories', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ export const categoriesService = {
 
   async findOne(id: number): Promise<Category> {
     try {
-      const response = await fetch(getApiUrl(`/categories/${id}`), {
+      const response = await apiFetch(`/categories/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

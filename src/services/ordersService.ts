@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 export enum OrderStatus {
   PENDING = 'pending',
@@ -58,7 +58,7 @@ export type PagedResult<T> = {
 export const ordersService = {
   async create(orderData: CreateOrderDTO): Promise<Order> {
     try {
-      const response = await fetch(getApiUrl('/orders'), {
+      const response = await apiFetch('/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,9 +95,8 @@ export const ordersService = {
       if (filters?.createdById) params.append('createdById', filters.createdById.toString());
       if (filters?.status) params.append('status', filters.status);
 
-      const url = `${getApiUrl('/orders')}${params.toString() ? `?${params.toString()}` : ''}`;
-      
-      const response = await fetch(url, {
+      const qs = params.toString();
+      const response = await apiFetch(`/orders${qs ? `?${qs}` : ''}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -128,8 +127,7 @@ export const ordersService = {
       if (params.status) qs.append('status', params.status);
       if (params.q) qs.append('q', params.q);
 
-      const url = `${getApiUrl('/orders/paged')}?${qs.toString()}`;
-      const response = await fetch(url, {
+      const response = await apiFetch(`/orders/paged?${qs.toString()}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +151,7 @@ export const ordersService = {
 
   async findOne(id: number): Promise<Order> {
     try {
-      const response = await fetch(getApiUrl(`/orders/${id}`), {
+      const response = await apiFetch(`/orders/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +181,7 @@ export const ordersService = {
 
   async update(id: number, updateData: UpdateOrderDTO): Promise<Order> {
     try {
-      const response = await fetch(getApiUrl(`/orders/${id}`), {
+      const response = await apiFetch(`/orders/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -218,7 +216,7 @@ export const ordersService = {
 
   async remove(id: number): Promise<void> {
     try {
-      const response = await fetch(getApiUrl(`/orders/${id}`), {
+      const response = await apiFetch(`/orders/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +247,7 @@ export const ordersService = {
 
   async updateStatus(id: number, status: OrderStatus): Promise<Order> {
     try {
-      const response = await fetch(getApiUrl(`/orders/${id}/status`), {
+      const response = await apiFetch(`/orders/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

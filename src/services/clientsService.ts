@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 //findOne, update y remove se usarian en el edit
 
@@ -50,7 +50,7 @@ export const clientsService = {
   
   async create(clientData: CreateClientDTO): Promise<Client> {
     try {
-      const response = await fetch(getApiUrl('/clients'), {
+      const response = await apiFetch('/clients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export const clientsService = {
   
   async findAll(): Promise<Client[]> {
     try {
-      const response = await fetch(getApiUrl('/clients'), {
+      const response = await apiFetch('/clients', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export const clientsService = {
   
   async findOne(id: number): Promise<Client> {
     try {
-      const response = await fetch(getApiUrl(`/clients/${id}`), {
+      const response = await apiFetch(`/clients/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export const clientsService = {
   
   async update(id: number, updateData: UpdateClientDTO): Promise<Client> {
     try {
-      const response = await fetch(getApiUrl(`/clients/${id}`), {
+      const response = await apiFetch(`/clients/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ export const clientsService = {
   
   async remove(id: number): Promise<{ message: string }> {
     try {
-      const response = await fetch(getApiUrl(`/clients/${id}`), {
+      const response = await apiFetch(`/clients/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export const clientsService = {
 
   async findCitiesByProvince(state: string): Promise<string[]> {
     try {
-      const response = await fetch(getApiUrl(`/clients/cities?state=${encodeURIComponent(state)}`), {
+      const response = await apiFetch(`/clients/cities?state=${encodeURIComponent(state)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

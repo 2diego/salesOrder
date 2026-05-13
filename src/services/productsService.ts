@@ -1,4 +1,4 @@
-import { getApiUrl } from '../config/api.config';
+import { apiFetch } from './http';
 
 export interface CreateProductDTO {
   name: string;
@@ -46,7 +46,7 @@ export const productsService = {
   
   async create(productData: CreateProductDTO): Promise<Product> {
     try {
-      const response = await fetch(getApiUrl('/products'), {
+      const response = await apiFetch('/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export const productsService = {
 
   async findAll(): Promise<Product[]> {
     try {
-      const response = await fetch(getApiUrl('/products'), {
+      const response = await apiFetch('/products', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export const productsService = {
 
   async findOne(id: number): Promise<Product> {
     try {
-      const response = await fetch(getApiUrl(`/products/${id}`), {
+      const response = await apiFetch(`/products/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ export const productsService = {
 
   async findByCategory(categoryId: number): Promise<Product[]> {
     try {
-      const response = await fetch(getApiUrl(`/products/category/${categoryId}`), {
+      const response = await apiFetch(`/products/category/${categoryId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ export const productsService = {
 
   async update(id: number, updateData: UpdateProductDTO): Promise<Product> {
     try {
-      const response = await fetch(getApiUrl(`/products/${id}`), {
+      const response = await apiFetch(`/products/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ export const productsService = {
 
   async remove(id: number): Promise<{ message: string }> {
     try {
-      const response = await fetch(getApiUrl(`/products/${id}`), {
+      const response = await apiFetch(`/products/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

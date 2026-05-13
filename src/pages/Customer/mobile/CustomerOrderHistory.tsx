@@ -6,8 +6,8 @@ import BtnBlue from "../../../components/common/BtnBlue/BtnBlue";
 import InfoRow from '../../../components/common/InfoRow/InfoRow'
 import { LuClipboardList } from 'react-icons/lu'
 import { ordersLinksService } from '../../../services/ordersLinksService'
-import { clientsService } from '../../../services/clientsService'
-import { ordersService, Order } from '../../../services/ordersService'
+import { customerPortalService } from '../../../services/customerPortalService'
+import type { Order } from '../../../services/ordersService'
 import { useNavigate } from 'react-router-dom'
 
 const CustomerOrderHistory = () => {
@@ -49,11 +49,11 @@ const CustomerOrderHistory = () => {
         }
 
         // 2. Get datos del cliente (nombre)
-        const client = await clientsService.findOne(clientId)
+        const client = await customerPortalService.findClient(clientId, token)
         setClientName(client.name)
 
-        // 3. Cargar todas las ordenes para este cliente
-        const clientOrders = await ordersService.findAll({ clientId })
+        // 3. Cargar todas las ordenes del cliente
+        const clientOrders = await customerPortalService.findOrdersByClient(clientId, token)
         // Ordenar por fecha de creación (más reciente primero)
         const sortedOrders = clientOrders.sort((a, b) => {
           const dateA = new Date(a.createdAt).getTime()
@@ -62,9 +62,8 @@ const CustomerOrderHistory = () => {
         })
         setOrders(sortedOrders)
 
-      } catch (err: any) {
-        console.error('Error loading data:', err)
-        setError(err.message || 'Error al cargar los datos')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error al cargar los datos')
       } finally {
         setLoading(false)
       }
