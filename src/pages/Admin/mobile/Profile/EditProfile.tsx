@@ -1,91 +1,199 @@
-﻿import Header from "../../../../components/common/Header/Header";
-import { Link } from "react-router-dom";
-import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
-import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue";
-import FormField from "../../../../components/common/FormField/FormField";
-import { useState } from "react";
+﻿import Header from '../../../../components/common/Header/Header';
+import { Link } from 'react-router-dom';
+import SectionTitle from '../../../../components/common/SectionTitle/SectionTitle';
+import BtnBlue from '../../../../components/common/BtnBlue/BtnBlue';
+import FormField from '../../../../components/common/FormField/FormField';
+import { useCallback, useEffect, useState } from 'react';
 import './Profile.css';
+import { useAuth } from '../../../../context/AuthContext';
+import { fetchMyProfile, updateMyProfile } from '../../../../services/profileService';
 
 interface EditProfileProps {
   desktop?: boolean;
 }
 
 const EditProfile: React.FC<EditProfileProps> = ({ desktop = false }) => {
+  const { user, status } = useAuth();
+
   const [profileData, setProfileData] = useState({
-    name: 'Nombre usuario',
-    email: 'usuario@example.com'
+    name: '',
+    email: '',
+    phone: '',
   });
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfileData(prev => ({
-      ...prev,
-      [field]: e.target.value
-    }));
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      setLoadError(null);
+      setLoading(true);
+      try {
+        const profile = await fetchMyProfile();
+        if (!cancelled) {
+          setProfileData({
+            name: profile.name,
+            email: profile.email,
+            phone: profile.phone,
+          });
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setLoadError(e instanceof Error ? e.message : 'No se pudo cargar el perfil');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
+
+  const handleInputChange = useCallback((field: 'name' | 'email' | 'phone') => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setProfileData((prev) => ({ ...prev, [field]: value }));
+      setSaveSuccess(false);
+    };
+  }, []);
+
+  const handleSubmit = async () => {
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    const name = profileData.name.trim();
+    const email = profileData.email.trim();
+    const phone = profileData.phone.trim();
+
+    if (!name || !email) {
+      setSaveError('Nombre y correo son obligatorios');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const updated = await updateMyProfile({ name, email, phone });
+      setProfileData({
+        name: updated.name,
+        email: updated.email,
+        phone: updated.phone,
+      });
+      setSaveSuccess(true);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'No se pudo guardar');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleSubmit = () => {
-    console.log('Updating profile:', profileData);
-  };
+  const headerTitle = profileData.name.trim() || user?.username || 'Perfil';
+  const roleSubtitle =
+    user?.role === 'admin' ? 'Admin' : user?.role === 'seller' ? 'Vendedor' : 'Usuario';
 
   const content = (
     <div className={`edit-profile-container ${desktop ? 'desktop-edit-profile' : ''}`}>
-      {/* Desktop Header */}
       {desktop && (
         <div className="desktop-section-header">
           <h3>Modificar Perfil</h3>
         </div>
       )}
 
-      {/* Mobile Header */}
       {!desktop && (
-        <Header title="Nombre usuario" subtitle="Admin">
-          <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
+        <Header title={headerTitle} subtitle={roleSubtitle}>
+          <Link to="/Profile" aria-label="Cerrar">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </Link>
         </Header>
       )}
 
-      {/* Mobile Title */}
       {!desktop && (
         <SectionTitle>
           <h2>Modificar perfil</h2>
         </SectionTitle>
       )}
 
-      {/* Form Fields */}
       <div className={`form-container ${desktop ? 'desktop-form' : ''}`}>
-        <h4 className="field-label">Nombre</h4>
-        <FormField
-          label="nombre"
-          value={profileData.name}
-          placeholder="Ej: Juan Perez"
-          editable={true}
-          onChange={handleInputChange('name')}
-        />
+        {loading ? (
+          <p className="profile-feedback">Cargando datos del perfil…</p>
+        ) : null}
 
-        <h4 className="field-label">Email</h4>
-        <FormField
-          label="email"
-          value={profileData.email}
-          placeholder="Ej: juanperez@example.com"
-          editable={true}
-          onChange={handleInputChange('email')}
-        />
+        {loadError ? (
+          <p className="profile-feedback profile-feedback--error" role="alert">
+            {loadError}
+          </p>
+        ) : null}
 
-        <div className="button-container">
-          <BtnBlue width="100%" height="3rem" onClick={handleSubmit}>
-            <span>Guardar cambios</span>
-          </BtnBlue>
-        </div>
+        {!loading && !loadError ? (
+          <>
+            <h4 className="field-label">Nombre</h4>
+            <FormField
+              label="nombre"
+              value={profileData.name}
+              placeholder="Ej: Juan Pérez"
+              editable={true}
+              onChange={handleInputChange('name')}
+            />
 
-        {/* Back Button mobile */}
-        {!desktop && (
+            <h4 className="field-label">Correo electrónico</h4>
+            <FormField
+              label="email"
+              value={profileData.email}
+              placeholder="Ej: juan@example.com"
+              editable={true}
+              onChange={handleInputChange('email')}
+            />
+
+            <h4 className="field-label">Teléfono</h4>
+            <FormField
+              label="teléfono"
+              value={profileData.phone}
+              placeholder="Ej: +54 11 1234-5678"
+              editable={true}
+              onChange={handleInputChange('phone')}
+            />
+
+            {saveError ? (
+              <p className="profile-feedback profile-feedback--error" role="alert">
+                {saveError}
+              </p>
+            ) : null}
+
+            {saveSuccess ? (
+              <p className="profile-feedback profile-feedback--success" role="status">
+                Cambios guardados correctamente.
+              </p>
+            ) : null}
+
+            <div className="button-container">
+              <BtnBlue width="100%" height="3rem" onClick={() => void handleSubmit()} disabled={saving}>
+                <span>{saving ? 'Guardando…' : 'Guardar cambios'}</span>
+              </BtnBlue>
+            </div>
+          </>
+        ) : null}
+
+        {!desktop ? (
           <Link to="/Profile" style={{ textDecoration: 'none', color: 'inherit' }}>
             <BtnBlue width="100%" height="3rem" isBackButton={true}>
               <span>Volver</span>
             </BtnBlue>
           </Link>
-        )}
+        ) : null}
       </div>
     </div>
   );

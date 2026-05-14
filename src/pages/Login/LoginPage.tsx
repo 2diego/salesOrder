@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getStoredToken } from '../../services/http';
+import { useAuth } from '../../context/AuthContext';
 import LoginForm from './LoginForm';
 import './Login.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { status } = useAuth();
 
   useEffect(() => {
-    if (getStoredToken()) {
+    if (status === 'authenticated') {
       navigate('/', { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, status]);
 
   return (
     <div className="login-page">

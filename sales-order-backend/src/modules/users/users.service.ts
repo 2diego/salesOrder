@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -9,6 +10,7 @@ import { Repository, QueryDeepPartialEntity } from 'typeorm';
 import { User, UserRole } from '../../entities/user.entity';
 import { CreateUserDTO } from './dto/create-user-dto';
 import { UpdateUserDTO } from './dto/update-user-dto';
+import { UpdateOwnProfileDto } from './dto/update-own-profile.dto';
 import { UserResponseDTO } from './dto/user-response-dto';
 import * as bcrypt from 'bcrypt';
 
@@ -71,6 +73,60 @@ export class UsersService {
     return this.userRepository.findOne({
       where: { username, isActive: true },
     });
+  }
+
+  /**
+   * Actualización restringida al perfil propio: no expone vía API campos privilegiados.
+   */
+  async updateOwnProfile(userId: number, dto: UpdateOwnProfileDto): Promise<UserResponseDTO> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId, isActive: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+
+    const name = dto.name !== undefined ? dto.name.trim() : undefined;
+    const email = dto.email !== undefined ? dto.email.trim().toLowerCase() : undefined;
+    const phone = dto.phone !== undefined ? dto.phone.trim() : undefined;
+
+    if (name !== undefined && name.length === 0) {
+      throw new BadRequestException('El nombre no puede estar vacío');
+    }
+    if (email !== undefined && email.length === 0) {
+      throw new BadRequestException('El correo electrónico no puede estar vacío');
+    }
+
+    if (email !== undefined && email !== user.email) {
+      const emailTaken = await this.userRepository.findOne({
+        where: { email },
+      });
+      if (emailTaken && emailTaken.id !== userId) {
+        throw new ConflictException('El correo electrónico ya está en uso');
+      }
+    }
+
+    const updateData: QueryDeepPartialEntity<User> = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+
+    if (Object.keys(updateData).length === 0) {
+      return this.mapToResponseDTO(user);
+    }
+
+    await this.userRepository.update(userId, updateData);
+
+    const updatedUser = await this.userRepository.findOne({
+      where: { id: userId, isActive: true },
+    });
+
+    if (!updatedUser) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado tras la actualización`);
+    }
+
+    return this.mapToResponseDTO(updatedUser);
   }
 
   async changePassword(

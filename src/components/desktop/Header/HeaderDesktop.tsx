@@ -4,12 +4,13 @@ import BtnBlue from '../../common/BtnBlue/BtnBlue';
 import HeaderNotification from '../HeaderNotification/HeaderNotification';
 import CreateLink from '../../../pages/Admin/mobile/Orders/CreateLink';
 import { ordersService, OrderStatus } from '../../../services/ordersService';
-import { logout as authLogout } from '../../../services/authService';
+import { useAuth } from '../../../context/AuthContext';
 import './HeaderDesktop.css';
 
 const HeaderDesktop = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateLinkPopup, setShowCreateLinkPopup] = useState(false);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
@@ -48,7 +49,7 @@ const HeaderDesktop = () => {
   };
 
   const handleLogout = () => {
-    authLogout();
+    logout();
     setShowUserMenu(false);
     navigate('/login');
   };
@@ -91,7 +92,7 @@ const HeaderDesktop = () => {
       </div>
 
       <div className="header-right">
-        <span className="header-right-text">Bienvenido, {'user.name'}</span>
+        <span className="header-right-text">Bienvenido, {user?.username ?? 'Usuario'}</span>
         <div className="user-menu-container">
           <button 
             className="user-avatar"
