@@ -13,7 +13,7 @@ interface EditProfileProps {
 }
 
 const EditProfile: React.FC<EditProfileProps> = ({ desktop = false }) => {
-  const { user, status } = useAuth();
+  const { status, refreshDisplayProfile } = useAuth();
 
   const [profileData, setProfileData] = useState({
     name: '',
@@ -91,6 +91,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ desktop = false }) => {
         email: updated.email,
         phone: updated.phone,
       });
+      await refreshDisplayProfile();
       setSaveSuccess(true);
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : 'No se pudo guardar');
@@ -99,9 +100,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ desktop = false }) => {
     }
   };
 
-  const headerTitle = profileData.name.trim() || user?.username || 'Perfil';
-  const roleSubtitle =
-    user?.role === 'admin' ? 'Admin' : user?.role === 'seller' ? 'Vendedor' : 'Usuario';
+  const headerTitleOverride = profileData.name.trim() || undefined;
 
   const content = (
     <div className={`edit-profile-container ${desktop ? 'desktop-edit-profile' : ''}`}>
@@ -112,7 +111,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ desktop = false }) => {
       )}
 
       {!desktop && (
-        <Header title={headerTitle} subtitle={roleSubtitle}>
+        <Header title={headerTitleOverride}>
           <Link to="/Profile" aria-label="Cerrar">
             <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round" />

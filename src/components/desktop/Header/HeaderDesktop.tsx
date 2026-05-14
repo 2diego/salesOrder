@@ -10,7 +10,7 @@ import './HeaderDesktop.css';
 const HeaderDesktop = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, displayName, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateLinkPopup, setShowCreateLinkPopup] = useState(false);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
@@ -92,7 +92,9 @@ const HeaderDesktop = () => {
       </div>
 
       <div className="header-right">
-        <span className="header-right-text">Bienvenido, {user?.username ?? 'Usuario'}</span>
+        <span className="header-right-text">
+          Bienvenido, {displayName?.trim() || user?.username?.trim() || 'Usuario'}
+        </span>
         <div className="user-menu-container">
           <button 
             className="user-avatar"

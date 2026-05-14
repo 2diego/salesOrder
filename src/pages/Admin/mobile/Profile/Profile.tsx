@@ -3,18 +3,12 @@ import { Link } from "react-router-dom";
 import NavTo from "../../../../components/common/NavTo/NavTo";
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
 import { LuUser } from "react-icons/lu";
-import { useAuth } from "../../../../context/AuthContext";
 
 const Profile = () => {
-  const { user } = useAuth();
-  const title = user?.username ?? "Perfil";
-  const subtitle =
-    user?.role === "admin" ? "Admin" : user?.role === "seller" ? "Vendedor" : "Usuario";
-
   return (
     <>
       {/* Header */}  
-      <Header title={title} subtitle={subtitle}>
+      <Header>
         <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
         </svg>
