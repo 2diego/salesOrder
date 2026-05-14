@@ -20,6 +20,7 @@ import { JwtUser } from '../../auth/jwt-user';
 import { UserRole } from '../../entities/user.entity';
 import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { CreateUserDTO } from './dto/create-user-dto';
+import { UpdateOwnProfileDto } from './dto/update-own-profile.dto';
 import { UpdateUserDTO } from './dto/update-user-dto';
 import { UserResponseDTO } from './dto/user-response-dto';
 import { UsersService } from './users.service';
@@ -37,6 +38,8 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
   async findAll(): Promise<UserResponseDTO[]> {
     return this.usersService.findAll();
   }
@@ -53,12 +56,30 @@ export class UsersController {
     );
   }
 
+  /** Perfil del usuario autenticado (debe declararse antes de @Get(':id')). */
+  @Get('me')
+  async findMe(@Req() req: Request & { user: JwtUser }): Promise<UserResponseDTO> {
+    return this.usersService.findOne(req.user.userId);
+  }
+
+  @Patch('me')
+  async updateMe(
+    @Req() req: Request & { user: JwtUser },
+    @Body() dto: UpdateOwnProfileDto,
+  ): Promise<UserResponseDTO> {
+    return this.usersService.updateOwnProfile(req.user.userId, dto);
+  }
+
   @Get(':id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserResponseDTO> {
     return this.usersService.findOne(id);
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDTO,

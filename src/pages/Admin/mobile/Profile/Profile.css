@@ -61,3 +61,30 @@
 .edit-password-container {
   width: 100%;
 }
+
+.profile-feedback {
+  margin: 0.75rem 1rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+}
+
+.desktop-form .profile-feedback {
+  margin-left: 0;
+  color: var(--mainWhite);
+}
+
+.profile-feedback--error {
+  color: #b91c1c;
+}
+
+.desktop-form .profile-feedback--error {
+  color: #fca5a5;
+}
+
+.profile-feedback--success {
+  color: #15803d;
+}
+
+.desktop-form .profile-feedback--success {
+  color: #86efac;
+}

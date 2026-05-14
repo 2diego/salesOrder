@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BtnBlue from '../../components/common/BtnBlue/BtnBlue';
-import { loginRequest } from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,7 @@ export default function LoginForm() {
     }
     setLoading(true);
     try {
-      await loginRequest(u, password);
+      await login(u, password);
       navigate('/', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo iniciar sesión');

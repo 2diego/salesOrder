@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Login from './pages/Login';
-import { getStoredToken } from './services/http';
 import Orders from './pages/Admin/mobile/Orders/Orders';
 import Reports from './pages/Admin/mobile/Reports/Reports';
 import Manage from './pages/Admin/mobile/Manage/Manage';
@@ -32,6 +31,7 @@ import EditPassword from './pages/Admin/mobile/Profile/EditPassword';
 import EditProfile from './pages/Admin/mobile/Profile/EditProfile';
 import { useIsDesktop } from './hooks/useIsDesktop';
 import CustomerDesktop from './pages/Customer/desktop/CustomerDesktop';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 const NewOrderRoute = () => {
   const isDesktop = useIsDesktop();
@@ -54,7 +54,13 @@ const HistoryOrderDetailsRoute = () => {
 };
 
 function RequireAuth({ children }: { children: ReactNode }) {
-  if (!getStoredToken()) {
+  const { status } = useAuth();
+
+  if (status === 'loading') {
+    return null;
+  }
+
+  if (status !== 'authenticated') {
     return <Navigate to="/login" replace />;
   }
   return <>{children}</>;
@@ -186,6 +192,8 @@ if (!rootElement) throw new Error('Failed to find the root element');
 
 createRoot(rootElement).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 )

@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../config/api.config';
-import { setStoredToken } from './http';
+import { apiFetch, setStoredToken } from './http';
 
 export type LoginUser = {
   userId: number;
@@ -23,6 +23,17 @@ export async function loginRequest(username: string, password: string): Promise<
   const data = payload as { access_token: string; user: LoginUser };
   setStoredToken(data.access_token);
   return data;
+}
+
+export async function getCurrentUser(): Promise<LoginUser> {
+  const response = await apiFetch('/auth/me');
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error((payload as { message?: string }).message ?? 'No se pudo recuperar la sesión');
+  }
+
+  return payload as LoginUser;
 }
 
 export function logout(): void {
