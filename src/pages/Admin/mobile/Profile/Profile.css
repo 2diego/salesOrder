@@ -88,3 +88,30 @@
 .desktop-form .profile-feedback--success {
   color: #86efac;
 }
+
+/* Hub Perfil (mobile): enlaces y fila de cerrar sesión */
+.profile-options-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.profile-logout-row {
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  color: #b71010;
+  font-weight: 500;
+  text-align: left;
+}
+
+.profile-logout-row__label {
+  margin: 0;
+}
+
+.profile-logout-row__icon {
+  font-size: 1.5rem;
+}

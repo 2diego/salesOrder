@@ -1,25 +1,28 @@
-﻿import Header from "../../../../components/common/Header/Header"
+import Header from "../../../../components/common/Header/Header";
 import { Link } from "react-router-dom";
 import NavTo from "../../../../components/common/NavTo/NavTo";
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
-import { LuUser } from "react-icons/lu";
-import { useAuth } from "../../../../context/AuthContext";
+import { LuUser, LuLogOut } from "react-icons/lu";
+import { useLogoutConfirm } from "../../../../hooks/useLogoutConfirm";
+import { HeaderCloseIcon } from "../../../../components/mobile/header/MobileHeaderIcons";
+import "../../../../components/common/NavTo/NavTo.css";
+import "./Profile.css";
 
 const Profile = () => {
-  const { user } = useAuth();
-  const title = user?.username ?? "Perfil";
-  const subtitle =
-    user?.role === "admin" ? "Admin" : user?.role === "seller" ? "Vendedor" : "Usuario";
+  const { requestLogout, logoutDialog } = useLogoutConfirm();
 
   return (
     <>
-      {/* Header */}  
-      <Header title={title} subtitle={subtitle}>
-        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
-        <LuUser />
-      </Header>
+      {/* Header */}
+      <Header
+        leftSlot={
+          <button type="button" className="header-icon-button" onClick={requestLogout} aria-label="Cerrar sesión">
+            <HeaderCloseIcon width={24} height={24} />
+          </button>
+        }
+        rightSlot={<LuUser />}
+      />
+      {logoutDialog}
 
       {/* Manage Title */}
       <SectionTitle>
@@ -27,14 +30,22 @@ const Profile = () => {
       </SectionTitle>
 
       {/* Manage Options */}
-      <Link to="/Profile/EditProfile" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Profile/EditProfile" className="profile-options-link">
         <NavTo text="Modificar datos de perfil" />
       </Link>
-      <Link to="/Profile/EditPassword" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/Profile/EditPassword" className="profile-options-link">
         <NavTo text="Modificar contraseña" />
       </Link>
+      <button
+        type="button"
+        className="navto-container profile-logout-row"
+        onClick={requestLogout}
+      >
+        <p className="profile-logout-row__label">Cerrar sesión</p>
+        <LuLogOut className="profile-logout-row__icon" aria-hidden />
+      </button>
     </>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

@@ -1,20 +1,19 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SidebarItem from './SidebarItem';
 import './Sidebar.css';
-import { 
-  LuClipboardList, 
-  LuUsers, 
-  LuBox, 
-  LuUserCog, 
+import {
+  LuClipboardList,
+  LuUsers,
+  LuBox,
+  LuUserCog,
   LuUser,
-  LuLogOut 
-} from "react-icons/lu";
+  LuLogOut,
+} from 'react-icons/lu';
+import { useLogoutConfirm } from '../../../hooks/useLogoutConfirm';
+import type { SidebarNavItem } from './SidebarItem';
 
-const Sidebar = () => {
-  const location = useLocation();
-
-  const menuItems = [
-    {
+const menuItems: SidebarNavItem[] = [
+  {
     id: 'orders',
     label: 'Pedidos',
     icon: LuClipboardList,
@@ -43,39 +42,45 @@ const Sidebar = () => {
     label: 'Perfil',
     icon: LuUser,
     path: '/Profile',
-  }/*,
-  {
-    id: 'reports',
-    label: 'Reportes',
-    icon: LuFileChartColumnIncreasing,
-    path: '/Reports',
-  }*/,
+  },
   {
     id: 'logout',
-    label: 'Cerrar Sesión',
+    label: 'Cerrar sesión',
     icon: LuLogOut,
     path: '',
   },
 ];
 
-  return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <h2>Admin Panel</h2>
-      </div>
+const Sidebar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { requestLogout, logoutDialog } = useLogoutConfirm({
+    variant: 'desktop',
+    onConfirmed: () => navigate('/login', { replace: true }),
+  });
 
-      <div className="sidebar-header-line" />
-      
-      <nav className="sidebar-nav">
-        {menuItems.map(item => (
-          <SidebarItem
-            key={item.id}
-            item={item}
-            isActive={location.pathname === item.path}
-          />
-        ))}
-      </nav>
-    </div>
+  return (
+    <>
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h2>Admin Panel</h2>
+        </div>
+
+        <div className="sidebar-header-line" />
+
+        <nav className="sidebar-nav">
+          {menuItems.map((item) => (
+            <SidebarItem
+              key={item.id}
+              item={item}
+              isActive={item.path !== '' && location.pathname === item.path}
+              onLogoutClick={item.id === 'logout' ? requestLogout : undefined}
+            />
+          ))}
+        </nav>
+      </div>
+      {logoutDialog}
+    </>
   );
 };
 

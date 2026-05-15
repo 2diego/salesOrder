@@ -4,6 +4,18 @@
   background: #f5f7fb;
 }
 
+/* Header compartido: aire superior y misma columna que el contenido */
+.customer-desktop > .header-container {
+  margin-top: 1.25rem;
+  max-width: 1440px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+}
+
 .customer-desktop-content {
   display: grid;
   grid-template-columns: 2fr 1.3fr;

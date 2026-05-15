@@ -1,4 +1,6 @@
-﻿import Header from "../../../../components/common/Header/Header";
+import Header from "../../../../components/common/Header/Header";
+import { HeaderBackNavLink } from "../../../../components/mobile/header/HeaderBackNavLink";
+import { LuUser } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
 import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue";
@@ -60,11 +62,10 @@ const EditPassword: React.FC<EditPasswordProps> = ({ desktop = false }) => {
 
       {/* Mobile Header */}
       {!desktop && (
-        <Header title="Nombre usuario" subtitle="Admin">
-          <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-        </Header>
+        <Header
+          leftSlot={<HeaderBackNavLink to="/Profile" ariaLabel="Volver al perfil" />}
+          rightSlot={<LuUser />}
+        />
       )}
 
       {/* Mobile Title */}

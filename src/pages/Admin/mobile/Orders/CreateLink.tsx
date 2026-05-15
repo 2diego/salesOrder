@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Header from "../../../../components/common/Header/Header";
+import { useLogoutConfirm } from "../../../../hooks/useLogoutConfirm";
+import { HeaderCloseIcon } from "../../../../components/mobile/header/MobileHeaderIcons";
 import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue"
 import { LuClipboardList } from "react-icons/lu";
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
@@ -16,6 +18,7 @@ interface CreateLinkProps {
 }
 
 const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => {
+  const { requestLogout, logoutDialog } = useLogoutConfirm();
   const [clientData, setClientData] = useState({
     name: '',
     email: '',
@@ -280,12 +283,14 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
 
       {/* Mobile Header */}
       {!desktop && (
-        <Header title="Nombre usuario" subtitle="Admin">
-          <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-          <LuClipboardList />
-        </Header>
+        <Header
+          leftSlot={
+            <button type="button" className="header-icon-button" onClick={requestLogout} aria-label="Cerrar sesión">
+              <HeaderCloseIcon width={24} height={24} />
+            </button>
+          }
+          rightSlot={<LuClipboardList />}
+        />
       )}
 
       {/* Mobile Title */}
@@ -625,6 +630,7 @@ const CreateLink: React.FC<CreateLinkProps> = ({ desktop = false, onClose }) => 
           </div>
         )}
       </div>
+      {logoutDialog}
     </>
   );
 
