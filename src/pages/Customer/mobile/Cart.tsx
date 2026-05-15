@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import Header from "../../../components/common/Header/Header"
+import { HeaderBackNavLink } from "../../../components/mobile/header/HeaderBackNavLink";
+import { CartHeaderIcon } from '../../../components/mobile/header/CartHeaderIcon';
 import SectionTitle from "../../../components/common/SectionTitle/SectionTitle"
 import ProductList from "../../../components/common/ProductList/ProductList"
 import BtnBlue from "../../../components/common/BtnBlue/BtnBlue"
@@ -211,35 +213,17 @@ const Cart = () => {
   return (
     <>
       {/* Header */}        
-      <Header title={orderNumber || 'Pedido'} subtitle={orderDate || ''}>
-        <Link 
-          to={`/NewOrder${token ? `?token=${token}` : ''}`} 
-          style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9.5 3.5L5 8L9.5 12.5" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M5 8H14" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-        </Link>
-
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-          xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-          {/* Cuerpo del carrito */}
-          <path d="M3 3h2.4l1.8 9.6a2 2 0 0 0 2 1.6h7.4a1.6 1.6 0 0 0 1.6-1.2L21 6H6.8"
-            stroke="#000" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-
-          {/* Ruedas */}
-          <circle cx="10.5" cy="19" r="1.4" stroke="#000" strokeWidth="1.2" fill="none"/>
-          <circle cx="18.5" cy="19" r="1.4" stroke="#000" strokeWidth="1.2" fill="none"/>
-
-          {/* Conexion rueda trasera a carro */}
-          <line x1="10.5" y1="17.6" x2="10.5" y2="14.2" stroke="#000" strokeWidth="1.2" strokeLinecap="round"/>
-
-          {/* Conexion entre ruedas */}
-          <line x1="10.5" y1="17.6" x2="18.5" y2="17.6" stroke="#000" strokeWidth="1.2" strokeLinecap="round"/>
-        </svg>
-
-      </Header>
+      <Header
+        title={orderNumber || 'Pedido'}
+        subtitle={orderDate || ''}
+        leftSlot={
+          <HeaderBackNavLink
+            to={`/NewOrder${token ? `?token=${token}` : ''}`}
+            ariaLabel="Volver al pedido"
+          />
+        }
+        rightSlot={<CartHeaderIcon />}
+      />
       
       {/* Orders Title */}
       <SectionTitle>

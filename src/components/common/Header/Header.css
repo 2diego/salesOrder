@@ -1,20 +1,38 @@
 .header-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--header-side-width, 2.5rem) 1fr var(--header-side-width, 2.5rem);
   align-items: center;
-  justify-content: space-between;
+  column-gap: 0.35rem;
   margin-bottom: 1rem;
 }
 
-.icon-left,
-.icon-right {
-  flex: 0 0 auto;
+.header-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
   font-size: 1.5rem;
+}
+
+.header-side--start {
+  justify-self: start;
+}
+
+.header-side--end {
+  justify-self: end;
+}
+
+.header-side svg {
+  display: block;
+  flex-shrink: 0;
 }
 
 .header-text {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
+  text-align: center;
 }
 
 .header-text .title {
@@ -24,4 +42,17 @@
 .header-text .subtitle {
   font-size: 0.85rem;
   color: #666;
+}
+
+.header-icon-button,
+.header-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
 }

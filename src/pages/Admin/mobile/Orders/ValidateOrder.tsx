@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
 import Header from "../../../../components/common/Header/Header"
+import { HeaderBackNavLink } from "../../../../components/mobile/header/HeaderBackNavLink";
 import { LuClipboardList } from "react-icons/lu";
 import ProductList from "../../../../components/common/ProductList/ProductList";
 import BtnBlue from "../../../../components/common/BtnBlue/BtnBlue";
@@ -392,20 +393,9 @@ const ValidateOrder = () => {
       <Header 
         title={formatOrderNumber(order.id)} 
         subtitle={formatDate(order.createdAt)}
-      >
-        <svg 
-          width="24" 
-          height="24" 
-          viewBox="0 0 16 16" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-          onClick={() => navigate('/Orders')}
-          style={{ cursor: 'pointer' }}
-        >
-          <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
-        <LuClipboardList />
-      </Header>
+        leftSlot={<HeaderBackNavLink to="/Orders" ariaLabel="Volver a pedidos" />}
+        rightSlot={<LuClipboardList />}
+      />
 
       {/* Error Message */}
       {error && (

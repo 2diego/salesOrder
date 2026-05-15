@@ -1,0 +1,87 @@
+.logout-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.logout-confirm-panel {
+  width: 100%;
+  max-width: 420px;
+  background: #f7fafc;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 1.25rem;
+}
+
+.logout-confirm-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #0d141c;
+}
+
+.logout-confirm-message {
+  margin: 0.75rem 0 0;
+  color: #4d7099;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.logout-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  align-items: center;
+}
+
+.logout-confirm-cancel {
+  flex: 1;
+  height: 3rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0d141c;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.logout-confirm-primary-wrap {
+  flex: 1;
+}
+
+/* --- Variante admin desktop (panel oscuro, coherente con header/sidebar) --- */
+
+.logout-confirm-overlay--desktop {
+  z-index: 2500;
+  backdrop-filter: blur(4px);
+}
+
+.logout-confirm-panel--desktop {
+  max-width: 440px;
+  background: linear-gradient(195deg, rgb(31, 41, 55), rgba(31, 41, 55, 0.96));
+  border: 1px solid rgba(100, 100, 100, 0.45);
+  box-shadow: rgba(0, 0, 0, 0.35) 0 1.25rem 1.75rem 0;
+}
+
+.logout-confirm-title--desktop {
+  color: rgb(233, 232, 232);
+}
+
+.logout-confirm-message--desktop {
+  color: rgba(226, 232, 240, 0.88);
+}
+
+.logout-confirm-cancel--desktop {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(148, 163, 184, 0.35);
+  color: rgb(233, 232, 232);
+}
+
+.logout-confirm-cancel--desktop:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

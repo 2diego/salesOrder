@@ -1,19 +1,25 @@
-﻿import Header from "../../../../components/common/Header/Header"
+import Header from "../../../../components/common/Header/Header"
+import { useLogoutConfirm } from "../../../../hooks/useLogoutConfirm";
+import { HeaderCloseIcon } from "../../../../components/mobile/header/MobileHeaderIcons";
 import { LiaToolsSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import NavTo from "../../../../components/common/NavTo/NavTo";
 import SectionTitle from "../../../../components/common/SectionTitle/SectionTitle";
 
 const Manage = () => {
+  const { requestLogout, logoutDialog } = useLogoutConfirm();
   return (
     <>
       {/* Header */}  
-      <Header>
-        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 3L13 13M13 3L3 13" stroke="#0D141C" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
-        <LiaToolsSolid fontSize={"1.75rem"}/>
-      </Header>
+      <Header
+        leftSlot={
+          <button type="button" className="header-icon-button" onClick={requestLogout} aria-label="Cerrar sesión">
+            <HeaderCloseIcon width={24} height={24} />
+          </button>
+        }
+        rightSlot={<LiaToolsSolid fontSize={"1.75rem"} />}
+      />
+      {logoutDialog}
 
       {/* Manage Title */}
       <SectionTitle>

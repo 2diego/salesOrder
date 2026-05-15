@@ -1,19 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BtnBlue from '../../common/BtnBlue/BtnBlue';
 import HeaderNotification from '../HeaderNotification/HeaderNotification';
 import CreateLink from '../../../pages/Admin/mobile/Orders/CreateLink';
 import { ordersService, OrderStatus } from '../../../services/ordersService';
 import { useAuth } from '../../../context/AuthContext';
+import { useLogoutConfirm } from '../../../hooks/useLogoutConfirm';
 import './HeaderDesktop.css';
 
 const HeaderDesktop = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, displayName, logout } = useAuth();
+  const { user, displayName } = useAuth();
+  const { requestLogout, logoutDialog } = useLogoutConfirm({
+    variant: 'desktop',
+    onConfirmed: () => navigate('/login', { replace: true }),
+  });
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateLinkPopup, setShowCreateLinkPopup] = useState(false);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showUserMenu) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      const root = userMenuRef.current;
+      if (root && !root.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    return () => document.removeEventListener('pointerdown', handlePointerDown, true);
+  }, [showUserMenu]);
 
   useEffect(() => {
     const fetchPendingCount = async () => {
@@ -48,10 +66,9 @@ const HeaderDesktop = () => {
     setShowCreateLinkPopup(false);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogoutClick = () => {
     setShowUserMenu(false);
-    navigate('/login');
+    requestLogout();
   };
 
   const handleProfile = () => {
@@ -95,7 +112,7 @@ const HeaderDesktop = () => {
         <span className="header-right-text">
           Bienvenido, {displayName?.trim() || user?.username?.trim() || 'Usuario'}
         </span>
-        <div className="user-menu-container">
+        <div className="user-menu-container" ref={userMenuRef}>
           <button 
             className="user-avatar"
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -120,7 +137,7 @@ const HeaderDesktop = () => {
               
               <div className="dropdown-divider"></div>
               
-              <div className="dropdown-item logout" onClick={handleLogout}>
+              <div className="dropdown-item logout" onClick={handleLogoutClick}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7Z" fill="currentColor"/>
                   <path d="M4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" fill="currentColor"/>
@@ -139,6 +156,7 @@ const HeaderDesktop = () => {
           onClose={handleCloseCreateLinkPopup}
         />
       )}
+      {logoutDialog}
     </header>
   );
 };

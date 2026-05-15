@@ -351,10 +351,7 @@ const CustomerDesktop = () => {
 
   return (
     <div className="customer-desktop">
-      <Header title={orderNumber || 'Pedido'} subtitle={orderDate || ''}>
-        <span />
-        <span />
-      </Header>
+      <Header title={orderNumber || 'Pedido'} subtitle={orderDate || ''} />
 
       <div className="customer-desktop-timer-row">
         <span className="customer-desktop-timer">

@@ -93,7 +93,6 @@ export default function LoginForm() {
           width="100%"
           height="3rem"
           borderRadius="0.75rem"
-          background="linear-gradient(195deg, rgba(43, 118, 184, 0.699), rgba(15, 55, 107, 0.459))"
           htmlType="submit"
           disabled={loading}
         >
